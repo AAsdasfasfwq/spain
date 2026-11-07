@@ -143,6 +143,24 @@
   /** torn paper card with drop shadow (editorial collage piece). returns Path2D */
   K.card = (ctx, x, y, w, h, o = {}) => { const p = MG.path.torn(x, y, w, h, { seed: o.seed || 3, amp: o.amp ?? 3, edges: o.edges || 'tblr' }); ctx.save(); if (o.rot) { ctx.translate(x + w / 2, y + h / 2); ctx.rotate(o.rot); ctx.translate(-(x + w / 2), -(y + h / 2)); } MG.fx.shadow(ctx, p, { dx: o.sdx ?? 8, dy: o.sdy ?? 14, blur: o.sblur ?? 22, color: 'rgba(40,20,10,0.32)' }); ctx.fillStyle = o.color || P.cal; ctx.fill(p); ctx.clip(p); MG.tex.over(ctx, 'fibers', { alpha: 0.6 }); if (o.draw) o.draw(ctx); ctx.restore(); return p; };
 
+  /** SOL / SOMBRA numbered interstitial — the film's structural device.
+   *  side 'sol'  → economic pillars ("First, tourism" … "Fifth, …")   : saffron light side
+   *  side 'sombra' → the price / problems ("The second problem: housing") : violet shadow side
+   *  Use for ~2–3 s, then transition out into the topic.  o: {n, total=5, title, side, kicker} */
+  K.numberCard = (ctx, t, t0, o = {}) => {
+    const sol = (o.side || 'sol') === 'sol'; const bgA = sol ? P.sol : P.sombra, bgB = sol ? P.cal : P.paper2; const fg = sol ? P.ink : P.cal;
+    K.paper(ctx, bgB, { light: 0.2 });
+    const k = MG.prog(t, t0, t0 + 0.75, 'inOutCubic'); const ang = MG.deg(-62);
+    ctx.save(); ctx.translate(lerp(sol ? -900 : MG.W + 900, MG.W * 0.56, k), MG.H / 2); ctx.rotate(ang + Math.PI / 2); ctx.fillStyle = bgA; ctx.fillRect(-3000, -3000, 3000, 6000); ctx.restore();
+    ctx.save(); ctx.beginPath(); ctx.save(); ctx.translate(lerp(sol ? -900 : MG.W + 900, MG.W * 0.56, k), MG.H / 2); ctx.rotate(ang + Math.PI / 2); ctx.rect(-3000, -3000, 3000, 6000); ctx.restore(); ctx.clip(); MG.tex.over(ctx, 'blotch', { alpha: 0.18, color: sol ? P.solDeep : '#000', scale: 3 }); ctx.restore();
+    const num = String(o.n || 1).padStart(2, '0'); const nx = 560, ny = 700;
+    MG.text.reveal(ctx, num, nx, ny, t, t0 + 0.25, { font: MG.F.cond, weight: 900, size: 520, color: fg, align: 'center', style: 'rise', by: 'char', stagger: 0.07, dur: 0.6 });
+    MG.text.reveal(ctx, `${sol ? 'PILLAR' : 'PROBLEM'}  ${num} / ${String(o.total || 5).padStart(2, '0')}`, nx, 250, t, t0 + 0.45, { font: MG.F.mono, weight: 500, size: 24, tracking: 0.3, color: fg, align: 'center', style: 'track', by: 'line' });
+    if (sol) K.sun(ctx, 1460, 330, 70 * MG.prog(t, t0 + 0.5, t0 + 1.2, 'outBack'), t, { corona: 0.3 }); else { const r = 70 * MG.prog(t, t0 + 0.5, t0 + 1.2); if (r > 1) { ctx.save(); ctx.fillStyle = MG.col.a(P.sombraDeep, 0.9); ctx.beginPath(); ctx.arc(1460, 330, r, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = MG.col.a(P.sol, 0.8); ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(1460, 330, r, -1.2, 1.9); ctx.stroke(); ctx.restore(); } }
+    MG.text.reveal(ctx, o.title || '', 1120, 640, t, t0 + 0.55, { font: MG.F.display, weight: 800, size: o.size || 120, color: P.ink, align: 'left', style: 'rise', by: 'word', stagger: 0.08 });
+    if (o.kicker) MG.text.reveal(ctx, o.kicker, 1124, 730, t, t0 + 0.8, { font: MG.F.serif, italic: true, size: 48, color: P.ink2, style: 'blur', by: 'word' });
+  };
+
   // ---------- characters toolkit ----------
   /** Expressive eye. o: {r, look:[-1..1,-1..1], blink 0..1, iris colour, lid (0 open … 1 half-lidded), angry, sad, outline} */
   K.eye = (ctx, x, y, o = {}) => {

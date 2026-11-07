@@ -1,4 +1,4 @@
-MG.segment('TEST', {
+MG.segment('EXAMPLE', { // API demo — load with ?only=_example (not part of the film)
   start: 0, end: 30,
   scenes: [
     { id: 'map', start: 0, end: 6, draw(ctx, t, S) {

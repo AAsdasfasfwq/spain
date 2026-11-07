@@ -6,6 +6,7 @@
    node tools/snap.js --only s03 --strip 380.0 0.1 12 --out /tmp/x             → 12 frames, 0.1 s apart, as one strip (check motion)
    node tools/snap.js --only s03 --audio S03 --out /tmp/x                      → S03.wav + loudness/peak report + spectrogram PNG
    node tools/snap.js --only s03 --clip 351 360 --out /tmp/x                   → short MP4 with VO + segment audio (needs ffmpeg)
+   node tools/snap.js --only s03 --perf 351 507 1 --out /tmp/x                → render-time budget report
    Options: --scale 0.5 (downscale stills), --errors (print scene errors), --gpu
 */
 const fs = require('fs'); const path = require('path'); const { execFileSync } = require('child_process');
@@ -38,6 +39,11 @@ const argv = process.argv.slice(2); const arg = (k, n = 1) => { const i = argv.i
     const [a, st, n] = arg('strip', 3).map(parseFloat); const pages = []; for (let i = 0; i < n; i++) { const t = a + i * st; pages.push(await page.evaluate((t) => { MG.renderFrame(t); const k = document.createElement('canvas'); k.width = 480; k.height = 270; const x = k.getContext('2d'); x.drawImage(MG.post.out, 0, 0, 480, 270); x.fillStyle = '#fff'; x.font = '13px monospace'; x.fillText(t.toFixed(2), 6, 262); return k.toDataURL('image/png'); }, t)); }
     const img = await page.evaluate(async ([pages]) => { const cols = 4; const k = document.createElement('canvas'); k.width = 480 * cols; k.height = 270 * Math.ceil(pages.length / cols); const x = k.getContext('2d'); for (let i = 0; i < pages.length; i++) { const im = new Image(); im.src = pages[i]; await im.decode(); x.drawImage(im, (i % cols) * 480, Math.floor(i / cols) * 270); } return k.toDataURL('image/jpeg', 0.85); }, [pages]);
     const f = path.join(out, `strip_${a.toFixed(2)}.jpg`); fs.writeFileSync(f, Buffer.from(img.split(',')[1], 'base64')); saved.push(f);
+  }
+  if (arg('perf', 3)) {
+    const [a, b, st] = arg('perf', 3).map(parseFloat); const r = await page.evaluate(([a, b, st]) => { const res = []; for (let t = a; t <= b; t += st) { MG.renderFrame(t); const t0 = performance.now(); MG.renderFrame(t + 1 / 30); MG.post.out.toDataURL('image/jpeg', 0.93); res.push([t, performance.now() - t0, MG.current.scene && MG.current.scene.id]); } return res; }, [a, b, st]);
+    const avg = r.reduce((x, y) => x + y[1], 0) / r.length; const worst = [...r].sort((x, y) => y[1] - x[1]).slice(0, 8);
+    saved.push(`PERF avg ${avg.toFixed(0)} ms/frame over ${r.length} samples (budget ≤ 150 avg, ≤ 400 worst). worst: ` + worst.map((w) => `${w[0].toFixed(1)}s ${w[1].toFixed(0)}ms ${w[2]}`).join(' | '));
   }
   if (arg('audio')) {
     const id = arg('audio').toUpperCase(); const r = await page.evaluate((id) => MG.audio.renderSegmentWav(id), id); const parts = []; for (let i = 0; i < r.chunks; i++) parts.push(Buffer.from(await page.evaluate((i) => MG.audio.chunk(i), i), 'base64'));
