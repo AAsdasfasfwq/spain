@@ -1480,6 +1480,247 @@ SC.push({
 // registration
 // =====================================================================================================
 SC.sort((a, b) => a.start - b.start);
-{ const last = SC[SC.length - 1]; if (last.end < 1187.85) SC.push({ id: 's07_tmp_fill', start: last.end, end: 1187.85, draw(ctx, t) { MG.kit.paper(ctx, P.paper2); MG.text.draw(ctx, 'TODO ' + t.toFixed(2), 960, 540, { font: MG.F.mono, size: 40, align: 'center' }); } }); }
+// =====================================================================================================
+// CH.F THE BURST (1120.85 → 1161.37) · CH.G TODAY · WHY (1161.37 → 1187.85)
+// =====================================================================================================
+const FIG = (ctx, x, y, h, i, o = {}) => S7.figure(ctx, x, y, h, { skin: SKINS[i % 5], hair: HAIRS[(i * 3) % 5], top: o.top || ['#4C6B8C', '#8A4A3A', '#5A6A3A', '#6A4A7A', '#3A5A6A', '#9A7A3A'][i % 6], bottom: o.bottom || ['#2E3440', '#3A3030', '#2A3A4A'][i % 3], hairStyle: ['short', 'long', 'curly', 'bun', 'short'][i % 5], seed: i + 3, ...o });
+/** the bullring stand (sol y sombra): rows of seated spectators on a curved tier; shade covers a fraction from the left */
+S7.ring = (ctx, t, shadeFrac, o = {}) => {
+  // frontal view of a bullring "tendido": 10 curved rows × 10 seats = 100 people; the shade (sombra) creeps over them
+  MG.fx.vgrad(ctx, [[0, '#E9C79A'], [1, '#D8A86E']]);
+  const seats = []; for (let r = 0; r < 10; r++) { const y = 150 + r * 84; const sc = 0.62 + r * 0.05; for (let i = 0; i < 10; i++) { const x = 960 + (i - 4.5) * (150 + r * 6); seats.push({ r, i, x, y: y + Math.pow((x - 960) / 960, 2) * 70, s: sc }); } }
+  // tiers (stone steps) behind each row
+  for (let r = 0; r < 10; r++) { const y = 150 + r * 84 + 40; ctx.fillStyle = r % 2 ? '#C9B08A' : '#D6BE96'; ctx.beginPath(); ctx.moveTo(0, y + 70); for (let x = 0; x <= W; x += 40) ctx.lineTo(x, y + Math.pow((x - 960) / 960, 2) * 70); ctx.lineTo(W, y + 160); ctx.lineTo(0, y + 160); ctx.closePath(); ctx.fill(); ctx.fillStyle = 'rgba(80,50,30,0.25)'; ctx.fillRect(0, y - 2, W, 3); }
+  // decide shade per seat along a diagonal axis so that exactly shadeFrac of the 100 are in shadow
+  const ax = Math.cos(MG.deg(28)), ay = Math.sin(MG.deg(28)); const us = seats.map((q) => q.x * ax + q.y * ay).sort((p1, p2) => p1 - p2); const n = Math.round(shadeFrac * 100); const thr = n <= 0 ? -1e9 : n >= 100 ? 1e9 : (us[n - 1] + us[n]) / 2;
+  for (const q of seats) { const idx = q.r * 10 + q.i; const young = o.young && idx % 2 === 0; S7.bust(ctx, q.x, q.y + 34, q.s * 1.05, { skin: SKINS[idx % 5], hair: HAIRS[(idx * 3) % 5], hairStyle: young ? 'curly' : ['short', 'long', 'curly', 'bun', 'short'][idx % 5], top: o.colors ? o.colors(idx) : ['#4C6B8C', '#8A4A3A', '#5A6A3A', '#6A4A7A', '#3A5A6A', '#9A7A3A'][idx % 6], young, sad: q.x * ax + q.y * ay < thr, seed: idx }); }
+  // the shadow half-plane (soft edge) over the stand
+  if (n > 0) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(58,43,58,0.6)'; const px = thr * ax, py = thr * ay; const dx = -ay, dy = ax; ctx.beginPath(); ctx.moveTo(px + dx * 3000, py + dy * 3000); ctx.lineTo(px - dx * 3000, py - dy * 3000); ctx.lineTo(px - dx * 3000 - ax * 4000, py - dy * 3000 - ay * 4000); ctx.lineTo(px + dx * 3000 - ax * 4000, py + dy * 3000 - ay * 4000); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  ctx.fillStyle = '#9E2A22'; ctx.fillRect(0, 1000, W, 80); ctx.fillStyle = '#F2C230'; ctx.fillRect(0, 1000, W, 8);
+};
+S7.ringFrac = (frac) => frac; // the wedge spans the visible 10 columns
+
+// ---- F1 · 1120.85 · the bubble bursts in 2008
+{ const tBub = TW('bubble', 1121.3), tBur = TW('bursts', 1121.8), t2008 = TW('2008,', 1122.6);
+SC.push({ id: 's07_bubble', start: 1120.85, end: 1123.95, transIn: { type: 'blur', dur: 0.5 },
+  draw(ctx, t) {
+    MG.fx.vgrad(ctx, [[0, '#BFC8D2'], [1, '#E8E2D6']]); const kp = pr(t, tBur - 0.05, tBur + 0.25, 'outExpo'); const R = 330 * (1 + 0.04 * Math.sin(t * 3)) * (1 + kp * 0.15);
+    const cx = 960, cy = 470 + MG.wiggle(t, 0.4, 8, 2);
+    if (kp < 1) { ctx.save(); ctx.globalAlpha = 1 - kp; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip(); MG.fx.vgrad(ctx, [[0, '#F6D7A0'], [1, '#F3B778']], cx - R, cy - R, R * 2, R * 2);
+      for (let i = 0; i < 6; i++) { const hx = cx - 260 + i * 100, hh2 = 90 + (i % 3) * 50; ctx.fillStyle = '#F4EFE6'; ctx.fillRect(hx, cy + 140 - hh2, 80, hh2); ctx.fillStyle = 'rgba(80,60,60,0.18)'; ctx.fillRect(hx + 56, cy + 140 - hh2, 24, hh2); }
+      ctx.strokeStyle = '#E2A21A'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(cx + 120, cy + 150); ctx.lineTo(cx + 120, cy - 160); ctx.lineTo(cx - 140, cy - 160); ctx.moveTo(cx + 120, cy - 120); ctx.lineTo(cx + 200, cy - 160); ctx.stroke();
+      ctx.restore();
+      // iridescent skin
+      ctx.save(); ctx.globalAlpha = (1 - kp) * 0.8; const g = ctx.createRadialGradient(cx - R * 0.4, cy - R * 0.45, R * 0.05, cx, cy, R); g.addColorStop(0, 'rgba(255,255,255,0.7)'); g.addColorStop(0.6, 'rgba(255,255,255,0.05)'); g.addColorStop(0.86, 'rgba(160,200,255,0.25)'); g.addColorStop(0.95, 'rgba(255,170,220,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0.0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fill(); ctx.restore(); }
+    if (kp > 0) { // droplets + falling bricks
+      MG.fx.particles(ctx, { n: 80, seed: 31, t: (t - tBur) * 0.25, area: [cx - R, cy - R, R * 2, R * 2], vel: [0, 0], life: 4, size: [2, 5], color: '#DDEBFF', alpha: 0.7 * (1 - kp * 0.5), gravity: 0 });
+      for (let i = 0; i < 18; i++) { const tt = Math.max(0, t - tBur); const x = cx - 260 + (i % 6) * 100 + (MG.rand(4, i) - 0.5) * 80 + tt * (MG.rand(5, i) - 0.5) * 300; const y = cy + 60 - (i / 6 | 0) * 40 + 0.5 * 2200 * tt * tt; if (y > H + 50) continue; ctx.save(); ctx.translate(x, y); ctx.rotate(tt * (MG.rand(6, i) * 6 - 3)); ctx.fillStyle = C.brick || '#B5543A'; ctx.fillRect(-26, -12, 52, 24); ctx.strokeStyle = 'rgba(40,20,10,0.4)'; ctx.lineWidth = 2; ctx.strokeRect(-26, -12, 52, 24); ctx.restore(); } }
+    // 2008 stamped on the brick pile at the bottom
+    const k8 = pr(t, t2008 - 0.2, t2008 + 0.3, 'outBack'); if (k8 > 0) { ctx.save(); ctx.translate(960, 900); ctx.scale(k8, k8); S7.type(ctx, '2008', 0, 0, { font: MG.F.cond, weight: 900, size: 240, color: C.crisisInk || '#1d1d1f', align: 'center' }); ctx.restore(); }
+  },
+  post: { grade: 'cool', vignette: 0.36 } }); }
+
+// ---- F2 · 1123.95 · Spain falls harder than any European country except Greece — the countries sink as slabs on a tilted map
+{ const tHard = TW('harder', 1124.6), tExc = TW('except', 1126.2), tGreece = TW('Greece.', 1126.9);
+SC.push({ id: 's07_sink', start: 1123.95, end: 1127.73, transIn: { type: 'zoom', dur: 0.45, x: 960, y: 900, amount: 1.5, from: 0.88 },
+  init() { this.pr = MG.geo.proj('conic', { center: [10, 47], scale: 1250, translate: [960, 560] }); },
+  draw(ctx, t) {
+    const prj = this.pr; ctx.fillStyle = '#8FA7B8'; ctx.fillRect(0, 0, W, H); const drop = { Spain: 46, Greece: 64, Italy: 18, Portugal: 22, Ireland: 24, France: 8, Germany: 4, 'United Kingdom': 10, Netherlands: 7, Belgium: 6, Austria: 5, Poland: 2, Sweden: 6, Denmark: 8 };
+    const kd = pr(t, tHard - 0.3, tGreece + 0.4, 'inOutCubic');
+    for (const f of MG.geo.world50.features) { const n = f.properties.name; const c = window.d3.geoCentroid(f); if (c[0] < -26 || c[0] > 45 || c[1] < 33 || c[1] > 71) continue; const d = (drop[n] || 3) * kd; MG.geo.slab(ctx, prj, f, { depth: 10 + d * 0.0, top: n === 'Spain' ? P.rojo : n === 'Greece' ? '#7E1F1B' : '#DCD6CA', side: '#4A4440', dir: [0, 1], shadow: false, edge: false, stroke: 'rgba(40,30,30,0.35)', width: 0.8 });
+      if (d > 2) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.translate(0, 0); MG.geo.draw(ctx, prj, f, { fill: `rgba(30,20,40,${Math.min(0.55, d / 90)})` }); ctx.restore(); } }
+    // depth gauges under Spain and Greece
+    for (const [n, ll, d, t0] of [['SPAIN', [-3.7, 40.2], 46, tHard], ['GREECE', [22.5, 39.2], 64, tExc]]) { const k = pr(t, t0 - 0.2, t0 + 0.6, 'inOutCubic'); const p = prj(ll); if (!p || k <= 0) continue; ctx.save(); ctx.strokeStyle = '#1d1d1f'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(p[0], p[1] + d * 4 * k); ctx.stroke(); MG.fx.arrowHead(ctx, [[p[0], p[1]], [p[0], p[1] + d * 4 * k]], 18, '#1d1d1f'); S7.halo(ctx, n, p[0] + 14, p[1] + d * 4 * k, { size: 26, color: n === 'SPAIN' ? P.rojo : '#7E1F1B' }); ctx.restore(); }
+    S7.mono(ctx, 'the hardest falls in Europe', 140, 150, t, tHard - 0.1, { size: 26, color: '#1d1d1f' });
+  },
+  post: { grade: 'cool', vignette: 0.36, sat: 0.85 } }); }
+
+// ---- F3 · 1127.7 · the bullring: unemployment 26 % → youth 55 % → more than half of under-25s
+{ const t26 = TW('26', 1129.5), tYouth = TW('Youth', 1130.53), t55 = TW('55', 1132.0), tHalf = TW('half', 1134.4), t25 = TW('25', 1135.9);
+SC.push({ id: 's07_ring', start: 1127.73, end: 1137.48, transIn: { type: 'zoom', dur: 0.5, x: 960, y: 560, amount: 1.4, from: 0.85 },
+  draw(ctx, t) {
+    const young = t > tYouth - 0.2; const frac = MG.keys(t, [[1127.73, 0], [t26 + 0.3, 0.26, 'inOutCubic'], [tYouth, 0.26], [t55 + 0.4, 0.55, 'inOutCubic'], [tHalf, 0.55], [t25 + 0.4, 0.56]]);
+    const z = MG.keys(t, [[1127.73, 1.0], [tYouth, 1.02], [t25 + 0.5, 1.12, 'inOutSine'], [1137.5, 1.14]]); ctx.save(); ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-960, -540);
+    S7.ring(ctx, t, frac, { young, colors: young ? (i) => ['#E07B24', '#2FA7A0', '#C8322B', '#6A4A7A', '#F2C230'][i % 5] : undefined }); ctx.restore();
+    const big = t < tYouth ? '26 %' : '55 %'; const k = t < tYouth ? pr(t, t26 - 0.2, t26 + 0.4, 'outBack') : pr(t, t55 - 0.2, t55 + 0.4, 'outBack');
+    ctx.save(); ctx.translate(330, 560); ctx.scale(k, k); ctx.fillStyle = 'rgba(30,20,30,0.55)'; ctx.fillRect(-230, -190, 460, 260); S7.type(ctx, big, 0, 0, { font: MG.F.cond, weight: 900, size: 200, color: '#F4EFE6', align: 'center', sc: 'rgba(0,0,0,0.5)' }); ctx.restore();
+    S7.mono(ctx, t < tYouth ? 'unemployment · 2013' : 'youth unemployment', 330, 610, t, t < tYouth ? t26 : tYouth, { align: 'center', size: 24, color: '#F4EFE6' });
+    if (t > tHalf - 0.2) S7.type(ctx, 'more than half of under-25s', 1300, 110, { font: MG.F.serif, italic: true, size: 56, color: '#1d1d1f', align: 'center', alpha: pr(t, tHalf - 0.2, tHalf + 0.4) });
+  },
+  post: { grade: 'warm', vignette: 0.36, sat: 0.95 } }); }
+
+// ---- F4 · 1137.5 · half a million families evicted — a corridor of front doors closing one by one
+{ const tHalf = TW('Half', 1137.48), tFam = TW('families', 1138.4), tEv = TW('evicted', 1139.2);
+SC.push({ id: 's07_evict', start: 1137.48, end: 1141.48, transIn: { type: 'push', dir: 'left', dur: 0.45 },
+  draw(ctx, t) {
+    MG.fx.vgrad(ctx, [[0, '#3A3A40'], [1, '#1E1E22']]); const cam = { x: 0, y: -1.6, z: 0 + pr(t, 1137.48, 1141.6, 'inOutSine') * 1.6, fov: 55 };
+    // floor & walls in perspective
+    const quad = (pts, col) => { const q = S7.ppoly(pts, cam); if (!q) return; ctx.fillStyle = col; ctx.fill(S7.path(q)); };
+    for (let zz = 6; zz < 34; zz += 2) { quad([[-2, 0, zz], [2, 0, zz], [2, 0, zz + 2], [-2, 0, zz + 2]], zz % 4 ? '#5A524A' : '#625A50'); quad([[-2, 0, zz], [-2, -3.2, zz], [-2, -3.2, zz + 2], [-2, 0, zz + 2]], MG.col.mix('#9A9286', '#3A3630', (zz - 6) / 30)); quad([[2, 0, zz], [2, -3.2, zz], [2, -3.2, zz + 2], [2, 0, zz + 2]], MG.col.mix('#8A8276', '#34302A', (zz - 6) / 30)); quad([[-2, -3.2, zz], [2, -3.2, zz], [2, -3.2, zz + 2], [-2, -3.2, zz + 2]], MG.col.mix('#7A7268', '#2E2A26', (zz - 6) / 30)); }
+    for (let i = 9; i >= 0; i--) for (const side of [-1, 1]) { const z0 = 7 + i * 2.6; const k = pr(t, tFam - 0.6 + (9 - i) * 0.1 + (side > 0 ? 0.05 : 0), tFam - 0.2 + (9 - i) * 0.1, 'inCubic'); const xw = side * 2; const open = 1 - k; // door leaf rotates shut
+      const fr = S7.ppoly([[xw, 0, z0], [xw, -2.2, z0], [xw, -2.2, z0 + 1.1], [xw, 0, z0 + 1.1]], cam); if (!fr) continue; ctx.fillStyle = `rgba(255,210,150,${0.55 * open})`; ctx.fill(S7.path(fr));
+      const ang = open * 1.25; const dx = -side * Math.sin(ang) * 1.1, dz = Math.cos(ang) * 1.1; const lf = S7.ppoly([[xw, 0, z0], [xw, -2.2, z0], [xw + dx, -2.2, z0 + dz], [xw + dx, 0, z0 + dz]], cam); if (lf) { ctx.fillStyle = MG.col.mix('#6E4A30', '#3A2A20', k); ctx.fill(S7.path(lf)); ctx.strokeStyle = 'rgba(0,0,0,0.4)'; ctx.lineWidth = 2; ctx.stroke(S7.path(lf)); }
+      if (k > 0.95) { const no = S7.ppoly([[xw - side * 0.02, -1.5, z0 + 0.3], [xw - side * 0.02, -1.2, z0 + 0.3], [xw - side * 0.02, -1.2, z0 + 0.8], [xw - side * 0.02, -1.5, z0 + 0.8]], cam); if (no) { ctx.fillStyle = '#F4EFE6'; ctx.fill(S7.path(no)); } } }
+    const kc = pr(t, tHalf - 0.1, tHalf + 0.5); ctx.save(); ctx.globalAlpha = kc; S7.type(ctx, S7.count(t, tHalf - 0.1, tEv + 0.6, 0, 500000), 960, 220, { font: MG.F.cond, weight: 900, size: 160, color: '#F4EFE6', align: 'center' }); ctx.restore(); S7.mono(ctx, 'families evicted', 960, 280, t, tEv - 0.1, { align: 'center', color: '#F2C9A0', size: 26 });
+  },
+  post: { grade: 'night', vignette: 0.5, sat: 0.8 } }); }
+
+// ---- F5 · 1141.5 · the young & educated leave for Germany and Britain — to work as waiters
+{ const tHund = TW('Hundreds', 1141.48), tEdu = TW('educated', 1143.4), tGer = TW('Germany', 1144.7), tBri = TW('Britain', 1145.6), tWait = TW('waiters.', 1147.3);
+SC.push({ id: 's07_leave', start: 1141.48, end: 1148.01, transIn: { type: 'blur', dur: 0.45 },
+  init() { this.pr = MG.geo.proj('conic', { center: [2.5, 46.5], scale: 2100, translate: [960, 560] }); this.map = S7.cacheMap('leave', this.pr, { neigh: ['France', 'Portugal', 'Morocco', 'Germany', 'United Kingdom', 'Ireland', 'Belgium', 'Netherlands', 'Switzerland', 'Italy', 'Austria', 'Denmark', 'Czechia', 'Luxembourg'], land: '#DCD6CA', spain: '#E9C99A' }); },
+  draw(ctx, t) {
+    const kw = pr(t, tWait - 0.8, tWait + 0.1, 'inOutCubic');
+    ctx.drawImage(this.map, 0, 0); const prj = this.pr; const src = prj(MG.geo.cities.Madrid);
+    const dst = [[MG.geo.cities.Berlin, tGer - 0.3], [MG.geo.cities.Munich, tGer], [MG.geo.cities.Frankfurt, tGer + 0.2], [MG.geo.cities.London, tBri - 0.2], [[-2.24, 53.48], tBri + 0.1]];
+    dst.forEach(([ll, t0], j) => { const b = prj(ll); for (let i = 0; i < 7; i++) { const u = MG.fract((t - t0) * 0.5 + i / 7); if (t < t0) continue; const x = lerp(src[0], b[0], u), y = lerp(src[1], b[1], u) - Math.sin(u * Math.PI) * 120; ctx.fillStyle = '#1d1d1f'; ctx.beginPath(); ctx.arc(x, y, 4, 0, TAU); ctx.fill(); } const pts = []; for (let u = 0; u <= 1.001; u += 0.05) pts.push([lerp(src[0], b[0], u), lerp(src[1], b[1], u) - Math.sin(u * Math.PI) * 120]); MG.fx.line(ctx, pts, { color: 'rgba(30,30,30,0.35)', width: 2, dash: [6, 6], progress: pr(t, t0 - 0.2, t0 + 0.6) }); });
+    S7.mapLabel(ctx, prj, MG.geo.cities.Berlin, t, tGer - 0.2, 'GERMANY', { dotColor: '#1d1d1f' }); S7.mapLabel(ctx, prj, MG.geo.cities.London, t, tBri - 0.2, 'BRITAIN', { dotColor: '#1d1d1f' });
+    // the graduate becomes a waiter (character card in the foreground, lit by a café lamp)
+    const fx = 1560, fy = 1010; ctx.save(); MG.fx.contact(ctx, fx, fy, 120, 18, 0.35);
+    const grad = (c, o2) => S7.figure(c, fx, fy, 520, { skin: C.skin4, hair: C.hair2, hairStyle: 'short', top: o2.top, bottom: '#1d1d1f', seed: 9, look: -0.4, ...o2 });
+    ctx.save(); ctx.beginPath(); ctx.rect(fx - 300, 0, 600, H); ctx.clip();
+    if (kw < 1) { ctx.save(); ctx.globalAlpha = 1 - kw; grad(ctx, { top: '#2E3440', prop: (c, s) => { c.fillStyle = '#1d1d1f'; c.beginPath(); c.moveTo(-60, s.hy - 56); c.lineTo(60, s.hy - 56); c.lineTo(0, s.hy - 80); c.closePath(); c.fill(); c.fillRect(-30, s.hy - 60, 60, 16); c.save(); c.translate(70, s.shY + 70); c.rotate(-0.4); c.fillStyle = '#F4EFE6'; c.fillRect(-12, -50, 24, 100); c.fillStyle = P.rojo; c.fillRect(-13, -8, 26, 10); c.restore(); } }); ctx.restore(); }
+    if (kw > 0) { ctx.save(); ctx.globalAlpha = kw; grad(ctx, { top: '#F4EFE6', vest: '#1d1d1f', apron: '#1d1d1f', arms: [0.2, -1.9], prop: (c, s) => { c.save(); c.translate(120, s.shY - 30); c.fillStyle = '#C9CDD2'; c.beginPath(); c.ellipse(0, 0, 80, 14, 0, 0, TAU); c.fill(); c.fillStyle = '#F2C230'; c.fillRect(-40, -46, 22, 44); c.fillStyle = '#E6DFD0'; c.fillRect(-6, -40, 18, 38); c.fillRect(24, -34, 16, 32); c.restore(); } }); ctx.restore(); }
+    ctx.restore(); ctx.restore();
+    S7.mono(ctx, kw < 0.5 ? 'young · educated' : 'waiter', fx, 200, t, kw < 0.5 ? tEdu - 0.1 : tWait - 0.5, { align: 'center', size: 26, color: '#1d1d1f' });
+    if (t > tHund) S7.type(ctx, 'hundreds of thousands', 140, 170, { font: MG.F.display, weight: 800, size: 72, color: '#1d1d1f', alpha: pr(t, tHund, tHund + 0.5) });
+  },
+  post: { grade: 'cool', vignette: 0.34 } }); }
+
+// ---- F6 · 1148.0 · "ni-ni" — neither in school nor working (paste-up on a wall above a row of young people)
+{ const tGen = TW('generation', 1148.6), tNini = TW('“ni-ni”—neither', 1150.4) || 1150.4, tSchool = TW('school', 1151.9), tWork = TW('working.', 1152.7);
+SC.push({ id: 's07_nini', start: 1148.01, end: 1153.81, transIn: { type: 'zoom', dur: 0.5, x: 1560, y: 600, amount: 1.4, from: 0.88 },
+  draw(ctx, t) {
+    ctx.fillStyle = '#B9B2A6'; ctx.fillRect(0, 0, W, H); MG.tex.over(ctx, 'blotch', { alpha: 0.3, color: '#4a4440', scale: 3 }); for (let y = 0; y < H; y += 90) { ctx.fillStyle = 'rgba(0,0,0,0.05)'; ctx.fillRect(0, y, W, 2); }
+    // the paste-up poster
+    const kp = pr(t, tNini - 0.6, tNini + 0.1, 'inOutCubic'); ctx.save(); ctx.translate(960, 90); ctx.rotate(-0.02); const ph = 420 * kp; ctx.fillStyle = '#F2EBDD'; ctx.fillRect(-520, 0, 1040, ph); if (ph > 200) { ctx.beginPath(); ctx.rect(-520, 0, 1040, ph); ctx.clip(); S7.type(ctx, 'NI-NI', 0, 300, { font: MG.F.stencil2, weight: 900, size: 300, color: '#1d1d1f', align: 'center', shadow: false }); } ctx.restore();
+    // a row of young people sitting on the kerb below
+    for (let i = 0; i < 9; i++) { const x = 200 + i * 190; S7.figure(ctx, x, 1060, 380, { skin: SKINS[i % 5], hair: HAIRS[(i + 2) % 5], top: ['#2FA7A0', '#C8322B', '#6A4A7A', '#F2C230', '#3A5A6A'][i % 5], bottom: '#2E3440', hairStyle: ['curly', 'long', 'short', 'bun', 'short'][i % 5], seed: 20 + i, look: Math.sin(t + i) * 0.4, lean: Math.sin(i * 1.3) * 0.06 }); }
+    // "school" and "work" struck out in marker
+    [['SCHOOL', 560, tSchool], ['WORK', 1360, tWork]].forEach(([w, x, t0]) => { const k = pr(t, t0 - 0.1, t0 + 0.3); if (k <= 0) return; ctx.save(); ctx.globalAlpha = k; S7.type(ctx, w, x, 600, { font: MG.F.marker, size: 96, color: '#1d1d1f', align: 'center', shadow: false }); const kk = pr(t, t0 + 0.2, t0 + 0.55, 'inOutCubic'); ctx.strokeStyle = P.rojo; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(x - 180, 570); ctx.lineTo(x - 180 + 360 * kk, 560); ctx.stroke(); ctx.restore(); });
+    S7.mono(ctx, 'a whole generation', 140, 560, t, tGen - 0.1, { size: 24, color: '#1d1d1f' });
+  },
+  post: { grade: 'bleach', vignette: 0.36 } }); }
+
+// ---- F7 · 1153.8 · Spain borrows €40 billion from Europe to rescue its banks — a bank sinking, Europe's ring of stars as a lifebuoy
+{ const tBor = TW('borrows', 1154.1), t40 = TW('€40', 1155.0) || 1155.0, tEur = TW('Europe', 1156.3), tRes = TW('rescue', 1156.9);
+SC.push({ id: 's07_bailout', start: 1153.81, end: 1158.44, transIn: { type: 'blur', dur: 0.45 },
+  draw(ctx, t) {
+    MG.fx.vgrad(ctx, [[0, '#2A3440'], [1, '#0E141C']]); const sink = lerp(0, 120, pr(t, 1153.8, tEur, 'inOutSine')) - lerp(0, 90, pr(t, tRes - 0.2, tRes + 1.2, 'outBack'));
+    // the bank (neo-classical portico) half under water
+    ctx.save(); ctx.translate(960, 640 + sink); ctx.fillStyle = '#C9C6BF'; ctx.beginPath(); ctx.moveTo(-360, -260); ctx.lineTo(0, -380); ctx.lineTo(360, -260); ctx.closePath(); ctx.fill(); ctx.fillRect(-340, -260, 680, 40); for (let i = 0; i < 6; i++) { const x = -300 + i * 120; MG.fx.volume(ctx, MG.path.rr(x - 26, -220, 52, 400, 4), [x - 26, -220, 52, 400], { color: '#D8D4CC', shade: 0.4, hi: 0.3, cel: true }); } ctx.fillStyle = '#A9A6A0'; ctx.fillRect(-360, 180, 720, 40); S7.type(ctx, 'BANCO', 0, -280, { font: MG.F.roman, weight: 700, size: 40, color: '#4A4440', align: 'center', shadow: false }); ctx.restore();
+    // black water surface with ripples
+    ctx.fillStyle = 'rgba(8,12,18,0.82)'; ctx.fillRect(0, 700, W, 380); ctx.strokeStyle = 'rgba(160,190,220,0.25)'; ctx.lineWidth = 2; for (let i = 0; i < 12; i++) { ctx.beginPath(); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, 708 + i * 30 + Math.sin(x * 0.01 + t * 2 + i) * 4); ctx.stroke(); }
+    // the EU ring of 12 stars descends as a lifebuoy
+    const kb = pr(t, tEur - 0.6, tRes + 0.2, 'inOutCubic'); const by = lerp(-200, 470, kb); ctx.save(); ctx.translate(960, by); ctx.strokeStyle = '#24408E'; ctx.lineWidth = 46; ctx.beginPath(); ctx.ellipse(0, 0, 300, 90, 0, 0, TAU); ctx.stroke(); for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; const sx = Math.cos(a) * 300, sy = Math.sin(a) * 90; ctx.fillStyle = '#F2C230'; ctx.fill(MG.path.star(sx, sy, 16, 7, 5)); } ctx.restore();
+    if (t > t40 - 0.2) { const k = pr(t, t40 - 0.2, t40 + 0.4, 'outBack'); ctx.save(); ctx.translate(960, 220); ctx.scale(k, k); S7.type(ctx, '€40 bn', 0, 0, { font: MG.F.cond, weight: 900, size: 170, color: '#F4EFE6', align: 'center' }); ctx.restore(); S7.mono(ctx, 'to rescue the banks', 960, 280, t, tRes - 0.2, { align: 'center', color: '#C9D6E2', size: 26 }); }
+  },
+  post: { grade: 'night', vignette: 0.45 } }); }
+
+// ---- F8 · 1158.4 · it takes ten years to climb out — ten steps 2008 → 2018, a small figure climbs into the light
+{ const tTen = TW('ten', 1159.3), tOut = TW('out.', 1160.7);
+SC.push({ id: 's07_climb', start: 1158.44, end: 1161.37, transIn: { type: 'zoom', dur: 0.4, x: 960, y: 900, amount: 1.4, from: 0.9 },
+  draw(ctx, t) {
+    MG.fx.vgrad(ctx, [[0, '#F6D7A0'], [0.4, '#8A8A8E'], [1, '#2A2E36']]); const k = pr(t, 1158.5, 1161.3, 'inOutSine');
+    for (let i = 0; i < 10; i++) { const x = 320 + i * 132, y = 960 - i * 66; const p = new Path2D(); p.rect(x, y, 132, H - y); ctx.fillStyle = MG.col.mix('#4A4A50', '#D9C9A8', i / 9); ctx.fill(p); ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(x, y, 132, 6); S7.type(ctx, String(2008 + i + (i === 9 ? 1 : 0)), x + 66, y + 44, { font: MG.F.mono, weight: 600, size: 22, color: i > 5 ? '#3A2A20' : '#D8DCE2', align: 'center', shadow: false }); }
+    const step = k * 9.2; const si = Math.floor(step), sf = step - si; const x = 320 + step * 132 + 66, y = 960 - si * 66 - Math.sin(sf * Math.PI) * 40 - (sf > 0.5 ? 66 * (sf - 0.5) * 2 : 0);
+    MG.fx.glow(ctx, 1640, 240, 520, '#FFE2A8', 0.6 * k); S7.figure(ctx, x, y, 170, { skin: C.skin1, hair: C.hair1, top: '#C8322B', bottom: '#2E3440', walk: step * Math.PI, seed: 5 });
+    S7.type(ctx, '10 years', 140, 180, { font: MG.F.display, weight: 800, size: 96, color: '#1d1d1f', alpha: pr(t, tTen - 0.2, tTen + 0.4) });
+  },
+  post: { grade: 'warm', vignette: 0.32 } }); }
+
+// ---- G1 · 1161.4 · today ≈ 11 %, still the EU's highest — the bullring again, then a spotlight on the EU map · "Why?"
+{ const tToday = TW('Today,', 1161.37), t11 = TW('11', 1163.2), tHigh = TW('highest', 1165.2), tEU = TW('European', 1165.9), tWhy = TW('Why?', 1167.48);
+SC.push({ id: 's07_today', start: 1161.37, end: 1168.52, transIn: { type: 'blur', dur: 0.45 },
+  init() { this.pr = MG.geo.proj('conic', { center: [12, 50], scale: 1300, translate: [960, 560] }); },
+  draw(ctx, t) {
+    const km = pr(t, tHigh - 0.9, tHigh - 0.1, 'inOutCubic');
+    if (km < 1) { ctx.save(); ctx.globalAlpha = 1 - km; S7.ring(ctx, t, MG.keys(t, [[1161.37, 0.55], [t11 + 0.3, 0.11, 'inOutCubic']])); const k = pr(t, t11 - 0.2, t11 + 0.4, 'outBack'); ctx.save(); ctx.translate(1590, 560); ctx.scale(k, k); ctx.fillStyle = 'rgba(250,240,220,0.75)'; ctx.fillRect(-230, -190, 460, 260); S7.type(ctx, '≈11 %', 0, 0, { font: MG.F.cond, weight: 900, size: 200, color: '#1d1d1f', align: 'center' }); ctx.restore(); S7.mono(ctx, 'unemployment today', 1590, 610, t, t11, { align: 'center', size: 24, color: '#1d1d1f' }); ctx.restore(); }
+    if (km > 0) { ctx.save(); ctx.globalAlpha = km; ctx.fillStyle = '#1E2028'; ctx.fillRect(0, 0, W, H); const prj = this.pr; const eu = ['Spain', 'Portugal', 'France', 'Italy', 'Germany', 'Austria', 'Belgium', 'Netherlands', 'Luxembourg', 'Ireland', 'Denmark', 'Sweden', 'Finland', 'Poland', 'Czechia', 'Slovakia', 'Hungary', 'Slovenia', 'Croatia', 'Romania', 'Bulgaria', 'Greece', 'Cyprus', 'Malta', 'Estonia', 'Latvia', 'Lithuania'];
+      for (const f of MG.geo.world50.features) { const c = window.d3.geoCentroid(f); if (c[0] < -26 || c[0] > 45 || c[1] < 33 || c[1] > 71) continue; const n = f.properties.name; MG.geo.draw(ctx, prj, f, { fill: n === 'Spain' ? P.sol : eu.includes(n) ? '#4A4E5A' : '#2E313A', stroke: 'rgba(0,0,0,0.5)', width: 0.8 }); }
+      const sp = prj([-3.7, 40.2]); ctx.save(); ctx.globalCompositeOperation = 'screen'; const g = ctx.createRadialGradient(sp[0], sp[1], 10, sp[0], sp[1], 300); g.addColorStop(0, 'rgba(255,220,150,0.55)'); g.addColorStop(1, 'rgba(255,220,150,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore(); MG.kit.sun(ctx, sp[0] - 260, sp[1] - 360, 46, t, { corona: 0.6, rays: 0.4 });
+      S7.halo(ctx, 'HIGHEST IN THE EU', sp[0] + 40, sp[1] + 10, { size: 32, color: '#1d1d1f', halo: 'rgba(250,236,200,0.95)' }); ctx.restore(); }
+    if (t > tWhy - 0.1) { const k = pr(t, tWhy - 0.1, tWhy + 0.4, 'outBack'); ctx.save(); ctx.translate(1500, 820); ctx.scale(k, k); S7.type(ctx, 'Why?', 0, 0, { font: MG.F.display, italic: true, weight: 900, size: 160, color: '#F4EFE6', align: 'center' }); ctx.restore(); }
+  },
+  post: { grade: 'cool', vignette: 0.4 } }); }
+
+// ---- G2 · 1168.5 · seasonal, low-paying work: the hotel opens in May and hires you, closes in October and lets you go
+{ const tTour = TW('Tourism', 1168.52), tSeas = TW('seasonal,', 1170.3), tMay = TW('May', 1173.4), tHire = TW('hires', 1173.9), tOct = TW('October', 1176.0), tGo = TW('go.', 1177.2);
+SC.push({ id: 's07_hotel', start: 1168.52, end: 1177.8, transIn: { type: 'zoom', dur: 0.5, x: 1500, y: 820, amount: 1.4, from: 0.88 },
+  draw(ctx, t) {
+    // month along the arc: Jan → Dec over the scene; sunlight only May → October
+    const mon = MG.keys(t, [[1168.52, 1.5], [tMay - 0.3, 4.8, 'inOutSine'], [tHire + 0.8, 5.6], [tOct - 0.3, 9.7, 'inOutSine'], [tGo + 0.3, 10.6], [1177.8, 11.2]]); const open = mon >= 5 && mon < 10; const kl = clamp(Math.min(mon - 4.6, 10.2 - mon) * 2.5);
+    MG.fx.vgrad(ctx, [[0, MG.col.mix('#7A8494', '#F3C489', kl)], [1, MG.col.mix('#AEB4BC', '#F8E7C8', kl)]]);
+    // the year arc with month ticks; the sun rides it
+    ctx.save(); ctx.strokeStyle = 'rgba(30,30,30,0.35)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(960, 760, 820, 560, 0, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke(); const ML = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']; for (let m = 0; m < 12; m++) { const a = Math.PI * 1.05 + (m + 0.5) / 12 * Math.PI * 0.9; const x = 960 + Math.cos(a) * 820, y = 760 + Math.sin(a) * 560; S7.type(ctx, ML[m], x, y - 16, { font: MG.F.mono, weight: 700, size: 24, color: m >= 4 && m <= 9 ? '#B8322A' : '#3A3A40', align: 'center', shadow: false }); }
+    const sa = Math.PI * 1.05 + (mon / 12) * Math.PI * 0.9; MG.kit.sun(ctx, 960 + Math.cos(sa) * 820, 760 + Math.sin(sa) * 560, 52, t, { corona: 0.5 * kl, color: open ? P.sol : '#C9B08A' }); ctx.restore();
+    // the beach hotel
+    ctx.fillStyle = MG.col.mix('#C9C6BF', '#F4EFE6', kl); ctx.fillRect(620, 420, 680, 520); for (let r = 0; r < 6; r++) for (let c = 0; c < 8; c++) { ctx.fillStyle = open ? '#F2C98A' : '#4A4E5A'; ctx.fillRect(650 + c * 82, 450 + r * 78, 52, 44); }
+    ctx.fillStyle = '#E9C99A'; ctx.fillRect(0, 940, W, 140); S7.type(ctx, 'HOTEL', 960, 410, { font: MG.F.retro, size: 64, color: open ? P.rojo : '#5A5A60', align: 'center', shadow: false });
+    // the sign on the door: ABIERTO / CERRADO
+    ctx.save(); ctx.translate(960, 880); ctx.rotate(MG.jiggle(t, tMay - 0.2, 0.3, 3, 4) + MG.jiggle(t, tOct - 0.2, 0.3, 3, 4)); ctx.fillStyle = open ? '#2FA7A0' : '#B8322A'; ctx.fillRect(-110, -30, 220, 60); S7.type(ctx, open ? 'ABIERTO' : 'CERRADO', 0, 14, { font: MG.F.grotesk, weight: 800, size: 34, color: '#F4EFE6', align: 'center', shadow: false }); ctx.restore();
+    // the worker: walks in on "hires you", walks out on "lets you go"
+    const kin = pr(t, tHire - 0.2, tHire + 0.8, 'inOutSine'), kout = pr(t, tGo - 0.4, tGo + 0.6, 'inOutSine'); const wx = lerp(lerp(260, 900, kin), 1700, kout); const walking = (kin > 0 && kin < 1) || (kout > 0 && kout < 1);
+    S7.figure(ctx, wx, 1000, 330, { skin: C.skin2, hair: C.hair3, hairStyle: 'bun', top: '#F4EFE6', bottom: '#2E3440', apron: open || kout < 0.5 ? '#2FA7A0' : undefined, walk: walking ? t * 9 : null, seed: 12, look: kout > 0 ? 0.6 : -0.3 });
+    S7.mono(ctx, 'seasonal · low-paid', 140, 170, t, tSeas - 0.1, { size: 28, color: '#1d1d1f' });
+    if (t > tMay - 0.2 && t < tOct) S7.type(ctx, 'May: hired', 1540, 980, { font: MG.F.grotesk, weight: 800, size: 46, color: '#1d1d1f', align: 'center', alpha: pr(t, tMay - 0.2, tMay + 0.3) });
+    if (t > tOct - 0.2) S7.type(ctx, 'October: let go', 1540, 980, { font: MG.F.grotesk, weight: 800, size: 46, color: P.rojo, align: 'center', alpha: pr(t, tOct - 0.2, tOct + 0.3) });
+  },
+  post: (t) => ({ grade: 'warm', vignette: 0.32, sat: 0.95 }) }); }
+
+// ---- G3 · 1177.8 · one in four contracts temporary — a European record — the 2022 reform slows the revolving door, the habit stuck
+{ const tOne = TW('one', 1179.0), tTemp = TW('temporary,', 1181.0), tRec = TW('record.', 1182.8), t2022 = TW('2022', 1184.2), tDown = TW('down,', 1185.8), tStuck = TW('stuck.', 1187.3);
+SC.push({ id: 's07_door', start: 1177.8, end: 1187.85, transIn: { type: 'zoom', dur: 0.5, x: 960, y: 880, amount: 1.6, from: 0.85 },
+  draw(ctx, t) {
+    MG.fx.vgrad(ctx, [[0, '#3A2E2A'], [1, '#1E1816']]); MG.fx.glow(ctx, 960, 300, 900, '#FFD08A', 0.2);
+    // revolving-door drum (glass cylinder) in perspective
+    const speed = MG.keys(t, [[1177.8, 1.2], [t2022, 1.2], [tDown + 0.6, 0.35, 'inOutCubic'], [tStuck, 0.38], [1189, 0.45]]); // rev/s-ish
+    let ang = 0; { const N = 80; const a0 = 1177.8; for (let i = 0; i < N; i++) { const tt = a0 + (t - a0) * (i + 0.5) / N; const sp = MG.keys(tt, [[1177.8, 1.2], [t2022, 1.2], [tDown + 0.6, 0.35, 'inOutCubic'], [tStuck, 0.38], [1189, 0.45]]); ang += sp * (t - a0) / N * 1.6; } }
+    const cx = 960, cy = 640, R = 420, rx = R, ry = R * 0.28; ctx.fillStyle = '#2A2220'; ctx.beginPath(); ctx.ellipse(cx, cy + 300, rx + 30, ry + 12, 0, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(180,210,230,0.12)'; ctx.fillRect(cx - rx, cy - 320, rx * 2, 620);
+    const wings = []; for (let i = 0; i < 4; i++) { const a = ang + i * Math.PI / 2; wings.push({ a, i, d: Math.sin(a) }); } wings.sort((a, b) => a.d - b.d);
+    for (const w of wings) { const x2 = cx + Math.cos(w.a) * rx, y2 = Math.sin(w.a) * ry; const red = w.i === 0; ctx.fillStyle = red ? MG.col.a(P.rojo, 0.75 + 0.15 * w.d) : `rgba(200,225,240,${0.25 + 0.15 * (w.d + 1)})`; ctx.beginPath(); ctx.moveTo(cx, cy - 300); ctx.lineTo(x2, cy - 300 + y2); ctx.lineTo(x2, cy + 300 + y2); ctx.lineTo(cx, cy + 300); ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#C9A04A'; ctx.lineWidth = 6; ctx.stroke();
+      if (red && w.d > -0.2 && t > tTemp - 0.4) S7.type(ctx, 'TEMP', (cx + x2) / 2, cy + y2 / 2, { font: MG.F.stencil, size: 40, color: '#F4EFE6', align: 'center', shadow: false }); }
+    ctx.strokeStyle = '#C9A04A'; ctx.lineWidth = 10; ctx.beginPath(); ctx.ellipse(cx, cy - 300, rx, ry, 0, 0, TAU); ctx.stroke(); ctx.fillStyle = '#C9A04A'; ctx.fillRect(cx - 6, cy - 300, 12, 600);
+    // the figures pushed around (in and out of work)
+    for (let i = 0; i < 3; i++) { const a = ang * 1.0 + i * 2.1; const px = cx + Math.cos(a) * rx * 0.6, d = Math.sin(a); if (d < 0) continue; S7.figure(ctx, px, cy + 300 + d * ry * 0.6, 300, { skin: SKINS[i + 1], hair: HAIRS[i], top: ['#2FA7A0', '#F2C230', '#6A4A7A'][i], bottom: '#2E3440', walk: t * 8 + i, seed: 40 + i }); }
+    const k1 = pr(t, tOne - 0.2, tOne + 0.4, 'outBack'); ctx.save(); ctx.translate(300, 300); ctx.scale(k1, k1); S7.type(ctx, '1 in 4', 0, 0, { font: MG.F.cond, weight: 900, size: 170, color: '#F4EFE6', align: 'center' }); ctx.restore(); S7.mono(ctx, 'contracts temporary', 300, 360, t, tTemp - 0.2, { align: 'center', size: 24, color: '#F2C9A0' }); S7.mono(ctx, 'a European record', 300, 400, t, tRec - 0.3, { align: 'center', size: 22, color: P.sol });
+    // brass plaque on the frame: 2022 REFORM
+    const kp = pr(t, t2022 - 0.3, t2022 + 0.4, 'outBack'); if (kp > 0) { ctx.save(); ctx.translate(1580, 300); ctx.scale(kp, kp); MG.fx.volume(ctx, MG.path.rr(-170, -60, 340, 120, 10), [-170, -60, 340, 120], { color: '#C9A04A', shade: 0.4, hi: 0.6, outline: '#5a3a10', outlineW: 3 }); S7.type(ctx, '2022 REFORM', 0, 16, { font: MG.F.roman, weight: 900, size: 40, color: '#3A2410', align: 'center', shadow: false }); ctx.restore(); }
+    if (t > tStuck - 0.5) S7.type(ctx, 'the habit stuck', 1580, 900, { font: MG.F.serif, italic: true, size: 64, color: '#F4EFE6', align: 'center', alpha: pr(t, tStuck - 0.5, tStuck) });
+  },
+  post: { grade: 'warm', vignette: 0.45 } }); }
+
+// ===================================================================================== AUDIO (whole segment)
+S7.audio = (A) => {
+  // CH.A water / heat
+  A.music('heat', 1013.98, 1054.6, { key: 'E2', bpm: 70, intensity: [[1013.98, 0.4], [1020, 0.55], [1028, 0.5], [1040, 0.6], [1048, 0.7], [1054.4, 0.5]], fadeIn: 1.5, fadeOut: 1.4 });
+  A.sfx.amb('cicadas', 1014.0, 12, { gain: 0.7 }); A.sfx.sizzle(1014.2, 2.5, { gain: 0.8 }); A.sfx.thud(1015.0, { gain: 0.4 });
+  for (let i = 0; i < 6; i++) A.sfx.pop(1016.6 + i * 0.22, { freq: 380 - i * 20, gain: 0.45 }); A.sfx.blip(1019.0, { note: 'A5', gain: 0.5 }); A.sfx.tick(1021.6, { gain: 0.8 }); A.sfx.tick(1025.4, { gain: 0.8 });
+  A.sfx.splash(1028.3, { gain: 0.4 }); A.sfx.amb('wind', 1032.0, 8, { gain: 0.5 }); A.sfx.creak(1036.6, { gain: 0.7 }); A.sfx.amb('hum', 1040.6, 4, { gain: 0.8 }); A.sfx.whoosh(1040.5, { dur: 0.5, gain: 0.5 });
+  A.sfx.stamp(1049.7, { gain: 0.45 }); A.sfx.sizzle(1051.6, 2.6, { gain: 0.8 });
+  // CH.B cars
+  A.music('pulse', 1053.9, 1067.0, { key: 'A2', bpm: 118, intensity: [[1053.9, 0.45], [1058, 0.7], [1066.5, 0.5]], fadeIn: 1.0, fadeOut: 1.4 });
+  for (let i = 0; i < 5; i++) A.sfx.thud(1056.4 + i * 0.75, { gain: 0.35 }); A.sfx.amb('city', 1063.0, 3.2, { gain: 0.9 });
+  // CH.C the price — a shadow falls
+  A.sfx.downlifter(1066.4, { dur: 2, gain: 0.7 }); A.sfx.sub(1069.1, { gain: 0.5 });
+  A.music('tension', 1067.2, 1100.8, { key: 'C3', bpm: 100, intensity: [[1067.2, 0.3], [1072, 0.4], [1078, 0.5], [1089, 0.7], [1097, 0.85], [1100.5, 0.5]], fadeIn: 1.2, fadeOut: 1.6 });
+  A.sfx.impact(1071.9, { size: 0.4, gain: 0.5 }); A.sfx.creak(1079.0, { gain: 0.8 }); A.sfx.creak(1084.5, { gain: 0.6 }); for (let i = 0; i < 10; i++) A.sfx.thud(1089.4 + i * 0.3, { gain: 0.25 });
+  // CH.E ghosts
+  A.music('ambient', 1100.3, 1121.2, { key: 'D3', bpm: 64, scale: 'phrygian', intensity: [[1100.3, 0.35], [1110, 0.45], [1121, 0.3]], fadeIn: 1.4, fadeOut: 1.2 });
+  A.sfx.amb('wind', 1100.7, 20, { gain: 0.6 }); for (let i = 0; i < 6; i++) A.sfx.typekey(1108.3 + i * 0.12, { gain: 0.6 }); A.sfx.powerDown(1113.9, { gain: 0.6 });
+  // CH.F the burst
+  A.sfx.pop(1121.8, { freq: 900, gain: 0.9 }); A.sfx.impact(1122.1, { size: 0.5, gain: 0.55 }); for (let i = 0; i < 8; i++) A.sfx.thud(1122.5 + i * 0.1, { gain: 0.3 });
+  A.music('dread', 1121.5, 1137.8, { key: 'C2', intensity: 0.6, fadeIn: 0.8, fadeOut: 1.4 }); A.sfx.sub(1129.5, { gain: 0.5 }); A.sfx.sub(1132.0, { gain: 0.5 }); A.sfx.amb('crowd', 1127.8, 9.5, { gain: 0.35 });
+  for (let i = 0; i < 12; i++) A.sfx.thud(1138.3 + i * 0.1, { gain: 0.35 });
+  A.music('lament', 1137.2, 1161.6, { key: 'D3', bpm: 60, intensity: [[1137.2, 0.35], [1144, 0.5], [1153.8, 0.5], [1161.3, 0.4]], fadeIn: 1.2, fadeOut: 1.0 });
+  A.sfx.plane(1144.3, 3.0, { gain: 0.5 }); A.sfx.ding(1147.4, { note: 'E5', gain: 0.5 }); A.sfx.paper(1149.9, { dur: 0.8, gain: 0.8 }); A.sfx.swish(1152.0); A.sfx.swish(1152.9);
+  A.sfx.splash(1154.3, { gain: 0.5 }); A.sfx.chime(1156.6, { note: 'G5', gain: 0.5 }); for (let i = 0; i < 10; i++) A.sfx.tock(1158.6 + i * 0.27, { gain: 0.5 });
+  // CH.G why · the revolving door (sneaky)
+  A.sfx.sub(1163.2, { gain: 0.4 }); A.sfx.swell(1167.4, { dur: 0.9, gain: 0.5 });
+  A.music('sneaky', 1167.6, 1189.3, { key: 'D3', bpm: 112, intensity: [[1167.6, 0.4], [1172, 0.6], [1178, 0.7], [1184.2, 0.55], [1187.8, 0.35]], fadeIn: 0.6, fadeOut: 1.4 });
+  A.sfx.amb('sea', 1168.6, 9, { gain: 0.5 }); A.sfx.click(1173.4, { gain: 1 }); A.sfx.ding(1173.9, { note: 'C6', gain: 0.5 }); A.sfx.click(1176.0, { gain: 1 }); A.sfx.slide(1177.0, { gain: 0.8 });
+  for (let i = 0; i < 9; i++) A.sfx.whoosh(1178.4 + i * 0.62, { dur: 0.35, gain: 0.18, pitch: 1.6 }); A.sfx.stamp(1184.2, { gain: 0.5 }); for (let i = 0; i < 4; i++) A.sfx.whoosh(1185.8 + i * 1.1, { dur: 0.6, gain: 0.14, pitch: 1.2 });
+};
 MG.segment('S07', { start: 1013.98, end: 1187.85, scenes: SC, audio(A) { if (S7.audio) S7.audio(A); } });
 })();
