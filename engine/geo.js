@@ -126,7 +126,7 @@
     if (o.atmosphere !== false) { const g = ctx.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.28); g.addColorStop(0, MG.col.a(o.atmosphere || '#9cc8ff', 0.45)); g.addColorStop(1, MG.col.a(o.atmosphere || '#9cc8ff', 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.3, 0, MG.TAU); ctx.fill(); }
     G.sphere(ctx, pr, { fill: o.ocean || '#1f4e8c' });
     ctx.save(); G.clip(ctx, pr, { type: 'Sphere' });
-    if (o.relief) { const img = MG.img(o.relief === true ? 'world_relief' : o.relief); if (img) G.raster(ctx, pr, img, [-180, -90, 180, 90], { grid: o.grid || 48, alpha: o.reliefAlpha ?? 1, onlyVisible: true }); }
+    if (o.relief && window.THREE) { const c = G.sphereTex(o.relief === true ? 'world_relief' : o.relief, pr, o); ctx.save(); ctx.globalAlpha *= o.reliefAlpha ?? 1; ctx.drawImage(c, 0, 0); ctx.restore(); }
     else G.draw(ctx, pr, G.land50 || G.world110, { fill: o.land || '#d9b477' });
     if (o.countries) for (const [n, c] of Object.entries(o.countries)) { const f = G.country(n, o.res || '50'); if (f) G.draw(ctx, pr, f, typeof c === 'string' ? { fill: c } : c); }
     if (o.border !== false) G.draw(ctx, pr, G.borders50, { stroke: o.border || 'rgba(40,25,15,0.25)', width: 0.8 });
@@ -140,10 +140,28 @@
     return pr;
   };
 
+  /** textured 3D sphere (Three.js) exactly matching a d3 orthographic projection `pr` → returns a 1920×1080 canvas.
+   *  texture: 'world_relief' | 'bluemarble' ; o.light [x,y,z], o.ambient */
+  G.sphereTex = (texture, pr, o = {}) => {
+    const T = window.THREE; if (!G._g3) { const sc = new T.Scene(); const mat = new T.MeshStandardMaterial({ roughness: 0.95, metalness: 0 }); const mesh = new T.Mesh(new T.SphereGeometry(1, 128, 96), mat); sc.add(mesh); const amb = new T.AmbientLight(0xffffff, 0.9); sc.add(amb); const dl = new T.DirectionalLight(0xfff1dc, 2.4); sc.add(dl); const cam = new T.OrthographicCamera(-1, 1, 1, -1, 0.1, 20); cam.position.set(0, 0, 5); cam.lookAt(0, 0, 0); G._g3 = { sc, mesh, mat, amb, dl, cam, tex: {} }; }
+    const g = G._g3; if (!g.tex[texture]) g.tex[texture] = MG.three.imageTexture(texture); if (g.mat.map !== g.tex[texture]) { g.mat.map = g.tex[texture]; g.mat.needsUpdate = true; }
+    const r = pr.rotate(); const lon = -r[0], lat = -r[1]; g.mesh.rotation.set(MG.deg(lat), -Math.PI / 2 - MG.deg(lon), 0, 'XYZ');
+    const s = pr.scale(), [x, y] = pr.translate(); Object.assign(g.cam, { left: -x / s, right: (MG.W - x) / s, top: y / s, bottom: -(MG.H - y) / s }); g.cam.updateProjectionMatrix();
+    const L = o.light3 || [-3, 2.2, 4]; g.dl.position.set(L[0], L[1], L[2]); g.dl.intensity = o.sunIntensity ?? 2.4; g.amb.intensity = o.ambient ?? 0.9;
+    return MG.three.render(g.sc, g.cam, { slot: o.slot ?? 4, toneMapping: T.NoToneMapping });
+  };
   /** warp an equirectangular image (covering bbox [lon0,lat0,lon1,lat1]) into any projection */
   G.raster = (ctx, pr, img, bbox, o = {}) => {
-    const [lon0, lat0, lon1, lat1] = bbox; const n = o.grid || 24;
-    MG.persp.quad(ctx, img, (u, v) => { const lon = lon0 + u * (lon1 - lon0), lat = lat1 - v * (lat1 - lat0); if (o.onlyVisible) { const r = pr.rotate(); const d = window.d3.geoDistance([lon, lat], [-r[0], -r[1]]); if (d > Math.PI / 2 + 0.15) return null; } const p = pr([lon, lat]); return p && isFinite(p[0]) ? p : null; }, n, { alpha: o.alpha });
+    // warp into an offscreen buffer first (no seams when blending), cached while the projection is unchanged
+    const key = [img.src || img.width, bbox.join(','), pr.scale().toFixed(2), pr.translate().map((v) => v.toFixed(1)).join(','), (pr.rotate ? pr.rotate() : [0]).map((v) => v.toFixed(3)).join(','), (pr.center ? pr.center() : [0]).map((v) => v.toFixed(3)).join(','), o.grid || 24].join('|');
+    G._rc = G._rc || []; let hit = G._rc.find((e) => e.key === key);
+    if (!hit) {
+      const c = G._rc.length >= 3 ? G._rc.shift().c : MG.canvas(MG.W, MG.H); const x = c.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.clearRect(0, 0, MG.W, MG.H);
+      const [lon0, lat0, lon1, lat1] = bbox; const n = o.grid || 24;
+      MG.persp.quad(x, img, (u, v) => { const lon = lon0 + u * (lon1 - lon0), lat = lat1 - v * (lat1 - lat0); if (o.onlyVisible) { const r = pr.rotate(); const d = window.d3.geoDistance([lon, lat], [-r[0], -r[1]]); if (d > Math.PI / 2 + 0.15) return null; } const p = pr([lon, lat]); return p && isFinite(p[0]) ? p : null; }, n);
+      hit = { key, c }; G._rc.push(hit);
+    }
+    ctx.save(); if (o.alpha !== undefined) ctx.globalAlpha *= o.alpha; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(hit.c, 0, 0); ctx.restore();
   };
   /** Iberian shaded relief (Natural Earth) drawn into projection. o: {alpha, clip: feature, grid} */
   G.IBERIA_BBOX = [-19, 26, 6, 45.5];

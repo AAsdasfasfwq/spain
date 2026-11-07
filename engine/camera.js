@@ -52,14 +52,13 @@
       if (typeof q === 'function') return q(u, v);
       const top = [lerp(q[0][0], q[1][0], u), lerp(q[0][1], q[1][1], u)], bot = [lerp(q[3][0], q[2][0], u), lerp(q[3][1], q[2][1], u)]; return [lerp(top[0], bot[0], v), lerp(top[1], bot[1], v)]; };
     ctx.save(); if (o.alpha !== undefined) ctx.globalAlpha *= o.alpha;
-    const tri = (s0, s1, s2, d0, d1, d2) => { // map source triangle (pixels) to dest triangle
-      const [x0, y0] = s0, [x1, y1] = s1, [x2, y2] = s2, [u0, v0] = d0, [u1, v1] = d1, [u2, v2] = d2;
-      const den = x0 * (y2 - y1) - x1 * y2 + x2 * y1 + (x1 - x2) * y0; if (Math.abs(den) < 1e-9) return;
-      const a = -(y0 * (u2 - u1) - y1 * u2 + y2 * u1 + (y1 - y2) * u0) / den, b = (y0 * (v2 - v1) - y1 * v2 + y2 * v1 + (y1 - y2) * v0) / den;
-      const c = (x0 * (u2 - u1) - x1 * u2 + x2 * u1 + (x1 - x2) * u0) / den, d = -(x0 * (v2 - v1) - x1 * v2 + x2 * v1 + (x1 - x2) * v0) / den;
-      const e = (x0 * (y2 * u1 - y1 * u2) + y0 * (x1 * u2 - x2 * u1) + (x2 * y1 - x1 * y2) * u0) / den, f = (x0 * (y2 * v1 - y1 * v2) + y0 * (x1 * v2 - x2 * v1) + (x2 * y1 - x1 * y2) * v0) / den;
-      // expand dest triangle slightly to hide seams
-      const cxm = (u0 + u1 + u2) / 3, cym = (v0 + v1 + v2) / 3, ex = (p) => [p[0] + (p[0] - cxm) * 0.02 + Math.sign(p[0] - cxm) * 0.6, p[1] + (p[1] - cym) * 0.02 + Math.sign(p[1] - cym) * 0.6];
+    const tri = (s0, s1, s2, d0, d1, d2) => { // affine map of source triangle (image px) onto dest triangle (screen)
+      const sx1 = s1[0] - s0[0], sy1 = s1[1] - s0[1], sx2 = s2[0] - s0[0], sy2 = s2[1] - s0[1];
+      const dx1 = d1[0] - d0[0], dy1 = d1[1] - d0[1], dx2 = d2[0] - d0[0], dy2 = d2[1] - d0[1];
+      const det = sx1 * sy2 - sx2 * sy1; if (Math.abs(det) < 1e-9) return;
+      const a = (dx1 * sy2 - dx2 * sy1) / det, c = (dx2 * sx1 - dx1 * sx2) / det, b = (dy1 * sy2 - dy2 * sy1) / det, d = (dy2 * sx1 - dy1 * sx2) / det;
+      const e = d0[0] - (a * s0[0] + c * s0[1]), f = d0[1] - (b * s0[0] + d * s0[1]);
+      const cxm = (d0[0] + d1[0] + d2[0]) / 3, cym = (d0[1] + d1[1] + d2[1]) / 3; const ex = (p) => { const vx = p[0] - cxm, vy = p[1] - cym, L = Math.hypot(vx, vy) || 1; return [p[0] + (vx / L) * 0.9, p[1] + (vy / L) * 0.9]; };
       const A = ex(d0), B = ex(d1), C = ex(d2);
       ctx.save(); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.lineTo(C[0], C[1]); ctx.closePath(); ctx.clip(); ctx.transform(a, b, c, d, e, f); ctx.drawImage(img, 0, 0); ctx.restore();
     };
@@ -84,8 +83,8 @@
     /** shared WebGLRenderer (1920×1080). */
     renderer() {
       if (this._r) return this._r; const T = window.THREE; if (!T) throw new Error('THREE not loaded yet');
-      const r = new T.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
-      r.setPixelRatio(1); r.setSize(MG.W, MG.H, false); r.outputColorSpace = T.SRGBColorSpace; r.toneMapping = T.ACESFilmicToneMapping; r.toneMappingExposure = 1.0; r.shadowMap.enabled = true; r.shadowMap.type = T.PCFSoftShadowMap;
+      const r = new T.WebGLRenderer({ antialias: false, alpha: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+      r.setPixelRatio(1); r.setSize(MG.W, MG.H, false); r.outputColorSpace = T.SRGBColorSpace; r.toneMapping = T.ACESFilmicToneMapping; r.toneMappingExposure = 1.0; r.shadowMap.enabled = false; r.shadowMap.type = T.PCFShadowMap; // enable per scene only if really needed (slow in software GL)
       this._r = r; return r;
     },
     /** PMREM room environment for nice PBR reflections (cached) */

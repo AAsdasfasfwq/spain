@@ -48,7 +48,7 @@
     retro: { temp: 0.05, tint: -0.015, sat: 0.92, contrast: 0.96, lift: 0.04, gamma: 1.02 },
     heat: { temp: 0.16, tint: 0.02, sat: 1.1, contrast: 1.06 },
   };
-  MG.POST_DEFAULT = { grade: 'neutral', grain: 0.045, vignette: 0.32, aberration: 0.0016, bloom: 0, bloomThreshold: 0.72, letterbox: 0, fade: 0, fadeColor: [0, 0, 0], temp: 0, tint: 0, sat: 1, contrast: 1, lift: 0, gamma: 1, gain: 1, halation: 0 };
+  MG.POST_DEFAULT = { grade: 'neutral', grain: 0.045, vignette: 0.32, aberration: 0, bloom: 0, bloomThreshold: 0.72, letterbox: 0, fade: 0, fadeColor: [0, 0, 0], temp: 0, tint: 0, sat: 1, contrast: 1, lift: 0, gamma: 1, gain: 1, halation: 0 };
   const POST_KEYS = ['grain', 'vignette', 'aberration', 'bloom', 'bloomThreshold', 'letterbox', 'fade', 'temp', 'tint', 'sat', 'contrast', 'lift', 'gamma', 'gain', 'halation'];
   function resolvePost(scene, t) {
     let p = scene && scene.post; if (typeof p === 'function') p = p(t, sceneInfo(scene, t));
@@ -163,60 +163,40 @@
     return post;
   };
 
-  // ---------- post (WebGL with 2D fallback) ----------
-  const VS = `attribute vec2 p; varying vec2 uv; void main(){ uv = p*0.5+0.5; uv.y = 1.0-uv.y; gl_Position = vec4(p,0.,1.); }`;
-  const FS = `precision highp float; varying vec2 uv; uniform sampler2D tex; uniform sampler2D blm;
-  uniform float grain, vign, aber, bloom, thr, lbox, fade, temp, tint, sat, con, lift, gam, gain, seed, halation; uniform vec3 fadeCol; uniform vec2 res;
-  float h(vec2 p){ p = fract(p*vec2(443.897,441.423)); p += dot(p, p.yx+19.19); return fract((p.x+p.y)*p.x); }
-  void main(){
-    vec2 c = uv-0.5; float r2 = dot(c,c);
-    vec2 off = c * aber * (0.4 + r2*3.0);
-    vec3 col; col.r = texture2D(tex, uv+off).r; col.g = texture2D(tex, uv).g; col.b = texture2D(tex, uv-off).b;
-    if (bloom > 0.0 || halation > 0.0) { vec3 b = texture2D(blm, uv).rgb; vec3 bb = max(b - thr, 0.0) / max(1.0-thr, 0.01); col += bb * bloom; col += vec3(1.0,0.45,0.2) * max(b.r - thr*0.9, 0.0) * halation; }
-    // white balance
-    col *= vec3(1.0 + temp, 1.0 - tint*0.5, 1.0 - temp) ; col.g *= 1.0 + tint*-0.5 + tint*0.0;
-    // lift / gamma / gain
-    col = col * gain + lift * (1.0 - col); col = pow(max(col, 0.0), vec3(1.0/gam));
-    float l = dot(col, vec3(0.2126,0.7152,0.0722)); col = mix(vec3(l), col, sat);
-    col = (col - 0.5) * con + 0.5;
-    // vignette
-    float v = smoothstep(0.85, 0.15, length(c*vec2(1.0, 0.86))*1.18); col *= mix(1.0, v, vign);
-    // grain (luma-weighted, film-like)
-    float n = h(uv*res + seed*91.7) - 0.5; n += h(uv*res*0.5 + seed*13.1) - 0.5; col += n * grain * (0.6 + 0.4*(1.0-l));
-    col = mix(col, fadeCol, fade);
-    float lb = lbox * 0.5; if (uv.y < lb || uv.y > 1.0-lb) col = vec3(0.02);
-    gl_FragColor = vec4(clamp(col,0.0,1.0), 1.0);
-  }`;
-  const P = (MG.post = { gl: null });
+  // ---------- post-processing (CPU 2D: fast & identical on every machine) ----------
+  const P = (MG.post = {});
   P.init = (canvas) => {
-    P.out = canvas; let gl = null;
-    try { gl = canvas.getContext('webgl', { preserveDrawingBuffer: true, antialias: false, premultipliedAlpha: false }); } catch (e) { gl = null; }
-    if (!gl) { console.warn('[post] WebGL unavailable — using 2D fallback'); P.ctx2d = canvas.getContext('2d'); return; }
-    const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
-    const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr); gl.useProgram(pr);
-    const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const mk = (unit) => { const tx = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, tx); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return tx; };
-    P.t0 = mk(0); P.t1 = mk(1); gl.uniform1i(gl.getUniformLocation(pr, 'tex'), 0); gl.uniform1i(gl.getUniformLocation(pr, 'blm'), 1);
-    P.u = {}; for (const n of ['grain', 'vign', 'aber', 'bloom', 'thr', 'lbox', 'fade', 'temp', 'tint', 'sat', 'con', 'lift', 'gam', 'gain', 'seed', 'halation', 'fadeCol', 'res']) P.u[n] = gl.getUniformLocation(pr, n);
-    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false); P.gl = gl; P.blm = MG.canvas(384, 216);
+    P.out = canvas; P.ctx = canvas.getContext('2d', { alpha: false }); P.small = MG.canvas(480, 270); P.tmpR = MG.canvas(MG.W, MG.H); P.tmpGB = MG.canvas(MG.W, MG.H);
+    P.vig = MG.cache('post:vignette', MG.W, MG.H, (x, w, h) => { const g = x.createRadialGradient(w / 2, h / 2, h * 0.28, w / 2, h / 2, Math.hypot(w, h) * 0.56); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.55, 'rgba(10,6,8,0.25)'); g.addColorStop(1, 'rgba(10,6,8,1)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
+    P.grains = []; for (let i = 0; i < 6; i++) P.grains.push(MG.cache('post:grain' + i, 512, 512, (x, w, h) => { const id = x.createImageData(w, h); const r = MG.rng(77 + i * 13); for (let k = 0; k < w * h; k++) { const v = (r() + r() + r()) / 3; const c = v * 255; id.data[k * 4] = id.data[k * 4 + 1] = id.data[k * 4 + 2] = c; id.data[k * 4 + 3] = 255; } x.putImageData(id, 0, 0); }));
   };
   P.apply = (src, o, frame) => {
-    const gl = P.gl;
-    if (!gl) { // 2D fallback
-      const x = P.ctx2d; MG.reset(x); x.filter = `saturate(${o.sat}) contrast(${o.con || o.contrast})`; x.drawImage(src, 0, 0); x.filter = 'none';
-      if (o.vignette > 0) { const g = x.createRadialGradient(960, 540, 300, 960, 540, 1150); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, `rgba(0,0,0,${o.vignette})`); x.fillStyle = g; x.fillRect(0, 0, MG.W, MG.H); }
-      if (o.grain > 0) { x.globalAlpha = o.grain * 2.2; x.globalCompositeOperation = 'overlay'; const tile = MG.tex.grain(256, 1, (frame % 8) + 1); x.fillStyle = x.createPattern(tile, 'repeat'); x.fillRect(0, 0, MG.W, MG.H); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
-      if (o.fade > 0) { x.fillStyle = `rgba(${o.fadeColor.map((v) => v * 255).join(',')},${o.fade})`; x.fillRect(0, 0, MG.W, MG.H); }
-      return;
+    const x = P.ctx; MG.reset(x);
+    const bright = (o.gain || 1) * (1 + (o.lift || 0) * 0.6) * (1 / Math.max(0.5, o.gamma || 1)) ** 0.25;
+    const filt = []; if (Math.abs((o.sat ?? 1) - 1) > 0.005) filt.push(`saturate(${o.sat.toFixed(3)})`); if (Math.abs((o.contrast ?? 1) - 1) > 0.005) filt.push(`contrast(${o.contrast.toFixed(3)})`); if (Math.abs(bright - 1) > 0.005) filt.push(`brightness(${bright.toFixed(3)})`);
+    const ab = o.aberration || 0;
+    if (ab >= 0.0012) { // edge-weighted RGB split: red channel scaled out, blue in
+      const R = P.tmpR.getContext('2d'), GB = P.tmpGB.getContext('2d');
+      R.globalCompositeOperation = 'source-over'; R.drawImage(src, 0, 0); R.globalCompositeOperation = 'multiply'; R.fillStyle = '#ff0000'; R.fillRect(0, 0, MG.W, MG.H);
+      GB.globalCompositeOperation = 'source-over'; GB.drawImage(src, 0, 0); GB.globalCompositeOperation = 'multiply'; GB.fillStyle = '#00ffff'; GB.fillRect(0, 0, MG.W, MG.H);
+      x.filter = filt.join(' ') || 'none'; x.drawImage(P.tmpGB, 0, 0); x.globalCompositeOperation = 'lighter'; const s = 1 + ab * 1.6; x.drawImage(P.tmpR, MG.W / 2 * (1 - s), MG.H / 2 * (1 - s), MG.W * s, MG.H * s); x.globalCompositeOperation = 'source-over'; x.filter = 'none';
+    } else { x.filter = filt.join(' ') || 'none'; x.drawImage(src, 0, 0); x.filter = 'none'; }
+    // white balance & tint as soft-light washes
+    if (Math.abs(o.temp || 0) > 0.003) { x.globalCompositeOperation = 'soft-light'; x.globalAlpha = Math.min(1, Math.abs(o.temp) * 3.2); x.fillStyle = o.temp > 0 ? '#ff9a3c' : '#3c8cff'; x.fillRect(0, 0, MG.W, MG.H); }
+    if (Math.abs(o.tint || 0) > 0.003) { x.globalCompositeOperation = 'soft-light'; x.globalAlpha = Math.min(1, Math.abs(o.tint) * 3.2); x.fillStyle = o.tint > 0 ? '#ff3cc8' : '#3cff6a'; x.fillRect(0, 0, MG.W, MG.H); }
+    if ((o.lift || 0) > 0.003) { x.globalCompositeOperation = 'screen'; x.globalAlpha = Math.min(0.5, o.lift * 2); x.fillStyle = '#3a3040'; x.fillRect(0, 0, MG.W, MG.H); }
+    x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+    // bloom / halation from a thresholded, blurred downsample
+    if ((o.bloom || 0) > 0.01 || (o.halation || 0) > 0.01) {
+      const s = P.small.getContext('2d'); s.globalCompositeOperation = 'source-over'; s.filter = `brightness(${(0.55 + (1 - (o.bloomThreshold ?? 0.72)) * 0.6).toFixed(2)}) contrast(3.2) blur(5px)`; s.drawImage(src, 0, 0, 480, 270); s.filter = 'none';
+      x.globalCompositeOperation = 'screen'; if (o.bloom > 0.01) { x.globalAlpha = Math.min(1, o.bloom); x.drawImage(P.small, 0, 0, MG.W, MG.H); }
+      if (o.halation > 0.01) { s.globalCompositeOperation = 'multiply'; s.fillStyle = '#ff5a2a'; s.fillRect(0, 0, 480, 270); x.globalAlpha = Math.min(1, o.halation); x.drawImage(P.small, -6, -4, MG.W + 12, MG.H + 8); }
+      x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
     }
-    gl.viewport(0, 0, MG.W, MG.H);
-    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, P.t0); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
-    if (o.bloom > 0 || o.halation > 0) { const bx = P.blm.getContext('2d'); bx.filter = 'blur(7px)'; bx.drawImage(src, 0, 0, 384, 216); bx.filter = 'none'; gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, P.t1); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, P.blm); }
-    const u = P.u; gl.uniform1f(u.grain, o.grain); gl.uniform1f(u.vign, o.vignette); gl.uniform1f(u.aber, o.aberration); gl.uniform1f(u.bloom, o.bloom); gl.uniform1f(u.thr, o.bloomThreshold); gl.uniform1f(u.lbox, o.letterbox); gl.uniform1f(u.fade, o.fade);
-    gl.uniform1f(u.temp, o.temp); gl.uniform1f(u.tint, o.tint); gl.uniform1f(u.sat, o.sat); gl.uniform1f(u.con, o.contrast); gl.uniform1f(u.lift, o.lift); gl.uniform1f(u.gam, o.gamma); gl.uniform1f(u.gain, o.gain); gl.uniform1f(u.seed, (frame % 997) * 0.37 + 0.11); gl.uniform1f(u.halation, o.halation || 0);
-    gl.uniform3f(u.fadeCol, o.fadeColor[0], o.fadeColor[1], o.fadeColor[2]); gl.uniform2f(u.res, MG.W, MG.H);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    if ((o.vignette || 0) > 0.01) { x.globalCompositeOperation = 'multiply'; x.globalAlpha = Math.min(1, o.vignette * 1.1); x.drawImage(P.vig, 0, 0); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
+    if ((o.grain || 0) > 0.002) { const tile = P.grains[frame % P.grains.length]; const pat = MG.tex.pattern(x, tile); const ox = (MG.hash(frame) * 512) | 0, oy = (MG.hash(frame + 7) * 512) | 0; x.save(); x.globalCompositeOperation = 'overlay'; x.globalAlpha = Math.min(1, o.grain * 4.2); x.translate(-ox, -oy); x.fillStyle = pat; x.fillRect(ox, oy, MG.W, MG.H); x.restore(); }
+    if ((o.fade || 0) > 0.001) { x.globalAlpha = Math.min(1, o.fade); x.fillStyle = `rgb(${o.fadeColor.map((v) => Math.round(v * 255)).join(',')})`; x.fillRect(0, 0, MG.W, MG.H); x.globalAlpha = 1; }
+    if ((o.letterbox || 0) > 0.001) { const h = MG.H * o.letterbox * 0.5; x.fillStyle = '#070606'; x.fillRect(0, 0, MG.W, h); x.fillRect(0, MG.H - h, MG.W, h); }
   };
 
   /** render final frame at time t into the output canvas */

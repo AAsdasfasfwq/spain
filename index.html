@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SPAIN — the empire the world comes to</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<style>
+  html, body { margin: 0; background: #0e0c0b; overflow: hidden; }
+  #out { display: block; width: 1920px; height: 1080px; }
+  body.fit #out { width: 100vw; height: 56.25vw; max-height: 100vh; max-width: 177.78vh; margin: auto; }
+  #mgbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; gap: 12px; align-items: center; padding: 8px 14px; background: rgba(14,12,11,.86); color: #f1e6d0; font: 13px 'JetBrains Mono', monospace; }
+  #mgbar input[type=range] { flex: 1; } #mgbar button { font-size: 16px; width: 44px; }
+  /* make sure every font face is requested early */
+  .fontwarm { position: absolute; left: -9999px; top: -9999px; }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/": "./vendor/three-addons/" } }</script>
+</head>
+<body>
+<canvas id="out" width="1920" height="1080"></canvas>
+<div class="fontwarm" aria-hidden="true">
+  <span style="font-family:Fraunces">a</span><span style="font-family:'Instrument Serif'">a</span><span style="font-family:Bricolage">a</span><span style="font-family:'Big Shoulders'">a</span><span style="font-family:'JetBrains Mono'">a</span><span style="font-family:Unbounded">a</span><span style="font-family:'IM Fell'">a</span><span style="font-family:'IM Fell SC'">a</span><span style="font-family:Cinzel">a</span><span style="font-family:'Saira Stencil'">a</span><span style="font-family:'Big Shoulders Stencil'">a</span><span style="font-family:Shrikhand">a</span><span style="font-family:'Permanent Marker'">a</span><span style="font-family:'Caveat Brush'">a</span><span style="font-family:'Bodoni Moda'">a</span><span style="font-family:'Climate Crisis'">a</span><span style="font-family:'Abril Fatface'">a</span><span style="font-family:Amiri">a الله</span>
+</div>
+<!-- libraries -->
+<script src="vendor/d3-array.min.js"></script>
+<script src="vendor/d3-geo.min.js"></script>
+<script src="vendor/d3-contour.min.js"></script>
+<script src="vendor/topojson-client.min.js"></script>
+<!-- data -->
+<script src="data/words.js"></script>
+<script src="data/geo_world110.js"></script>
+<script src="data/geo_world50.js"></script>
+<script src="data/geo_iberia10.js"></script>
+<script src="data/geo_spain.js"></script>
+<script src="data/geo_extra.js"></script>
+<!-- engine -->
+<script src="engine/util.js"></script>
+<script src="engine/draw.js"></script>
+<script src="engine/text.js"></script>
+<script src="engine/camera.js"></script>
+<script src="engine/geo.js"></script>
+<script src="engine/core.js"></script>
+<script src="engine/audio.js"></script>
+<script src="engine/kit.js"></script>
+<script type="module">
+  import * as THREE from 'three';
+  import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+  import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+  import { ConvexGeometry } from 'three/addons/geometries/ConvexGeometry.js';
+  import { SVGLoader } from 'three/addons/loaders/SVGLoader.js';
+  import * as BufferGeometryUtils from 'three/addons/utils/BufferGeometryUtils.js';
+  import { SimplexNoise } from 'three/addons/math/SimplexNoise.js';
+  window.THREE = THREE;
+  window.THREE_ADDONS = { RoomEnvironment, RoundedBoxGeometry, ConvexGeometry, SVGLoader, BufferGeometryUtils, SimplexNoise };
+  window.dispatchEvent(new Event('three-ready'));
+</script>
+<script src="engine/boot.js"></script>
+</body>
+</html>
