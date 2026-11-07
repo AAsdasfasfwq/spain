@@ -11,8 +11,8 @@ divide. Its visual world is a sun-baked editorial paper world lit by ONE low war
 casts a long, violet-tinted shadow; light and shade are the film's grammar. The recurring hero object is **the sun disk** —
 a textured saffron disk (`MG.kit.sun`) that keeps transforming: sun → silver peso coin → clock face (Franco's time zone) →
 solar panel → olive → football → spotlight → setting sun at the end. A hard diagonal light/shadow line ("the bullring
-divide", `MG.kit.solSombra`, `MG.kit.T.sombra`) is the signature wipe. The economy's five pillars are introduced on the
-**sol** side; the five problems ("the price") on the **sombra** side (`MG.kit.numberCard`). Callbacks tie the film: the
+divide", `MG.kit.solSombra`, `MG.kit.T.sombra`) is the signature wipe. Light vs shade tells the story INSIDE the
+scenes (the economy's pillars glow in sun, the problems fall into shade) — never as separate slides. Callbacks tie the film: the
 empire's silver routes (S03) return reversed as bank interest (S06) and finally as the world's tourists flying *in* (S11);
 "more rock than water" (S02) returns in the drought (S07); the 1940 clock (S04) returns as "dinner at ten" (S11).
 
@@ -86,8 +86,12 @@ Safe area: keep text & key info inside x 120…1800, y 90…990. Do not overload
 character, split it into 2–3 beats.
 
 ## 8. Transitions (library: `MG.transitions`, presets `MG.kit.T`)
-Meaningful, varied, never the same one 3× in a row. Family: sun-disk iris (motif), sombra diagonal wipe (signature),
-match cut / object morph (best), whip pan (energetic lists), paper tear (archival / history), azulejo tiles (Andalusia /
+**CLIENT RULE: no slide-like interstitials.** No full-screen title / number / date cards on flat or split colour
+backgrounds, no flat diagonal colour-band wipes (`MG.kit.numberCard` is BANNED; `MG.kit.dateCard` / `MG.kit.chapter`
+avoided). Topic changes and dates live INSIDE the visual world (engraved, standing in the scene, on objects, on the map,
+perspective type) and are reached by content-motivated, spatial transitions. Graphic wipes / iris / tiles / split / tear
+are allowed only when they are a real object or camera move in the scene, not decoration.
+Meaningful, varied, never the same one 3× in a row. Family: match cut / object morph (best), camera move / pass-through, foreground wipe by a real object,, whip pan (energetic lists), paper tear (archival / history), azulejo tiles (Andalusia /
 identity), rack-focus blur (calm), zoom-through, light flash, shape-mask (e.g. Spain silhouette), split, dip, hard cut on
 the beat. Object → infographic, infographic → physical scene, map → real environment, typography → scene.
 

@@ -194,7 +194,7 @@
       x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
     }
     if ((o.vignette || 0) > 0.01) { x.globalCompositeOperation = 'multiply'; x.globalAlpha = Math.min(1, o.vignette * 1.1); x.drawImage(P.vig, 0, 0); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
-    if ((o.grain || 0) > 0.002) { const tile = P.grains[frame % P.grains.length]; const pat = MG.tex.pattern(x, tile); const ox = (MG.hash(frame) * 512) | 0, oy = (MG.hash(frame + 7) * 512) | 0; x.save(); x.globalCompositeOperation = 'overlay'; x.globalAlpha = Math.min(1, o.grain * 4.2); x.translate(-ox, -oy); x.fillStyle = pat; x.fillRect(ox, oy, MG.W, MG.H); x.restore(); }
+    if ((o.grain || 0) > 0.002) { const tile = P.grains[frame % P.grains.length]; const pat = MG.tex.pattern(x, tile); const ox = (MG.hash(frame) * 512) | 0, oy = (MG.hash(frame + 7) * 512) | 0; x.save(); x.globalCompositeOperation = 'overlay'; x.globalAlpha = Math.min(1, o.grain * 2.8); x.scale(1.5, 1.5); x.translate(-ox, -oy); x.fillStyle = pat; x.fillRect(ox, oy, MG.W, MG.H); x.restore(); }
     if ((o.fade || 0) > 0.001) { x.globalAlpha = Math.min(1, o.fade); x.fillStyle = `rgb(${o.fadeColor.map((v) => Math.round(v * 255)).join(',')})`; x.fillRect(0, 0, MG.W, MG.H); x.globalAlpha = 1; }
     if ((o.letterbox || 0) > 0.001) { const h = MG.H * o.letterbox * 0.5; x.fillStyle = '#070606'; x.fillRect(0, 0, MG.W, h); x.fillRect(0, MG.H - h, MG.W, h); }
   };

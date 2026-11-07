@@ -123,7 +123,7 @@ Kit: `MG.kit.iberiaMap(ctx,{view,lift,relief,regions,provinces,spain,sea,portuga
 
 ## Kit (kit.js)
 Palette `MG.PAL`, states `MG.STATES`. Motifs: `MG.kit.sun(ctx,x,y,r,t,{variant:'sun|coin|clock|flat',rays,corona,halftone,hour,ring})`,
-`MG.kit.solSombra(ctx,pos,{angle,alpha})`. Interstitials: `MG.kit.numberCard(ctx,t,t0,{n,total,title,side:'sol'|'sombra',kicker})`,
+`MG.kit.solSombra(ctx,pos,{angle,alpha})`. Interstitials (CLIENT: `MG.kit.numberCard` is BANNED; avoid slide-like cards): 
 `MG.kit.dateCard(ctx,t,t0,year,{sub,state})`, `MG.kit.chapter(ctx,t,t0,title,{kicker,state})`, `MG.kit.tag(ctx,t,t0,name,{sub,x,y})`,
 `MG.kit.card(ctx,x,y,w,h,{seed,rot,color,draw})` torn paper card. Characters: `MG.kit.eye(ctx,x,y,{r,look,blink,lid,angry,sad,iris,skin})`,
 `MG.kit.brow`, `MG.kit.mouth(ctx,x,y,{w,mood,open})`, `MG.kit.hand(ctx,x,y,{pose,angle,s,skin,flip})`, `MG.kit.blink(t,seed)`,

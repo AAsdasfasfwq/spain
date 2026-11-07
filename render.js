@@ -8,9 +8,9 @@
      node render.js --audio-only          only (re)build the music + SFX bed and the final mix
      node render.js --video-only          skip audio (silent mp4 of the picture)
      node render.js --preview             open a local server for the browser preview player (http://localhost:8080/?preview=1&fit=1)
-   Options: --quality 0.93 (JPEG frames)  --png (lossless frames, slower)  --crf 16  --preset medium
+   Options: --quality 0.93 (JPEG frames)  --png (lossless frames, slower)  --crf 18  --preset medium
             --bed-gain 0   (dB, music+SFX bed level under the voice)  --force (ignore cached chunks/stems)  --gpu (try hardware GL)
-            --chunk 600 (frames per resumable chunk)
+            --chunk 600 (frames per resumable chunk)   --only s03 (render with only some segment files, for tests)
    Re-running resumes: finished chunks in build/parts and stems in build/audio are reused.
    ===================================================================== */
 const fs = require('fs'); const path = require('path'); const { spawn, spawnSync } = require('child_process'); const os = require('os');
@@ -21,7 +21,7 @@ const FPS = 30;
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 const ff = (args, opts = {}) => { const r = spawnSync('ffmpeg', ['-hide_banner', '-y', ...args], { stdio: opts.quiet ? ['ignore', 'ignore', 'pipe'] : 'inherit', encoding: 'utf8' }); if (r.status !== 0) throw new Error('ffmpeg failed: ' + (r.stderr || '').slice(-2000)); return r; };
 
-async function openPage(port, extra = '') {
+async function openPage(port, extra = (arg('only') ? '&only=' + arg('only') : '')) {
   const B = await launchBrowser({ gpu: flag('gpu') }); const page = await B.newPage();
   page.on('pageerror', (e) => log('pageerror', e.message));
   await page.goto(`http://127.0.0.1:${port}/index.html?v=render${extra}`, { waitUntil: 'load', timeout: 180000 });
@@ -63,7 +63,7 @@ async function buildAudio(port, info) {
 async function buildVideo(port, info, f0, f1, outName) {
   const parts = path.join(BUILD, 'parts'); fs.mkdirSync(parts, { recursive: true });
   const CH = parseInt(arg('chunk', '600')); const chunks = []; for (let a = f0; a < f1; a += CH) chunks.push([a, Math.min(f1, a + CH)]);
-  const fmt = flag('png') ? 'png' : 'jpeg'; const q = parseFloat(arg('quality', '0.93')); const crf = arg('crf', '16'), preset = arg('preset', 'medium');
+  const fmt = flag('png') ? 'png' : 'jpeg'; const q = parseFloat(arg('quality', '0.93')); const crf = arg('crf', '18'), preset = arg('preset', 'medium');
   const name = (c) => path.join(parts, `p_${String(c[0]).padStart(6, '0')}_${String(c[1]).padStart(6, '0')}_${fmt}.mp4`);
   const todo = chunks.filter((c) => flag('force') || !fs.existsSync(name(c)));
   const W = Math.max(1, Math.min(todo.length, parseInt(arg('workers', String(Math.max(1, Math.min(8, os.cpus().length - 1)))))));

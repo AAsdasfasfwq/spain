@@ -19,7 +19,12 @@ deepens / improves them (better ideas welcome), but keeps the handoffs and the f
 | S10 | 1509.97 → 1638.53 | Problem 5 memory · geopolitics · Ceuta/Melilla · Canary route · Gibraltar · Latin America · football | memory → border |
 | S11 | 1638.53 → 1750.00 | Where Spain wins · the unusual choice · live to enjoy · the real empire · end title | finale |
 
-## Handoffs (both neighbours must respect these)
+## Handoffs
+> CLIENT RULE (overrides everything below): no slide-like cards (`MG.kit.numberCard` banned, date/chapter cards avoided).
+> Transition types listed here are suggestions only — the incoming segment picks a content-motivated, spatial transition from
+> the previous segment's last frame. Frame-continuity handoff S01→S02 (relief map) stands; S02 now ends on a living
+> fall-of-Granada scene with 1492 integrated (not a date card) and S03 opens from it with its own motivated transition.
+
 * **S01→S02 @174.63** — S01 ends on the standard relief map: `MG.kit.iberiaMap(ctx,{view:'iberia', relief:0.75, lift:14})`
   with the Meseta emphasised. S02 opens on the identical frame (no transition: continuity), then Madrid's pin drops.
 * **S02→S03 @351.14** — S02 ends on the year **1492** (fall of Granada) as a `MG.kit.dateCard(ctx,t,t0,1492,{state:MG.STATES.empire, sub:'Granada'})`-style
@@ -37,13 +42,13 @@ deepens / improves them (better ideas welcome), but keeps the handoffs and the f
 
 ## Film-wide devices (use them!)
 * Sun disk motif (`MG.kit.sun`) — appears in every segment at least once, transforming meaningfully.
-* SOL/SOMBRA number cards (`MG.kit.numberCard`): pillars **01 tourism (S05) · 02 fashion (S05) · 03 banking (S06) · 04 energy (S06) ·
+* ~~SOL/SOMBRA number cards~~ — BANNED by the client. The structure remains (pillars **01 tourism (S05) · 02 fashion (S05) · 03 banking (S06) · 04 energy (S06) ·
   05 vegetable garden (S06)** on the `sol` side; problems **01 2008 / jobs (S07) · 02 housing (S08) · 03 children (S08) ·
-  04 a country coming apart (S09) · 05 memory (S10)** on the `sombra` side. Same component, same timing (~2.2 s), then a
-  meaningful transition into the topic.
+  04 a country coming apart (S09) · 05 memory (S10)** on the `sombra` side) but each line enters its topic's own world directly (sunlit for pillars,
+  falling into shade for problems), with at most a small numeral integrated into the scene.
 * Callbacks: S03 silver routes ⟶ S06 "conquest in reverse" (same route, reversed, interest payments) ⟶ S11 the world's tourists flying in.
   "More rock than water" type (S02) ⟶ S07. Franco's clock (S04) ⟶ "dinner at ten" (S11). 97 million (S01) ⟶ S08 "those 97 million tourists".
-* Chapter cards (`MG.kit.chapter` / `MG.kit.dateCard`) for big time jumps ("Now for the history" S02, 711 S02, 1492, 1936, 1959, 1975, 2008…).
+* Time jumps shown INSIDE scenes (no chapter/date slides) ("Now for the history" S02, 711 S02, 1492, 1936, 1959, 1975, 2008…).
 
 ## Director notes per segment
 

@@ -148,6 +148,7 @@
    *  side 'sombra' → the price / problems ("The second problem: housing") : violet shadow side
    *  Use for ~2–3 s, then transition out into the topic.  o: {n, total=5, title, side, kicker} */
   K.numberCard = (ctx, t, t0, o = {}) => {
+    if (!K._ncWarn) { K._ncWarn = true; console.warn('[kit] MG.kit.numberCard is BANNED by the client (slide-like interstitial) — remove it'); MG.errors.push('numberCard used (banned)'); }
     const sol = (o.side || 'sol') === 'sol'; const bgA = sol ? P.sol : P.sombra, bgB = sol ? P.cal : P.paper2; const fg = sol ? P.ink : P.cal;
     K.paper(ctx, bgB, { light: 0.2 });
     const k = MG.prog(t, t0, t0 + 0.75, 'inOutCubic'); const ang = MG.deg(-62);
