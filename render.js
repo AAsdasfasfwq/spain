@@ -32,17 +32,23 @@ async function openPage(port, extra = (arg('only') ? '&only=' + arg('only') : ''
 // ---------------- audio ----------------
 async function buildAudio(port, info) {
   const dir = path.join(BUILD, 'audio'); fs.mkdirSync(dir, { recursive: true });
-  const { B, page } = await openPage(port);
-  const stems = [];
+  // stems render in parallel: one headless browser per worker (OfflineAudioContext is single-threaded per page)
+  const stems = []; const queue = [];
   for (const s of info.segments) {
     const f = path.join(dir, `${s.id}.wav`);
     if (!s.audio) { log('audio', s.id, '— no audio() defined, skipped'); continue; }
-    if (fs.existsSync(f) && !flag('force')) { stems.push({ f, start: s.start }); log('audio', s.id, 'cached'); continue; }
-    log('audio', s.id, 'rendering…'); const r = await page.evaluate((id) => MG.audio.renderSegmentWav(id), s.id);
-    const parts = []; for (let i = 0; i < r.chunks; i++) parts.push(Buffer.from(await page.evaluate((i) => MG.audio.chunk(i), i), 'base64'));
-    fs.writeFileSync(f, Buffer.concat(parts)); stems.push({ f, start: s.start }); log('audio', s.id, `ok peak ${(20 * Math.log10(r.peak + 1e-9)).toFixed(1)} dBFS, ${r.seconds.toFixed(1)}s`);
+    stems.push({ f, start: s.start });
+    if (fs.existsSync(f) && !flag('force')) { log('audio', s.id, 'cached'); continue; }
+    queue.push({ s, f });
   }
-  await B.close();
+  const AW = Math.max(1, Math.min(queue.length, parseInt(arg('workers', String(Math.max(1, Math.min(8, os.cpus().length - 1)))))));
+  await Promise.all(Array.from({ length: AW }, async () => {
+    if (!queue.length) return; const { B, page } = await openPage(port);
+    while (queue.length) { const { s, f } = queue.shift(); log('audio', s.id, 'rendering…'); const t0 = Date.now(); const r = await page.evaluate((id) => MG.audio.renderSegmentWav(id), s.id);
+      const parts = []; for (let i = 0; i < r.chunks; i++) parts.push(Buffer.from(await page.evaluate((i) => MG.audio.chunk(i), i), 'base64'));
+      fs.writeFileSync(f, Buffer.concat(parts)); log('audio', s.id, `ok peak ${(20 * Math.log10(r.peak + 1e-9)).toFixed(1)} dBFS, ${r.seconds.toFixed(1)}s audio in ${((Date.now() - t0) / 1000).toFixed(0)}s`); }
+    await B.close();
+  }));
   // ---- mix: VO (normalised, limited) + bed (delayed stems, side-chain ducked under VO) ----
   const out = path.join(BUILD, 'mix.wav'); const vo = path.join(ROOT, 'assets', 'voiceover.mp3'); const dur = info.duration;
   const inputs = ['-i', vo]; stems.forEach((s) => inputs.push('-i', s.f));

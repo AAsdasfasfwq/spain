@@ -24,11 +24,19 @@
     for (const L of sorted) {
       const d = L.z - cz; const s = f / d; let blur = 0;
       if (L.blur !== undefined) blur = L.blur; else if (cam.focus !== undefined) blur = Math.min(cam.maxBlur ?? 22, Math.abs(1 / d - 1 / (cam.focus - cz)) * (cam.aperture ?? 0) * 1000);
-      ctx.save(); ctx.translate(MG.W / 2 + (cam.dx || 0), MG.H / 2 + (cam.dy || 0)); if (cam.rot) ctx.rotate(cam.rot); ctx.scale(s, s); ctx.translate(-(cam.x || 0), -(cam.y || 0));
-      if (L.alpha !== undefined) ctx.globalAlpha *= L.alpha;
-      if (L.sprite) { MG.sprite(ctx, L.sprite, L.x || 0, L.y || 0, { ax: L.ax ?? 0.5, ay: L.ay ?? 0.5, blur: blur > 0.5 ? blur / s : 0, scale: L.scale || 1 }); }
-      else if (L.draw) { if (blur > 0.6) ctx.filter = `blur(${(blur).toFixed(1)}px)`; L.draw(ctx, s, blur); }
-      ctx.restore();
+      const xf = (c) => { c.translate(MG.W / 2 + (cam.dx || 0), MG.H / 2 + (cam.dy || 0)); if (cam.rot) c.rotate(cam.rot); c.scale(s, s); c.translate(-(cam.x || 0), -(cam.y || 0)); };
+      if (L.draw && !L.sprite && blur > 0.6 && !L.direct) {
+        // blurred draw layer: render it sharp into an offscreen buffer, then blur that one bitmap (a canvas filter on every
+        // individual fill/drawImage of the layer costs one full blur pass per call)
+        const B = MG.scratch(8); const bx = B.getContext('2d'); MG.reset(bx); bx.clearRect(0, 0, MG.W, MG.H); bx.save(); xf(bx); L.draw(bx, s, blur); bx.restore(); MG.reset(bx);
+        ctx.save(); if (L.alpha !== undefined) ctx.globalAlpha *= L.alpha; ctx.filter = `blur(${(blur).toFixed(1)}px)`; ctx.drawImage(B, 0, 0); ctx.restore();
+      } else {
+        ctx.save(); xf(ctx);
+        if (L.alpha !== undefined) ctx.globalAlpha *= L.alpha;
+        if (L.sprite) { MG.sprite(ctx, L.sprite, L.x || 0, L.y || 0, { ax: L.ax ?? 0.5, ay: L.ay ?? 0.5, blur: blur > 0.5 ? blur / s : 0, scale: L.scale || 1 }); }
+        else if (L.draw) { if (blur > 0.6) ctx.filter = `blur(${(blur).toFixed(1)}px)`; L.draw(ctx, s, blur); }
+        ctx.restore();
+      }
       if (L.fog) { ctx.save(); ctx.globalAlpha = L.fog[1]; ctx.fillStyle = L.fog[0]; ctx.fillRect(0, 0, MG.W, MG.H); ctx.restore(); }
     }
   };
