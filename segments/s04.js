@@ -773,7 +773,430 @@
     },
     post: (t) => { const k = E.inOutCubic(clamp((t - (S59.tChanges - 0.2)) / 0.9)); return { grade: k > 0.5 ? 'retro' : 'archival', sat: lerp(0.75, 1.08, k), contrast: lerp(1.1, 1.0, k), vignette: lerp(0.45, 0.3, k), grain: 0.045, temp: lerp(0, 0.04, k) }; } });
   // ---- temporary filler for the rest of the segment (replaced chapter by chapter)
-  SC.push({ id: 's04_todo', start: SC[SC.length - 1].end, end: 681.58, draw(ctx, t) { MG.kit.paper(ctx, C.bone); mono(ctx, 'S04 · ' + t.toFixed(1), 960, 540, { align: 'center', size: 40 }); } });
+  // =====================================================================================================
+  // WORLD 2 — 1960s TRAVEL POSTER (572 → 631.8)   ·   WORLD 3 — SUN vs CLOCK (631.8 → 681.6)
+  // =====================================================================================================
+  const PO = {}; S4.PO = PO;
+  /** poster-print fill: flat ink + halftone core shadow + slight mis-registration rim */
+  PO.ink = (ctx, path, bb, col, o = {}) => {
+    ctx.save(); if (o.reg !== false) { ctx.save(); ctx.translate(o.rx ?? 2.5, o.ry ?? 1.5); ctx.fillStyle = rgba(o.regCol || C.coral, 0.35); ctx.fill(path); ctx.restore(); }
+    ctx.fillStyle = col; ctx.fill(path);
+    if (o.ht !== false) MG.fx.halftone(ctx, path, bb, { spacing: o.sp || 7, color: rgba(o.shade || C.navy, o.htA ?? 0.32), light: o.light || [-0.6, -0.8], cut: 0.42, amount: 1.25, angle: 22 });
+    ctx.restore();
+  };
+  PO.paperBg = (ctx, col) => ctx.drawImage(MG.tex.paper(col, { seed: 41, light: 0.18, blotch: 0.07 }), 0, 0);
+  PO.cloud = (ctx, x, y, s, col, t) => { const p = new Path2D(); const b = [[-60, 6, 34], [-25, -14, 42], [18, -20, 46], [58, -2, 36], [80, 14, 24], [-82, 16, 22]]; for (const [bx, by, r] of b) p.arc(x + (bx + Math.sin(t * 0.6 + bx) * 2) * s, y + by * s, r * s, 0, TAU); p.rect(x - 85 * s, y + 6 * s, 170 * s, 28 * s); PO.ink(ctx, p, [x - 110 * s, y - 70 * s, 220 * s, 110 * s], col, { sp: 6, shade: C.navy, htA: 0.22, reg: false }); };
+  PO.plane = (ctx, x, y, ang, s, col = C.white) => { ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.scale(s, s); const b = new Path2D('M-46 0 C-40 -7 30 -8 44 -3 C50 0 50 2 44 4 C30 8 -40 7 -46 0 Z'); const w = new Path2D('M-6 -2 L-22 -34 L-12 -34 L16 -3 Z M-6 2 L-22 34 L-12 34 L16 3 Z M-40 -1 L-50 -16 L-43 -16 L-32 -1 Z M-40 1 L-50 16 L-43 16 L-32 1 Z'); ctx.fillStyle = 'rgba(20,30,40,0.25)'; ctx.save(); ctx.translate(6, 10); ctx.fill(b); ctx.fill(w); ctx.restore(); ctx.fillStyle = mix(col, C.navy, 0.15); ctx.fill(w); ctx.fillStyle = col; ctx.fill(b); ctx.fillStyle = C.coral; ctx.fillRect(-44, -1.2, 86, 2.4); ctx.fillStyle = C.navy; for (let i = 0; i < 6; i++) ctx.fillRect(-20 + i * 9, -3.2, 3, 2.2); ctx.restore(); };
+  PO.parasol = (s, c1, c2) => MG.cache(`s4po:par:${s}:${c1}:${c2}`, 120 * s, 120 * s, (x, w) => { const cx = w / 2, cy = w / 2, R = w * 0.46; x.fillStyle = 'rgba(20,30,40,0.22)'; x.beginPath(); x.ellipse(cx + R * 0.35, cy + R * 0.3, R, R * 0.8, 0, 0, TAU); x.fill(); for (let k = 0; k < 8; k++) { x.fillStyle = k % 2 ? c1 : c2; x.beginPath(); x.moveTo(cx, cy); x.arc(cx, cy, R, k * TAU / 8, (k + 1) * TAU / 8); x.fill(); } const g = x.createRadialGradient(cx - R * 0.4, cy - R * 0.4, 0, cx, cy, R); g.addColorStop(0, 'rgba(255,255,255,0.35)'); g.addColorStop(1, 'rgba(0,0,0,0.18)'); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, R, 0, TAU); x.fill(); x.fillStyle = C.navy; x.beginPath(); x.arc(cx, cy, R * 0.07, 0, TAU); x.fill(); });
+  PO.towel = (ctx, x, y, a, c1, c2, s = 1) => { ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.scale(s, s); ctx.fillStyle = 'rgba(30,40,40,0.18)'; ctx.fillRect(-15, -26, 34, 56); ctx.fillStyle = c1; ctx.fillRect(-18, -30, 32, 56); ctx.fillStyle = c2; for (let i = 0; i < 4; i++) ctx.fillRect(-18, -30 + i * 14 + 4, 32, 5); ctx.restore(); };
+  /** stylised 60s technocrat (dark suit, thin tie, horn-rims). x,y = feet centre; s scale; o: {turn,-1..1, bob, hair, skin, arm (0..1 raised), glasses} */
+  PO.tech = (ctx, x, y, s, t, o = {}) => {
+    const al = MG.kit.alive(t, o.seed || 1); const turn = o.turn || 0; const skin = o.skin || '#E6C2A0', suit = o.suit || '#28323A', ink = '#141218';
+    ctx.save(); ctx.translate(x, y + al.bob * 0.6); ctx.scale(s, s); ctx.rotate(al.sway * 0.5);
+    MG.fx.contact(ctx, 0, 0, 70, 12, 0.3);
+    const legs = new Path2D('M-34 0 L-30 -150 L-4 -150 L-6 0 Z M6 0 L4 -150 L30 -150 L34 0 Z'); ctx.fillStyle = mix(suit, '#000', 0.25); ctx.fill(legs);
+    ctx.fillStyle = ink; ctx.beginPath(); ctx.ellipse(-20, -2, 22, 7, 0, 0, TAU); ctx.ellipse(20, -2, 22, 7, 0, 0, TAU); ctx.fill();
+    const torso = new Path2D('M-52 -150 C-60 -230 -58 -290 -40 -312 L40 -312 C58 -290 60 -230 52 -150 Z'); MG.fx.volume(ctx, torso, [-62, -315, 124, 170], { color: suit, shade: 0.5, hi: 0.18, cel: true, outline: ink, outlineW: 3 });
+    ctx.fillStyle = '#F4EFE6'; ctx.beginPath(); ctx.moveTo(-16, -312); ctx.lineTo(0, -250); ctx.lineTo(16, -312); ctx.fill(); ctx.fillStyle = o.tie || C.coralD; ctx.beginPath(); ctx.moveTo(-4, -306); ctx.lineTo(4, -306); ctx.lineTo(6, -246); ctx.lineTo(0, -238); ctx.lineTo(-6, -246); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-16, -312); ctx.lineTo(-6, -232); ctx.moveTo(16, -312); ctx.lineTo(6, -232); ctx.stroke();
+    // arms
+    const ar = o.arm ?? 0; const armPath = (side) => { const sx = side * 48; const ex = side * (56 + ar * 30), ey = -232 - ar * 40; const hx = side * (46 + ar * 70), hy = -170 - ar * 86; return [[sx, -298], [ex, ey], [hx, hy]]; };
+    for (const side of [-1, 1]) { const pts = armPath(side); MG.fx.ink(ctx, MG.path.spline(pts, 6), { width: 30, color: mix(suit, '#000', side < 0 ? 0.1 : 0.22), taper: [0, 0.15] }); MG.kit.hand(ctx, pts[2][0], pts[2][1], { pose: 'open', angle: side * 0.4 + (ar > 0.5 ? Math.PI : 0), s: 0.4, skin, flip: side < 0 }); }
+    // head
+    ctx.save(); ctx.translate(turn * 6, -320); const head = MG.path.smooth([[-30, -20], [-26, -66], [0, -82], [27, -66], [31, -20], [20, 8], [0, 16], [-20, 8]], true); MG.fx.volume(ctx, head, [-34, -84, 68, 102], { color: skin, shade: 0.45, hi: 0.3, cel: true, outline: ink, outlineW: 3, light: [-0.6, -0.8] });
+    ctx.fillStyle = skin; ctx.beginPath(); ctx.ellipse(-31 + turn * 4, -34, 6, 10, 0, 0, TAU); ctx.ellipse(31 + turn * 4, -34, 6, 10, 0, 0, TAU); ctx.fill();
+    const hair = new Path2D(`M-31 -44 C-36 -84 ${-8 + turn * 6} -98 28 -80 C34 -72 33 -58 31 -46 C22 -66 ${-4 + turn * 4} -72 -31 -44 Z`); ctx.fillStyle = o.hair || '#1B1716'; ctx.fill(hair); ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-12, -80); ctx.quadraticCurveTo(10, -88, 24, -74); ctx.stroke();
+    const ex = turn * 9, bl = MG.kit.blink(t, o.seed || 1);
+    for (const sx of [-12, 12]) MG.kit.eye(ctx, sx + ex, -38, { r: 5.5, look: [turn * 0.6 + (o.look || 0), 0.1], blink: bl, skin, iris: '#3a2a20' });
+    ctx.strokeStyle = ink; ctx.lineWidth = 2.6; for (const sx of [-12, 12]) { ctx.beginPath(); ctx.roundRect(sx + ex - 10, -46, 20, 15, 4); ctx.stroke(); } ctx.beginPath(); ctx.moveTo(-2 + ex, -40); ctx.lineTo(2 + ex, -40); ctx.stroke(); ctx.fillStyle = ink; ctx.fillRect(-23 + ex, -47, 46, 3.5);
+    MG.fx.ink(ctx, [[2 + ex, -34], [6 + ex * 1.3, -16], [0 + ex, -13]], { width: 2.4, color: mix(skin, ink, 0.55), taper: [0.2, 0.3] });
+    MG.kit.mouth(ctx, ex * 0.8, -2, { w: 18, mood: o.mood || 'neutral', open: o.talk ? Math.max(0, Math.sin(t * 13 + (o.seed || 0))) * 0.4 : 0, color: '#4a2620' });
+    ctx.restore(); ctx.restore();
+  };
+  /** aging dictator seated (re-use the propaganda portrait, softened & greyed by age) */
+  PO.oldFranco = (ctx, x, y, s, nod) => { const spr = S4.franco(); ctx.save(); ctx.translate(x, y); ctx.rotate(nod * 0.04); ctx.filter = 'sepia(0.35) saturate(0.7) brightness(1.04)'; ctx.drawImage(spr, -500 * s, -1150 * s + nod * 6, 1000 * s, 1200 * s); ctx.filter = 'none'; ctx.restore(); };
+
+  // ---- 572 · Opus Dei technocrats persuade the aging dictator — the 1959 plan unrolls over the camera
+  const PL = { tGroup: tw('group', 572.0), tOpus: tw('Opus', 575.3), tPers: tw('persuades', 576.4), tAging: tw('aging', 577.2), tOpen: tw('open', 578.0) };
+  SC.push({ id: 's04_plan59', start: 571.95, end: 579.22, transIn: { type: 'zoom', dur: 0.55, amount: 1.6, from: 0.88 },
+    init() { S4.franco(); this.room = MG.cache('s4po:room', W, H, (x, w, h) => { x.fillStyle = '#F1E2C4'; x.fillRect(0, 0, w, h); x.fillStyle = C.teal; x.fillRect(1240, 110, 520, 560); const g = x.createLinearGradient(1240, 110, 1760, 670); g.addColorStop(0, '#BFE3DF'); g.addColorStop(1, '#7FC6C0'); x.fillStyle = g; x.fillRect(1262, 132, 476, 516); x.fillStyle = C.navy; for (let i = 0; i < 18; i++) x.fillRect(1262, 140 + i * 29, 476, 9); x.fillStyle = '#D9C49C'; x.fillRect(0, 760, w, 320); x.fillStyle = 'rgba(60,40,20,0.16)'; for (let i = 0; i < 26; i++) x.fillRect(i * 80, 760, 3, 320); MG.tex.over(x, 'fibers', { alpha: 0.5 }); x.globalCompositeOperation = 'multiply'; const v = x.createRadialGradient(900, 420, 200, 960, 540, 1250); v.addColorStop(0, '#fff'); v.addColorStop(1, '#B49C80'); x.fillStyle = v; x.fillRect(0, 0, w, h); }); },
+    draw(ctx, t) {
+      const c = camKeys(t, [[571.95, { x: 980, y: 520, z: 1.12 }], [PL.tPers, { x: 960, y: 540, z: 1.0 }, 'inOutSine'], [PL.tOpen + 0.4, { x: 900, y: 560, z: 1.08 }, 'inOutSine'], [579.3, { x: 860, y: 600, z: 1.6 }, 'inCubic']]); const h = hh(t, 2.5, 41); c.dx = h.dx; c.dy = h.dy;
+      ctx.save(); camT(ctx, c); ctx.drawImage(this.room, 0, 0);
+      // venetian-blind light stripes falling across the room (sol / sombra)
+      ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(70,50,60,0.18)'; ctx.translate(1100, 0); ctx.transform(1, 0, -0.55, 1, 0, 0); for (let i = 0; i < 14; i++) ctx.fillRect(-200 + i * 70, 0, 34, H); ctx.restore();
+      // dictator behind the desk
+      const nod = Math.max(0, Math.sin((t - PL.tPers) * 5)) * MG.win(t, PL.tPers, PL.tOpen + 0.8, 0.2, 0.3);
+      PO.oldFranco(ctx, 1500, 840, 0.5, nod);
+      const desk = new Path2D('M1150 720 L1880 720 L1860 790 L1170 790 Z'); PO.ink(ctx, desk, [1150, 700, 730, 100], '#7A4A2E', { shade: '#2A1810', htA: 0.4, reg: false }); ctx.fillStyle = '#5E3822'; ctx.fillRect(1180, 790, 660, 300); ctx.fillStyle = 'rgba(0,0,0,0.2)'; ctx.fillRect(1180, 790, 660, 18);
+      // three technocrats enter in a staggered line
+      const tx = [[360, 0.0, '#26323B', C.coralD], [560, 0.25, '#2E2A33', C.tealD], [760, 0.5, '#33302A', C.navy]];
+      tx.forEach(([x0, d, suit, tie], i) => { const k = E.out(clamp((t - PL.tGroup - d) / 1.1)); const xx = lerp(x0 - 620, x0 + 80, k); PO.tech(ctx, xx, 1000, 1.55 - i * 0.04, t, { seed: 3 + i, suit, tie, turn: 0.6, arm: i === 1 ? MG.prog(t, PL.tPers - 0.3, PL.tPers + 0.5) : 0, talk: i === 1 && t > PL.tPers && t < PL.tOpen + 0.5, mood: i === 2 ? 'smirk' : 'neutral' }); });
+      // the plan scroll carried by the middle man → unrolls toward the camera
+      const ku = MG.prog(t, PL.tOpen - 0.2, 579.2, 'inOutCubic');
+      const sx = 760, sy = 640 - 70 * MG.prog(t, PL.tPers - 0.3, PL.tPers + 0.5);
+      ctx.save(); ctx.translate(sx, sy); const sw = lerp(260, 2400, ku), sh = lerp(36, 1800, ku * ku); ctx.rotate(lerp(-0.08, 0, ku));
+      ctx.shadowColor = 'rgba(20,20,30,0.35)'; ctx.shadowBlur = 20; ctx.shadowOffsetY = 12; ctx.fillStyle = '#EAF3F4'; ctx.fillRect(-sw / 2, -sh / 2, sw, sh); ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = rgba(C.seaD, 0.35); ctx.lineWidth = 1; for (let gx = -sw / 2; gx < sw / 2; gx += 24) { ctx.beginPath(); ctx.moveTo(gx, -sh / 2); ctx.lineTo(gx, sh / 2); ctx.stroke(); } for (let gy = -sh / 2; gy < sh / 2; gy += 24) { ctx.beginPath(); ctx.moveTo(-sw / 2, gy); ctx.lineTo(sw / 2, gy); ctx.stroke(); }
+      if (sh > 60) { ctx.globalAlpha = clamp((sh - 60) / 200); txt(ctx, 'PLAN DE ESTABILIZACIÓN', 0, -sh * 0.12, { font: F.stencil, size: 30 + ku * 60, color: C.seaD, align: 'center' }); txt(ctx, '1959', 0, sh * 0.1, { font: F.cond, weight: 900, size: 40 + ku * 140, color: C.coral, align: 'center' }); ctx.globalAlpha = 1; }
+      ctx.fillStyle = '#C9D9DB'; ctx.fillRect(-sw / 2 - 8, -sh / 2 - 6, 16, sh + 12); ctx.fillRect(sw / 2 - 8, -sh / 2 - 6, 16, sh + 12); ctx.restore();
+      ctx.restore();
+      if (t > PL.tOpus - 0.1 && ku < 0.3) { const k = MG.prog(t, PL.tOpus - 0.1, PL.tOpus + 0.5); ctx.save(); ctx.globalAlpha = k * (1 - ku * 3); MG.text.reveal(ctx, 'Opus Dei', 150, 200, t, PL.tOpus - 0.1, { font: F.retro, size: 96, color: C.navy, style: 'rise' }); mono(ctx, 'the technocrats', 156, 260, { size: 28, color: C.coralD }); ctx.restore(); }
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.3, sat: 1.04 } });
+
+  // ---- 579.2 · restrictions come down, foreign companies fly in, the beaches open for business
+  const OP = { tDown: tw('Restrictions', 579.22), tCome: tw('down.', 580.3), tForeign: tw('Foreign', 581.06), tBeach: tw('beaches', 584.9), tBiz: tw('business.', 586.0) };
+  SC.push({ id: 's04_open', start: 579.22, end: 587.02, transIn: { type: 'blur', dur: 0.5, amount: 18 },
+    init() { this.pr = GEO.proj('spain', { center: [-3.3, 40.0], scale: 5000, translate: [960, 560] }); this.rings = S4.esRings(this.pr);
+      const pr = this.pr; this.base = MG.cache('s4po:mapbase', W, H, (x) => { x.fillStyle = C.sea; x.fillRect(0, 0, W, H); x.strokeStyle = 'rgba(255,255,255,0.22)'; x.lineWidth = 2; for (let y = 10; y < H; y += 22) { x.beginPath(); for (let xx = 0; xx <= W; xx += 16) x.lineTo(xx, y + Math.sin(xx * 0.02 + y) * 3); x.stroke(); } for (const n of NEIGH) { const f = GEO.country(n, '10'); if (f) GEO.draw(x, pr, f, { fill: C.sand, stroke: rgba(C.navy, 0.4), width: 1.2 }); } const es = ES10(); const p2 = GEO.path2d(pr, es); PO.ink(x, p2, GEO.bbox(pr, es), C.butter, { shade: C.coralD, sp: 8, htA: 0.28 }); GEO.draw(x, pr, es, { stroke: C.navy, width: 2 }); GEO.draw(x, pr, GEO.provinceMesh, { stroke: rgba(C.navy, 0.18), width: 0.8 }); MG.tex.over(x, 'fibers', { alpha: 0.45 }); });
+      this.coast = []; const pts = [[-4.9, 36.5], [-4.4, 36.72], [-3.8, 36.74], [-2.9, 36.75], [-1.6, 37.3], [-0.7, 37.65], [-0.45, 38.35], [-0.13, 38.54], [0.15, 38.85], [-0.35, 39.4], [0.0, 40.2], [0.9, 41.05], [1.6, 41.25], [2.2, 41.45], [2.9, 41.75], [3.2, 42.1], [2.65, 39.55], [3.05, 39.75], [1.43, 38.95], [-5.6, 36.1], [-6.2, 36.5]]; for (const ll of pts) { const p = pr(ll); this.coast.push(p); } },
+    draw(ctx, t) {
+      const c = camKeys(t, [[579.22, { x: 960, y: 560, z: 1.0 }], [OP.tForeign, { x: 960, y: 520, z: 1.04 }, 'inOutSine'], [OP.tBeach, { x: 1150, y: 690, z: 1.35 }, 'inOutCubic'], [587.1, { x: 1200, y: 720, z: 1.55 }, 'inOutSine']]);
+      ctx.save(); camT(ctx, c); ctx.drawImage(this.base, 0, 0);
+      // walls topple: height shrinks with a wobble, dust bursts along them
+      const kd = MG.prog(t, OP.tDown + 0.2, OP.tCome + 0.4, 'inCubic'); const hW = 46 * (1 - kd) + MG.jiggle(t, OP.tCome + 0.4, 3, 6, 6);
+      if (hW > 0.5) S4.walls(ctx, this.rings, hW, { col: '#7A705E', top: '#B9AE96', lw: 9 });
+      if (t > OP.tCome) for (const r of this.rings) for (let i = 0; i < r.length; i += 9) MG.fx.smoke(ctx, r[i][0], r[i][1], t - OP.tCome, { n: 2, seed: i, spread: 30, rise: 14, r: 26, alpha: 0.45 * (1 - MG.lin(t, OP.tCome + 0.6, OP.tCome + 2.2)), color: '#E8DCC4', life: 2.2 });
+      // foreign factories fly in on arcs and land (no logos — flags only)
+      const facs = [[[2.35, 48.85], [2.17, 41.38], '#2B4C9B', '#FFFFFF', '#C8322B'], [[9.19, 45.46], [2.0, 41.5], '#1D8A4E', '#FFFFFF', '#C8322B'], [[8.68, 50.11], [-2.93, 43.26], '#111111', '#C8322B', '#F2C230'], [[-0.13, 51.5], [-3.7, 40.4], '#2B4C9B', '#C8322B', '#FFFFFF'], [[-30, 42], [-0.88, 41.65], '#2B4C9B', '#FFFFFF', '#C8322B']];
+      facs.forEach(([a, b, f1, f2, f3], i) => { const k = MG.prog(t, OP.tForeign + i * 0.22, OP.tForeign + 1.0 + i * 0.22, 'inOutCubic'); if (k <= 0) return; const A = this.pr(a), B = this.pr(b); const x = lerp(A[0], B[0], k), y = lerp(A[1], B[1], k) - Math.sin(k * Math.PI) * 160; const s = 0.8;
+        ctx.save(); ctx.translate(x, y); if (k >= 1) MG.fx.contact(ctx, 0, 6, 30, 8, 0.35); const body = new Path2D('M-26 4 L-26 -18 L-12 -28 L-12 -18 L2 -28 L2 -18 L16 -28 L16 4 Z'); PO.ink(ctx, body, [-28, -30, 46, 36], '#E8E0D0', { shade: C.navy, sp: 5, reg: false }); ctx.strokeStyle = C.navy; ctx.lineWidth = 2; ctx.stroke(body); ctx.fillStyle = '#8A7E70'; ctx.fillRect(18, -40, 7, 44); ctx.fillStyle = f1; ctx.fillRect(-20, -46, 6, 4); ctx.fillStyle = f2; ctx.fillRect(-14, -46, 6, 4); ctx.fillStyle = f3; ctx.fillRect(-8, -46, 6, 4); ctx.strokeStyle = C.navy; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-20, -46); ctx.lineTo(-20, -32); ctx.stroke();
+        if (k >= 1) MG.fx.smoke(ctx, 21, -44, t, { n: 4, seed: 11 + i, spread: 6, rise: 22, r: 14, alpha: 0.5, color: '#F4EFE6', life: 2.5, wind: 8 }); ctx.restore(); });
+      // parasols pop along the costas
+      if (t > OP.tBeach - 0.3) this.coast.forEach((p, i) => { const k = E.outBack(clamp((t - OP.tBeach + 0.3 - i * 0.06) / 0.4)); if (k <= 0) return; MG.sprite(ctx, PO.parasol(1, i % 3 ? C.coral : C.teal, C.white), p[0], p[1] - 6, { scale: 0.34 * k }); });
+      ctx.restore();
+      if (t > OP.tBeach - 0.1) { const k = MG.prog(t, OP.tBeach - 0.1, OP.tBeach + 0.7); ctx.save(); ctx.globalAlpha = k; MG.text.reveal(ctx, 'open for business', 140, 190, t, OP.tBeach - 0.05, { font: F.retro, size: 92, color: C.white, stroke: C.navy, strokeW: 10, style: 'rise' }); ctx.restore(); }
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.26, sat: 1.06 } });
+
+  // ---- 587 · sunny / cheap / safe — two hours from rainy London & Hamburg
+  const FL = { tSunny: tw('sunny,', 587.2), tCheap: tw('cheap,', 587.9), tSafe: tw('safe', 588.5), tTwo: tw('two-hour', 589.9), tLondon: tw('London', 591.3), tHam: tw('Hamburg.', 592.2) };
+  SC.push({ id: 's04_flights', start: 587.02, end: 593.06, transIn: { type: 'push', dir: 'up', dur: 0.55 },
+    init() { this.pr = GEO.proj('conic', { center: [1.5, 45.2], scale: 1900, translate: [960, 540] }); const pr = this.pr; this.base = MG.cache('s4po:eur', W, H, (x) => { x.fillStyle = C.sea; x.fillRect(0, 0, W, H); x.strokeStyle = 'rgba(255,255,255,0.18)'; x.lineWidth = 2; for (let y = 10; y < H; y += 22) { x.beginPath(); for (let xx = 0; xx <= W; xx += 16) x.lineTo(xx, y + Math.sin(xx * 0.02 + y) * 3); x.stroke(); } for (const f of GEO.iberia10.features) { if (/Spain/.test(f.properties.name)) continue; GEO.draw(x, pr, f, { fill: '#D7DCCB', stroke: rgba(C.navy, 0.35), width: 1 }); } const es = ES10(); PO.ink(x, GEO.path2d(pr, es), GEO.bbox(pr, es), C.butter, { shade: C.coralD, sp: 7 }); GEO.draw(x, pr, es, { stroke: C.navy, width: 2 }); MG.tex.over(x, 'fibers', { alpha: 0.45 }); }); },
+    draw(ctx, t) {
+      const c = camKeys(t, [[587.02, { x: 900, y: 640, z: 1.25 }], [FL.tTwo, { x: 960, y: 540, z: 1.0 }, 'inOutCubic'], [593.1, { x: 960, y: 520, z: 1.03 }]]); ctx.save(); camT(ctx, c); ctx.drawImage(this.base, 0, 0);
+      const pr = this.pr; const sp = pr([-3.7, 39.2]); const ld = pr(MG.geo.cities.London), hb = pr(MG.geo.cities.Hamburg), mal = pr(MG.geo.cities.Malaga), pal = pr(MG.geo.cities.Palma);
+      MG.kit.sun(ctx, sp[0] + 40, sp[1] - 190, 70 + 4 * Math.sin(t * 2), t, { color: C.coral, deep: C.coralD, rays: 0.6, rayColor: C.butter, corona: 0.4 });
+      // rain over the north
+      for (const [p, i] of [[ld, 0], [hb, 1]]) { const k = MG.prog(t, FL.tLondon - 1.6 + i * 0.4, FL.tLondon - 1.0 + i * 0.4); if (k <= 0) continue; ctx.save(); ctx.globalAlpha = k; MG.fx.particles(ctx, { n: 46, seed: 7 + i, t, area: [p[0] - 90, p[1] - 70, 180, 70], vel: [-30, 420], life: 0.5, size: [1.2, 2], shape: 'streak', streak: 0.05, color: '#E6F1F4', alpha: 0.75 }); PO.cloud(ctx, p[0], p[1] - 80, 0.95, '#8C99A3', t); ctx.restore(); }
+      // flight arcs with planes, two hours
+      [[ld, mal, 0], [hb, pal, 0.3]].forEach(([a, b, d], i) => { const k = MG.prog(t, FL.tTwo - 0.3 + d, FL.tTwo + 2.2 + d, 'inOutSine'); if (k <= 0) return; const pts = []; for (let u = 0; u <= 1.0001; u += 0.02) pts.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u) - Math.sin(u * Math.PI) * 120]); MG.fx.line(ctx, pts, { progress: k, color: C.white, width: 4, dash: [12, 9] }); const q = MG.path.along(pts, k); PO.plane(ctx, q[0], q[1], q[2], 0.8); });
+      ctx.restore();
+      // the three adjectives, painted like poster banners
+      [['SUNNY', FL.tSunny, C.butter], ['CHEAP', FL.tCheap, C.coral], ['SAFE', FL.tSafe, C.teal]].forEach(([w, t0, col], i) => { const k = MG.win(t, t0 - 0.05, FL.tTwo + 0.4, 0.35, 0.35); if (k <= 0) return; ctx.save(); ctx.globalAlpha = k; ctx.translate(1380 + i * 0, 260 + i * 120); ctx.rotate(-0.06); const wd = MG.text.width(ctx, w, { font: F.retro, size: 78 }); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(-30, -70); ctx.lineTo(wd + 30, -70); ctx.lineTo(wd + 10, 22); ctx.lineTo(-10, 22); ctx.fill(); txt(ctx, w, 0, 0, { font: F.retro, size: 78, color: C.navy }); ctx.restore(); });
+      if (t > FL.tTwo) { const k = MG.prog(t, FL.tTwo, FL.tTwo + 0.5); ctx.save(); ctx.globalAlpha = k; txt(ctx, '2 h', 1020, 590, { font: F.cond, weight: 900, size: 96, color: C.white, stroke: C.navy, strokeW: 8 }); ctx.restore(); }
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.26, sat: 1.05 } });
+
+  // ---- 593 · "Spain is different" — the poster in the arrivals hall; the tourists arrive by the millions
+  const DF = { tSpain: tw('Spain', 593.1), tDiff: tw('different,”', 593.6), tGerm: tw('Germans', 597.0), tBrit: tw('British', 597.8), tMill: tw('millions.', 598.9) };
+  SC.push({ id: 's04_different', start: 593.06, end: 599.86, transIn: { type: 'whip', dir: 'left', dur: 0.4 },
+    init() { this.poster = MG.cache('s4po:poster', 700, 980, (x, w, h) => { x.fillStyle = C.butter; x.fillRect(0, 0, w, h); MG.kit.sun(x, w * 0.68, 250, 150, 0, { color: C.coral, deep: C.coralD, corona: 0, halftone: 0.8 }); x.fillStyle = C.teal; x.fillRect(0, 520, w, 460); x.strokeStyle = C.white; x.lineWidth = 6; for (let k = 0; k < 7; k++) { x.beginPath(); for (let u = 0; u <= w; u += 10) x.lineTo(u, 560 + k * 52 + Math.sin(u * 0.03 + k) * 7); x.stroke(); }
+      // dancer silhouette with fan & polka-dot dress (flat poster figure)
+      x.save(); x.translate(250, 520); x.fillStyle = C.navy; x.beginPath(); x.ellipse(0, -330, 30, 38, 0, 0, TAU); x.fill(); x.fillStyle = C.coralD; x.beginPath(); x.moveTo(-10, -360); x.quadraticCurveTo(40, -420, 70, -370); x.lineTo(20, -350); x.fill(); x.fillStyle = C.navy; x.beginPath(); x.moveTo(-30, -290); x.lineTo(30, -290); x.lineTo(46, -170); x.quadraticCurveTo(160, -40, 120, 10); x.quadraticCurveTo(0, -30, -140, 20); x.quadraticCurveTo(-120, -80, -46, -170); x.closePath(); x.fill(); x.fillStyle = C.white; for (let i = 0; i < 40; i++) { const px = -120 + (i % 8) * 34 + (Math.floor(i / 8) % 2) * 17, py = -150 + Math.floor(i / 8) * 34; x.beginPath(); x.arc(px, py, 5, 0, TAU); x.fill(); } x.strokeStyle = C.navy; x.lineWidth = 16; x.lineCap = 'round'; x.beginPath(); x.moveTo(-26, -280); x.quadraticCurveTo(-90, -330, -70, -420); x.moveTo(26, -280); x.quadraticCurveTo(80, -250, 120, -300); x.stroke(); x.fillStyle = C.coral; x.beginPath(); x.moveTo(120, -300); x.arc(120, -300, 70, -1.9, -0.6); x.fill(); x.restore();
+      txt(x, 'Spain', 60, 160, { font: F.retro, size: 150, color: C.navy }); txt(x, 'is different', 66, 250, { font: F.retro, size: 78, color: C.coralD }); MG.tex.over(x, 'halftone', { alpha: 0.12, spacing: 6, radius: 1.4, color: C.navy }); MG.tex.over(x, 'fibers', { alpha: 0.5 }); }); },
+    draw(ctx, t) {
+      const kp = MG.prog(t, DF.tGerm - 0.6, DF.tMill + 0.4, 'inOutCubic');
+      // 1 · arrivals hall wall with the poster
+      PO.paperBg(ctx, '#E9DCC0'); ctx.save(); ctx.fillStyle = 'rgba(60,50,40,0.12)'; for (let i = 0; i < 12; i++) ctx.fillRect(0, 120 + i * 80, W, 2); ctx.restore();
+      const z = lerp(1.0, 0.42, kp); const px = lerp(960, 560, kp), py = lerp(540, 470, kp);
+      ctx.save(); ctx.translate(px, py); ctx.scale(z, z); ctx.rotate(-0.015); ctx.shadowColor = 'rgba(40,25,10,0.4)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 18; ctx.drawImage(this.poster, -350, -490); ctx.restore();
+      // 2 · arrivals board + tourists walking past (foreground parallax) as the camera pulls back
+      if (kp > 0.02) { ctx.save(); ctx.globalAlpha = kp; ctx.fillStyle = C.navy; ctx.fillRect(1080, 200, 640, 300); for (let r = 0; r < 4; r++) { const city = ['LONDON', 'HAMBURG', 'MANCHESTER', 'DÜSSELDORF'][r]; mono(ctx, city, 1110, 262 + r * 62, { size: 30, color: C.butter }); mono(ctx, r % 2 ? 'LANDED' : 'ON TIME', 1470, 262 + r * 62, { size: 24, color: C.white }); } ctx.restore(); }
+      const crowd = 14; for (let i = 0; i < crowd; i++) { const sp = 160 + MG.rand(3, i) * 120; const x = MG.mod(-300 + i * 160 + (t - 593) * sp, W + 600) - 300; const k = clamp((t - DF.tGerm + 0.8 - i * 0.12) * 1.5); if (k <= 0) continue; const s = 0.9 + MG.rand(4, i) * 0.4; ctx.save(); ctx.globalAlpha = k; ctx.translate(x, 1100); ctx.scale(s, s); const step = Math.sin((t - 593) * 9 + i) * 10; const coat = [C.coral, C.teal, C.butterD, '#8A6B4A', C.navy, '#B5513C'][i % 6];
+        ctx.fillStyle = C.navy; ctx.fillRect(-18 + step * 0.4, -170, 14, 170); ctx.fillRect(4 - step * 0.4, -170, 14, 170); const body = MG.path.smooth([[-38, -170], [-44, -320], [0, -350], [44, -320], [38, -170]], true); PO.ink(ctx, body, [-46, -352, 92, 184], coat, { reg: false, sp: 6, htA: 0.3 }); ctx.fillStyle = '#E8C4A0'; ctx.beginPath(); ctx.ellipse(0, -385, 26, 32, 0, 0, TAU); ctx.fill(); ctx.fillStyle = i % 3 ? '#C9A04A' : '#5A3A22'; ctx.beginPath(); ctx.ellipse(0, -404, 28, 18, 0, Math.PI, TAU); ctx.fill(); if (i % 2) { ctx.fillStyle = '#F4EFE6'; ctx.beginPath(); ctx.ellipse(0, -410, 40, 8, 0, 0, TAU); ctx.fill(); ctx.fillStyle = C.coral; ctx.fillRect(-26, -424, 52, 16); }
+        ctx.fillStyle = '#7A4A2E'; ctx.fillRect(40, -230, 46, 56); ctx.restore(); }
+      if (t > DF.tMill - 0.1) { MG.text.reveal(ctx, 'by the millions', 1100, 640, t, DF.tMill - 0.1, { font: F.retro, size: 96, color: C.coralD, stroke: C.cream, strokeW: 10, style: 'rise' }); }
+      if (t > DF.tGerm - 0.05) { mono(ctx, 'Germans', 1110, 720 + 0, { size: 26, color: C.navy, alpha: MG.prog(t, DF.tGerm, DF.tGerm + 0.3) }); mono(ctx, 'British', 1310, 720, { size: 26, color: C.navy, alpha: MG.prog(t, DF.tBrit, DF.tBrit + 0.3) }); }
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.28, sat: 1.05 } });
+
+  // ---- 599.9 · the Spanish Miracle: a skywriter over the beach; growth huts — 7 %, only Japan taller
+  const MI = { tMir: tw('Miracle.', 602.6), tGrow: tw('growth', 604.3), tSeven: tw('7', 605.0), tJapan: tw('Japan', 606.9), tFaster: tw('faster.', 607.7) };
+  SC.push({ id: 's04_miracle', start: 599.86, end: 608.66, transIn: { type: 'blur', dur: 0.5 },
+    init() { this.beach = MG.cache('s4po:beach', W, H, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, 560); g.addColorStop(0, '#9ED6E3'); g.addColorStop(1, '#E7F3EE'); x.fillStyle = g; x.fillRect(0, 0, w, 560); x.fillStyle = C.sea; x.fillRect(0, 520, w, 150); x.strokeStyle = 'rgba(255,255,255,0.5)'; x.lineWidth = 3; for (let k = 0; k < 5; k++) { x.beginPath(); for (let u = 0; u <= w; u += 12) x.lineTo(u, 540 + k * 26 + Math.sin(u * 0.02 + k * 2) * 4); x.stroke(); } x.fillStyle = C.sand; x.beginPath(); x.moveTo(0, 660); for (let u = 0; u <= w; u += 40) x.lineTo(u, 650 + Math.sin(u * 0.01) * 10); x.lineTo(w, h); x.lineTo(0, h); x.fill(); MG.tex.over(x, 'grain', { alpha: 0.25 }); MG.tex.over(x, 'fibers', { alpha: 0.4 }); }); },
+    draw(ctx, t) {
+      const kc = MG.prog(t, MI.tGrow - 0.6, MI.tGrow + 0.6, 'inOutCubic');
+      ctx.fillStyle = C.sand; ctx.fillRect(0, 0, W, H); ctx.save(); ctx.translate(0, lerp(0, -150, kc)); ctx.drawImage(this.beach, 0, 0); ctx.fillStyle = C.sand; ctx.fillRect(0, H - 2, W, 400); MG.kit.sun(ctx, 1640, 150, 70, t, { color: C.coral, deep: C.coralD, corona: 0.3 });
+      // skywriter plane trailing smoke letters
+      const ks = MG.prog(t, 600.0, MI.tMir + 0.4, 'linear'); const word = 'Spanish Miracle'; const sx0 = 260, sx1 = 1500; const px = lerp(sx0, sx1 + 120, ks), py = 300 + Math.sin(ks * 10) * 8;
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, px - 30, 600); ctx.clip(); ctx.filter = 'blur(2.5px)'; txt(ctx, word, sx0, 360, { font: F.retro, size: 130, color: 'rgba(255,255,255,0.95)' }); ctx.filter = 'none'; ctx.restore();
+      if (ks < 1) PO.plane(ctx, px, py, 0.05, 0.8, '#F4EFE6');
+      ctx.restore();
+      // growth huts (beach-cabin stripes) rise from the sand — the 1960s growth race
+      if (kc > 0) { const base = 1000; const rows = [['UK', 0.36, '#8A93A0'], ['W. GERMANY', 0.48, '#8A93A0'], ['FRANCE', 0.56, '#8A93A0'], ['ITALY', 0.58, '#8A93A0'], ['SPAIN', 0.74, C.coral], ['JAPAN', 1.0, '#E9E2D6']]; rows.forEach(([n, v, col], i) => { const k = E.out(clamp((t - MI.tGrow - i * 0.12) / 0.7)); const hgt = 560 * v * k; const x = 300 + i * 230; const isJ = n === 'JAPAN'; const kj = isJ ? E.out(clamp((t - MI.tJapan + 0.2) / 0.7)) : 1; const hh2 = isJ ? hgt * kj : hgt;
+          ctx.save(); MG.fx.contact(ctx, x, base + 4, 90, 14, 0.3); const p = new Path2D(); p.rect(x - 70, base - hh2, 140, hh2); ctx.fillStyle = col; ctx.fill(p); ctx.save(); ctx.clip(p); ctx.fillStyle = isJ ? '#D23C3C' : rgba(C.white, n === 'SPAIN' ? 0.9 : 0.5); if (!isJ) for (let s = 0; s < 6; s++) ctx.fillRect(x - 70 + s * 46, base - hh2, 22, hh2); else { ctx.beginPath(); ctx.arc(x, base - hh2 + 70, 34, 0, TAU); ctx.fill(); } ctx.fillStyle = 'rgba(20,20,40,0.22)'; ctx.fillRect(x + 30, base - hh2, 40, hh2); ctx.restore(); ctx.fillStyle = C.navy; ctx.beginPath(); ctx.moveTo(x - 86, base - hh2); ctx.lineTo(x, base - hh2 - 46 * Math.min(1, hh2 / 60)); ctx.lineTo(x + 86, base - hh2); ctx.fill();
+          mono(ctx, n, x, base + 50, { size: 20, align: 'center', color: n === 'SPAIN' ? C.coralD : C.navy, alpha: k }); ctx.restore(); });
+        if (t > MI.tSeven - 0.1) { const k = MG.prog(t, MI.tSeven - 0.1, MI.tSeven + 0.4, 'outBack'); const y = 1000 - 560 * 0.74 - 90; ctx.save(); ctx.translate(1220, y); ctx.scale(k, k); txt(ctx, '7 %', 0, 0, { font: F.cond, weight: 900, size: 120, color: C.coralD, align: 'center', stroke: C.cream, strokeW: 10 }); ctx.restore(); }
+        if (t > MI.tJapan) { const k = MG.prog(t, MI.tJapan, MI.tJapan + 0.4); mono(ctx, 'only Japan faster', 1450, 260, { size: 24, color: C.navy, alpha: k, align: 'center' }); }
+      }
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.25, sat: 1.06 } });
+
+  // ---- 608.7 · Andalusian farmworkers stream to coastal hotels and Barcelona factories
+  const MW = { tFarm: tw('Farmworkers', 608.66), tCoast: tw('coastal', 611.6), tBarc: tw('Barcelona.', 614.0) };
+  SC.push({ id: 's04_migrants', start: 608.66, end: 615.14, transIn: { type: 'zoom', dur: 0.5, amount: 1.4, from: 0.85 },
+    init() { this.pr = GEO.proj('spain', { center: [-2.6, 39.4], scale: 5600, translate: [960, 560] }); const pr = this.pr; this.base = MG.cache('s4po:mig', W, H, (x) => { x.fillStyle = C.sea; x.fillRect(0, 0, W, H); for (const n of NEIGH) { const f = GEO.country(n, '10'); if (f) GEO.draw(x, pr, f, { fill: C.sand, stroke: rgba(C.navy, 0.35), width: 1 }); } const es = ES10(); PO.ink(x, GEO.path2d(pr, es), GEO.bbox(pr, es), '#F4E3B8', { shade: C.coralD, sp: 8, htA: 0.2 }); const an = GEO.region('Andalusia'); PO.ink(x, GEO.path2d(pr, an), GEO.bbox(pr, an), '#D9B06A', { shade: C.coralD, sp: 6, htA: 0.4 }); x.save(); GEO.clip(x, pr, an); x.strokeStyle = 'rgba(122,80,30,0.35)'; x.lineWidth = 2; for (let i = -40; i < 80; i++) { x.beginPath(); x.moveTo(i * 16, 0); x.lineTo(i * 16 + 500, H); x.stroke(); } x.restore(); GEO.draw(x, pr, GEO.regionMesh, { stroke: rgba(C.navy, 0.3), width: 1 }); GEO.draw(x, pr, es, { stroke: C.navy, width: 2 }); MG.tex.over(x, 'fibers', { alpha: 0.45 }); }); },
+    draw(ctx, t) {
+      const pr = this.pr; const c = camKeys(t, [[608.66, { x: 860, y: 760, z: 1.25 }], [MW.tCoast, { x: 960, y: 620, z: 1.05 }, 'inOutCubic'], [615.2, { x: 1040, y: 520, z: 1.0 }, 'inOutSine']]); ctx.save(); camT(ctx, c); ctx.drawImage(this.base, 0, 0);
+      const src = [[-4.5, 37.6], [-5.6, 37.4], [-3.6, 37.9], [-6.2, 37.2], [-4.9, 38.0], [-3.0, 37.5]].map((ll) => pr(ll));
+      const dst = [[pr(MG.geo.cities.Malaga), MW.tCoast - 0.6, 'hotel'], [pr(MG.geo.cities.Benidorm), MW.tCoast - 0.2, 'hotel'], [pr([0.8, 41.1]), MW.tCoast + 0.2, 'hotel'], [pr(MG.geo.cities.Barcelona), MW.tBarc - 1.2, 'factory']];
+      mono(ctx, 'Andalusia', pr([-4.6, 37.3])[0], pr([-4.6, 37.3])[1] + 70, { size: 22, color: C.navy, align: 'center', alpha: MG.prog(t, 608.9, 609.4) });
+      dst.forEach(([d, t0, kind], j) => { const k = MG.prog(t, t0, t0 + 0.6, 'outBack'); if (k <= 0) return; ctx.save(); ctx.translate(d[0], d[1]); ctx.scale(k, k); if (kind === 'hotel') { PO.ink(ctx, MG.path.rr(-16, -64, 32, 64, 2), [-16, -64, 32, 64], C.white, { reg: false, sp: 4 }); ctx.fillStyle = C.teal; for (let r = 0; r < 6; r++) ctx.fillRect(-11, -58 + r * 10, 22, 4); ctx.strokeStyle = C.coralD; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(22, 0); ctx.lineTo(22, -90); ctx.lineTo(-30, -90); ctx.moveTo(22, -78); ctx.lineTo(48, -90); ctx.stroke(); } else { const b = new Path2D('M-36 0 L-36 -30 L-18 -44 L-18 -30 L0 -44 L0 -30 L18 -44 L18 0 Z'); PO.ink(ctx, b, [-36, -46, 56, 46], '#E8E0D0', { reg: false, sp: 4 }); ctx.fillStyle = '#7A6E60'; ctx.fillRect(22, -70, 10, 70); MG.fx.smoke(ctx, 27, -72, t, { n: 4, seed: 3, spread: 8, rise: 26, r: 16, alpha: 0.6, color: '#F4EFE6', life: 2.4, wind: 10 }); } ctx.restore();
+        for (let i = 0; i < 26; i++) { const s = src[i % src.length]; const u = MG.fract((t - t0) * 0.42 + i / 26); if (t < t0) continue; const x = lerp(s[0], d[0], u), y = lerp(s[1], d[1], u) - Math.sin(u * Math.PI) * 50; ctx.fillStyle = C.navy; ctx.beginPath(); ctx.ellipse(x, y - 5, 3.2, 6, 0, 0, TAU); ctx.fill(); ctx.beginPath(); ctx.arc(x, y - 13, 3, 0, TAU); ctx.fill(); } });
+      ctx.restore();
+      if (t > MW.tBarc - 0.4) MG.text.reveal(ctx, 'Barcelona', 1340, 220, t, MW.tBarc - 0.3, { font: F.retro, size: 70, color: C.navy, style: 'rise' });
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.26 } });
+
+  // ---- 615.1 · Benidorm: fishing village → forest of high-rises (2.5D time-lapse)
+  const BN = { tBen: tw('Benidorm,', 615.14), tFish: tw('fishing', 616.4), tForest: tw('forest', 617.6) };
+  SC.push({ id: 's04_benidorm', start: 615.14, end: 619.62, transIn: { type: 'blur', dur: 0.45 },
+    init() { const r = MG.rng(9); this.towers = []; for (let i = 0; i < 26; i++) this.towers.push({ x: 140 + i * 66 + r() * 30, w: 46 + r() * 34, h: 220 + r() * 430, d: r() * 0.7, c: [C.white, C.cream, '#F2D6C8', '#D8EDE8'][i % 4] }); this.towers.sort((a, b) => b.h - a.h);
+      this.bg = MG.cache('s4po:benbg', W, H, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, 700); g.addColorStop(0, '#F6C98A'); g.addColorStop(1, '#F8E7C8'); x.fillStyle = g; x.fillRect(0, 0, w, h); x.fillStyle = '#B9A58C'; x.beginPath(); x.moveTo(0, 640); x.quadraticCurveTo(400, 420, 820, 600); x.quadraticCurveTo(1300, 470, 1920, 620); x.lineTo(1920, 760); x.lineTo(0, 760); x.fill(); MG.tex.over(x, 'grain', { alpha: 0.2 }); }); },
+    draw(ctx, t) {
+      const k = MG.prog(t, BN.tFish + 0.4, 619.4, 'inOutSine'); const yr = Math.round(lerp(1955, 1975, k));
+      ctx.drawImage(this.bg, 0, 0); MG.kit.sun(ctx, 1500, 260, 80, t, { color: C.coral, deep: C.coralD, corona: 0.35 });
+      // towers grow behind the old village, staggered
+      for (const tw2 of this.towers) { const kk = E.out(clamp((k - tw2.d * 0.6) / 0.4)); if (kk <= 0) continue; const hgt = tw2.h * kk; const x = tw2.x, y = 760; const p = new Path2D(); p.rect(x, y - hgt, tw2.w, hgt); PO.ink(ctx, p, [x, y - hgt, tw2.w, hgt], tw2.c, { reg: false, sp: 5, htA: 0.18 }); ctx.save(); ctx.clip(p); ctx.fillStyle = rgba(C.tealD, 0.55); for (let fy = y - hgt + 10; fy < y - 10; fy += 16) { ctx.fillRect(x + 6, fy, tw2.w - 12, 5); } ctx.fillStyle = 'rgba(40,30,60,0.18)'; ctx.fillRect(x + tw2.w * 0.7, y - hgt, tw2.w * 0.3, hgt); ctx.restore(); }
+      // the old village: whitewashed houses + the blue-domed church on the promontory
+      ctx.fillStyle = '#EFE6D6'; for (let i = 0; i < 9; i++) { const x = 760 + i * 46, h2 = 40 + (i % 3) * 14; ctx.fillRect(x, 760 - h2, 42, h2); ctx.fillStyle = C.coralD; ctx.fillRect(x - 2, 760 - h2 - 6, 46, 7); ctx.fillStyle = '#EFE6D6'; }
+      ctx.fillStyle = '#F4EFE6'; ctx.fillRect(1160, 690, 70, 70); ctx.fillStyle = '#2E5FA8'; ctx.beginPath(); ctx.arc(1195, 690, 34, Math.PI, TAU); ctx.fill(); ctx.fillStyle = '#F4EFE6'; ctx.fillRect(1240, 640, 22, 120); ctx.fillStyle = '#2E5FA8'; ctx.beginPath(); ctx.arc(1251, 640, 12, Math.PI, TAU); ctx.fill();
+      // sea, boats, beach
+      ctx.fillStyle = C.sea; ctx.fillRect(0, 800, W, 280); ctx.fillStyle = C.sand; ctx.beginPath(); ctx.moveTo(0, 760); ctx.quadraticCurveTo(960, 830, 1920, 760); ctx.lineTo(1920, 812); ctx.quadraticCurveTo(960, 880, 0, 812); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth = 3; for (let kq = 0; kq < 5; kq++) { ctx.beginPath(); for (let u = 0; u <= W; u += 14) ctx.lineTo(u, 880 + kq * 36 + Math.sin(u * 0.02 + kq + t) * 4); ctx.stroke(); }
+      for (let i = 0; i < 3; i++) { const bx = 420 + i * 170 + Math.sin(t + i) * 6, by = 930 + i * 20; ctx.save(); ctx.globalAlpha = 1 - k * 0.8; ctx.fillStyle = [C.coral, C.teal, C.butterD][i]; ctx.beginPath(); ctx.moveTo(bx - 50, by); ctx.lineTo(bx + 50, by); ctx.lineTo(bx + 34, by + 20); ctx.lineTo(bx - 34, by + 20); ctx.fill(); ctx.fillStyle = C.white; ctx.beginPath(); ctx.moveTo(bx, by - 70); ctx.lineTo(bx, by); ctx.lineTo(bx + 40, by); ctx.fill(); ctx.restore(); }
+      for (let i = 0; i < 40; i++) { const kk = clamp((k - 0.3 - i * 0.012) * 3); if (kk <= 0) continue; MG.sprite(ctx, PO.parasol(1, i % 2 ? C.coral : C.teal, C.white), 80 + i * 46 + (i % 3) * 10, 786 + (i % 3) * 9, { scale: 0.22 * E.outBack(kk), sy: 0.55 }); }
+      txt(ctx, 'Benidorm', 140, 200, { font: F.retro, size: 110, color: C.navy, alpha: MG.prog(t, BN.tBen - 0.1, BN.tBen + 0.5) });
+      // year ticker painted on a little harbour sign
+      ctx.save(); ctx.translate(1700, 840); ctx.fillStyle = '#6B4A30'; ctx.fillRect(-4, 0, 8, 80); ctx.fillStyle = C.white; ctx.fillRect(-90, -50, 180, 64); ctx.strokeStyle = C.navy; ctx.lineWidth = 3; ctx.strokeRect(-90, -50, 180, 64); txt(ctx, String(yr), 0, 0, { font: F.cond, weight: 900, size: 54, color: C.coralD, align: 'center' }); ctx.restore();
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.25, sat: 1.05 } });
+
+  // ---- 619.6 · SEAT under licence from Fiat → every family has a car
+  const CR = { tSeat: tw('SEAT', 619.62), tLic: tw('license', 621.6), tFiat: tw('Fiat.', 622.3), tEvery: tw('every', 624.0), tCar: tw('car.', 624.9) };
+  PO.car = (ctx, x, y, s, col, o = {}) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); MG.fx.contact(ctx, 0, 4, 150, 16, 0.35); const body = new Path2D('M-150 -24 C-150 -60 -126 -70 -96 -72 C-80 -118 -40 -132 10 -132 C60 -132 92 -112 108 -76 C140 -72 156 -58 156 -26 L156 -8 L-150 -8 Z'); if (o.blue) { ctx.strokeStyle = 'rgba(240,248,255,0.95)'; ctx.lineWidth = 3; ctx.setLineDash(o.dash || []); ctx.stroke(body); ctx.setLineDash([]); } else { MG.fx.volume(ctx, body, [-152, -134, 310, 128], { color: col, shade: 0.4, hi: 0.45, cel: true, outline: '#1a1a22', outlineW: 3, light: [-0.4, -0.9] }); ctx.fillStyle = '#CFE7EE'; ctx.beginPath(); ctx.moveTo(-74, -78); ctx.quadraticCurveTo(-46, -118, 4, -120); ctx.lineTo(4, -78); ctx.closePath(); ctx.moveTo(16, -78); ctx.lineTo(16, -120); ctx.quadraticCurveTo(70, -116, 90, -78); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#F4EFE6'; ctx.fillRect(-150, -26, 306, 6); }
+    for (const wx of [-92, 96]) { ctx.save(); ctx.translate(wx, -8); ctx.rotate(o.roll || 0); ctx.fillStyle = o.blue ? 'transparent' : '#1a1a22'; ctx.strokeStyle = o.blue ? 'rgba(240,248,255,0.95)' : '#1a1a22'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 30, 0, TAU); o.blue ? ctx.stroke() : ctx.fill(); ctx.fillStyle = '#C9CDD2'; if (!o.blue) { ctx.beginPath(); ctx.arc(0, 0, 14, 0, TAU); ctx.fill(); ctx.fillStyle = '#1a1a22'; ctx.fillRect(-2, -14, 4, 28); } ctx.restore(); }
+    if (o.rack) { ctx.fillStyle = '#7A4A2E'; ctx.fillRect(-60, -150, 110, 18); ctx.fillStyle = C.coral; ctx.fillRect(-50, -168, 40, 18); ctx.fillStyle = C.teal; ctx.fillRect(-6, -172, 48, 22); ctx.strokeStyle = '#3a2a20'; ctx.lineWidth = 2; ctx.strokeRect(-60, -150, 110, 18); }
+    if (o.family) { for (const [hx, hc] of [[-46, '#5A3A22'], [-10, '#1B1716'], [44, '#C9A04A'], [70, '#5A3A22']]) { ctx.fillStyle = '#E6C2A0'; ctx.beginPath(); ctx.arc(hx, -96, hx > 40 ? 11 : 14, 0, TAU); ctx.fill(); ctx.fillStyle = hc; ctx.beginPath(); ctx.arc(hx, -103, hx > 40 ? 11 : 14, Math.PI, TAU); ctx.fill(); } } ctx.restore(); };
+  SC.push({ id: 's04_seat', start: 619.62, end: 625.44, transIn: { type: 'push', dir: 'left', dur: 0.5 },
+    draw(ctx, t) {
+      const kb = MG.prog(t, CR.tEvery - 0.5, CR.tEvery + 0.4, 'inOutCubic');
+      // blueprint world → coloured road world
+      ctx.fillStyle = mix('#24508A', '#F3E6C9', kb); ctx.fillRect(0, 0, W, H);
+      if (kb < 1) { ctx.save(); ctx.globalAlpha = 1 - kb; ctx.strokeStyle = 'rgba(220,235,255,0.18)'; ctx.lineWidth = 1; for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); } for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+        const kd = MG.prog(t, 619.7, 621.2, 'inOutSine'); PO.car(ctx, 960, 640, 2.1, C.coral, { blue: true, dash: [kd * 1800, 2000] });
+        ctx.strokeStyle = 'rgba(240,248,255,0.8)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(960 - 315, 720); ctx.lineTo(960 + 328, 720); ctx.stroke(); mono(ctx, '3.29 m', 960, 760, { size: 22, color: '#F0F8FF', align: 'center', alpha: kd });
+        MG.text.reveal(ctx, 'SEAT', 300, 260, t, CR.tSeat - 0.05, { font: F.grotesk, weight: 800, size: 120, color: '#F0F8FF', style: 'rise' }); if (t > CR.tLic - 0.1) MG.text.reveal(ctx, 'under licence from Fiat', 304, 330, t, CR.tLic - 0.1, { font: F.serif, italic: true, size: 52, color: '#CFE0F5', style: 'blur' }); ctx.restore(); }
+      if (kb > 0) { ctx.save(); ctx.globalAlpha = kb; const g = ctx.createLinearGradient(0, 0, 0, 600); g.addColorStop(0, '#9ED6E3'); g.addColorStop(1, '#F3E6C9'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, 600); ctx.fillStyle = C.sea; ctx.fillRect(0, 560, W, 120); ctx.fillStyle = '#5A5450'; ctx.fillRect(0, 780, W, 140); ctx.fillStyle = C.butter; for (let x = MG.mod(-(t - 623) * 600, 160) - 160; x < W; x += 160) ctx.fillRect(x, 846, 80, 8); ctx.fillStyle = C.sand; ctx.fillRect(0, 680, W, 100); ctx.fillRect(0, 920, W, 160);
+        // the family car, then a stream of cars along the coast road
+        const roll = (t - 622) * 9; PO.car(ctx, lerp(500, 980, MG.prog(t, CR.tEvery - 0.5, CR.tEvery + 0.6)), 880, 1.25, C.coral, { roll, rack: true, family: true });
+        for (let i = 0; i < 6; i++) { const kk = MG.prog(t, CR.tEvery + 0.2 + i * 0.12, CR.tEvery + 0.8 + i * 0.12); if (kk <= 0) continue; const x = MG.mod(1300 + i * 260 - (t - 624) * 280, W + 600) - 300; PO.car(ctx, x, 900 - (i % 2) * 120, 0.7 - (i % 2) * 0.15, [C.teal, C.butterD, '#8A6B4A', C.navy, '#B5513C', '#F4EFE6'][i], { roll }); }
+        ctx.restore(); if (t > CR.tEvery) MG.text.reveal(ctx, 'every family', 140, 220, t, CR.tEvery, { font: F.retro, size: 96, color: C.navy, style: 'rise' }); }
+    },
+    post: { grade: 'retro', grain: 0.05, vignette: 0.25 } });
+
+  // ---- 625.4 · in fifteen years: agricultural → industrial (the same landscape transforms; the words live on a roadside billboard)
+  const IN = { tFif: tw('fifteen', 625.6), tAgri: tw('agricultural', 628.1), tInd: tw('industrial', 630.4) };
+  SC.push({ id: 's04_industry', start: 625.44, end: 631.84, transIn: { type: 'blur', dur: 0.5 },
+    draw(ctx, t) {
+      const k = MG.prog(t, IN.tAgri + 0.3, IN.tInd + 0.5, 'inOutSine'); const yr = Math.round(lerp(1959, 1974, MG.prog(t, IN.tFif, IN.tInd + 0.4, 'linear')));
+      const g = ctx.createLinearGradient(0, 0, 0, 640); g.addColorStop(0, mix('#F6D9A8', '#C9D2D8', k)); g.addColorStop(1, '#F4EAD6'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); MG.kit.sun(ctx, 1560, 200, 70, t, { color: mix(C.coral, '#E8A070', k), deep: C.coralD, corona: 0.3 });
+      // hills
+      ctx.fillStyle = mix('#C7B27A', '#9EA28E', k); ctx.beginPath(); ctx.moveTo(0, 600); ctx.quadraticCurveTo(500, 470, 1000, 590); ctx.quadraticCurveTo(1500, 500, 1920, 590); ctx.lineTo(1920, H); ctx.lineTo(0, H); ctx.fill();
+      // factories rise from behind the hill
+      for (let i = 0; i < 8; i++) { const kk = E.out(clamp((k - i * 0.06) / 0.5)); if (kk <= 0) continue; const x = 220 + i * 210, hgt = (120 + (i % 3) * 50) * kk; const b = new Path2D(); b.moveTo(x - 70, 640); b.lineTo(x - 70, 640 - hgt); for (let s = 0; s < 3; s++) { b.lineTo(x - 70 + s * 46 + 23, 640 - hgt - 30 * kk); b.lineTo(x - 70 + s * 46 + 46, 640 - hgt); } b.lineTo(x + 70, 640); b.closePath(); PO.ink(ctx, b, [x - 70, 640 - hgt - 30, 140, hgt + 30], '#E2D8C6', { reg: false, sp: 5, htA: 0.25 }); ctx.fillStyle = '#7C6F62'; ctx.fillRect(x + 40, 640 - hgt - 120 * kk, 16, 120 * kk); if (kk > 0.8) MG.fx.smoke(ctx, x + 48, 640 - hgt - 120, t, { n: 5, seed: i + 30, spread: 10, rise: 30, r: 22, alpha: 0.5, color: '#EEE8DE', life: 3, wind: 14 }); }
+      // wheat field in front folds away
+      ctx.save(); const fy = 660; for (let i = 0; i < 90; i++) { const x = i * 22 + (i % 2) * 6; const hgt = (110 + MG.rand(8, i) * 40) * (1 - k * 0.92); const sw = Math.sin(t * 1.6 + i * 0.4) * 6 + k * 30; ctx.strokeStyle = mix('#D9A441', '#9E8B5A', k); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(x, 1080); ctx.quadraticCurveTo(x + sw * 0.5, 1080 - hgt * 0.5, x + sw, 1080 - hgt); ctx.stroke(); ctx.fillStyle = mix('#E8B54C', '#A0905E', k); ctx.beginPath(); ctx.ellipse(x + sw, 1080 - hgt - 8, 4, 12, sw * 0.02, 0, TAU); ctx.fill(); } ctx.restore();
+      // roadside billboard: AGRICULTURAL → INDUSTRIAL (the new poster is pasted over the old)
+      ctx.save(); ctx.translate(1240, 640); ctx.fillStyle = '#5A4632'; ctx.fillRect(-150, 0, 14, 300); ctx.fillRect(136, 0, 14, 300); ctx.fillStyle = '#F4EFE6'; ctx.fillRect(-300, -220, 600, 220); ctx.strokeStyle = C.navy; ctx.lineWidth = 4; ctx.strokeRect(-300, -220, 600, 220);
+      txt(ctx, 'agricultural', 0, -90, { font: F.retro, size: 78, color: '#7A6A3A', align: 'center' }); const kp = MG.prog(t, IN.tInd - 0.4, IN.tInd + 0.4, 'inOutCubic'); if (kp > 0) { ctx.save(); ctx.beginPath(); ctx.rect(-300, -220, 600, 220 * kp); ctx.clip(); ctx.fillStyle = C.teal; ctx.fillRect(-300, -220, 600, 220); txt(ctx, 'industrial', 0, -90, { font: F.retro, size: 86, color: C.white, align: 'center' }); ctx.restore(); ctx.fillStyle = 'rgba(0,0,0,0.15)'; ctx.fillRect(-300, -220 + 220 * kp - 4, 600, 6); }
+      mono(ctx, String(yr), 0, -30, { size: 28, color: kp > 0.5 ? C.white : C.navy, align: 'center' }); ctx.restore();
+      if (t > IN.tFif - 0.1) MG.text.reveal(ctx, '15 years', 140, 210, t, IN.tFif - 0.1, { font: F.cond, weight: 900, size: 120, color: C.navy, style: 'rise' });
+    },
+    post: (t) => ({ grade: 'retro', grain: 0.05, vignette: 0.26, sat: lerp(1.05, 0.92, MG.lin(t, 628, 631)) }) });
+
+  // ===================================== WORLD 3 · SUN vs CLOCK =====================================
+  const CL = {}; S4.CL = CL;
+  CL.room = () => MG.cache('s4cl:room', W, H, (x, w, h) => { x.fillStyle = '#E9D8BB'; x.fillRect(0, 0, w, h); x.fillStyle = '#D4BE98'; x.fillRect(0, 820, w, 260); MG.tex.over(x, 'blotch', { alpha: 0.12, color: '#6a4a2a', scale: 3 }); MG.tex.over(x, 'fibers', { alpha: 0.5 }); x.fillStyle = '#B48A5A'; x.fillRect(0, 812, w, 12); });
+  /** wall clock with wooden rim; hour float */
+  CL.clock = (ctx, x, y, r, hour, o = {}) => { ctx.save(); MG.fx.shadow(ctx, MG.path.circle(x, y, r + 14), { dx: 10, dy: 16, blur: 22, color: 'rgba(40,20,10,0.35)' }); MG.fx.volume(ctx, MG.path.circle(x, y, r + 14), [x - r - 14, y - r - 14, (r + 14) * 2, (r + 14) * 2], { color: o.rim || '#7A4A2E', shade: 0.5, hi: 0.4 }); ctx.fillStyle = '#F7F0E0'; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); ctx.strokeStyle = '#2A1E18'; ctx.lineCap = 'round'; for (let i = 0; i < 60; i++) { const a = (i / 60) * TAU; const big = i % 5 === 0; ctx.lineWidth = big ? r * 0.035 : r * 0.012; ctx.beginPath(); ctx.moveTo(x + Math.cos(a) * r * (big ? 0.8 : 0.88), y + Math.sin(a) * r * (big ? 0.8 : 0.88)); ctx.lineTo(x + Math.cos(a) * r * 0.93, y + Math.sin(a) * r * 0.93); ctx.stroke(); } for (let i = 1; i <= 12; i++) { const a = (i / 12) * TAU - Math.PI / 2; txt(ctx, String(i), x + Math.cos(a) * r * 0.66, y + Math.sin(a) * r * 0.66 + r * 0.06, { font: F.fashion, size: r * 0.17, weight: 700, color: '#2A1E18', align: 'center' }); }
+    const hr = hour % 12, mn = (hour % 1) * 60; const ha = (hr / 12) * TAU - Math.PI / 2, ma = (mn / 60) * TAU - Math.PI / 2; ctx.strokeStyle = '#1B1412'; ctx.lineWidth = r * 0.06; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ha) * r * 0.5, y + Math.sin(ha) * r * 0.5); ctx.stroke(); ctx.lineWidth = r * 0.035; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(ma) * r * 0.78, y + Math.sin(ma) * r * 0.78); ctx.stroke(); ctx.fillStyle = C.red; ctx.beginPath(); ctx.arc(x, y, r * 0.05, 0, TAU); ctx.fill();
+    const g = ctx.createLinearGradient(x - r, y - r, x + r, y + r); g.addColorStop(0, 'rgba(255,255,255,0.35)'); g.addColorStop(0.5, 'rgba(255,255,255,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); if (o.label) mono(ctx, o.label, x, y + r + 66, { size: Math.max(28, r * 0.22), weight: 700, align: 'center', color: o.labelColor || '#2A1E18' }); ctx.restore(); };
+
+  // ---- 631.8 · "a detail that tells you more than any statistic" — café table, rack focus from the yearbook to a wristwatch
+  const DT = { tDetail: tw('detail', 633.0), tStat: tw('statistic.', 635.8) };
+  SC.push({ id: 's04_detail', start: 631.84, end: 637.12, transIn: { type: 'blur', dur: 0.6 },
+    draw(ctx, t) {
+      const kf = MG.prog(t, DT.tDetail - 0.2, DT.tDetail + 0.9, 'inOutCubic');
+      ctx.fillStyle = '#3A2A22'; ctx.fillRect(0, 0, W, H); const bgL = ctx.createRadialGradient(1500, 200, 50, 1500, 200, 1300); bgL.addColorStop(0, 'rgba(255,190,120,0.55)'); bgL.addColorStop(1, 'rgba(255,190,120,0)'); ctx.fillStyle = bgL; ctx.fillRect(0, 0, W, H);
+      // marble table top (perspective) with the yearbook (out of focus after rack)
+      ctx.save(); ctx.fillStyle = '#E8E1D4'; ctx.beginPath(); ctx.moveTo(-200, 1080); ctx.lineTo(2120, 1080); ctx.lineTo(1560, 420); ctx.lineTo(360, 420); ctx.closePath(); ctx.fill(); ctx.clip(); MG.tex.over(ctx, 'blotch', { alpha: 0.15, color: '#6a6a70', scale: 5 }); ctx.restore();
+      const book = MG.cache('s4cl:book', 620, 420, (x, w, h) => { x.fillStyle = '#F2EBDD'; x.fillRect(0, 0, w, h); mono(x, 'Anuario estadístico', 30, 50, { size: 22, color: '#2A1E18' }); x.strokeStyle = '#2A1E18'; x.lineWidth = 2; x.beginPath(); x.moveTo(40, 360); x.lineTo(590, 360); x.moveTo(40, 360); x.lineTo(40, 90); x.stroke(); x.strokeStyle = C.red; x.lineWidth = 5; x.beginPath(); [[40, 330], [140, 310], [240, 270], [340, 230], [440, 170], [540, 120]].forEach((p, i) => (i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1]))); x.stroke(); for (let i = 0; i < 9; i++) { x.fillStyle = 'rgba(40,30,20,0.25)'; x.fillRect(320, 400 - i * 0, 0, 0); } MG.tex.over(x, 'fibers', { alpha: 0.5 }); });
+      ctx.save(); ctx.filter = `blur(${(kf * 9).toFixed(1)}px)`; ctx.translate(760, 640); ctx.rotate(-0.08); ctx.transform(1, 0, -0.25, 0.8, 0, 0); ctx.drawImage(book, -310, -210); ctx.restore(); ctx.filter = 'none';
+      // a coffee cup steaming
+      ctx.save(); ctx.filter = `blur(${(kf * 6).toFixed(1)}px)`; MG.fx.volume(ctx, MG.path.ellipse(420, 720, 70, 26), [350, 694, 140, 52], { color: '#F4EFE6', shade: 0.3 }); ctx.fillStyle = '#3A2214'; ctx.beginPath(); ctx.ellipse(420, 716, 56, 18, 0, 0, TAU); ctx.fill(); ctx.restore(); ctx.filter = 'none'; MG.fx.smoke(ctx, 420, 690, t, { n: 5, seed: 4, spread: 16, rise: 34, r: 22, alpha: 0.25, color: '#FFFFFF', life: 3 });
+      // the wrist + watch slides in sharp in the foreground
+      const kw = MG.prog(t, DT.tDetail - 0.6, DT.tDetail + 0.5); ctx.save(); ctx.translate(lerp(2100, 1340, kw), 760); ctx.rotate(-0.25); ctx.filter = `blur(${((1 - kf) * 10).toFixed(1)}px)`;
+      const arm = MG.path.smooth([[-520, -70], [-60, -90], [120, -60], [140, 40], [-60, 80], [-520, 70]], true); MG.fx.volume(ctx, arm, [-520, -90, 660, 170], { color: '#D9A780', shade: 0.4, hi: 0.3, cel: true, outline: '#3a2218', outlineW: 3 }); ctx.fillStyle = '#2C3E50'; ctx.fillRect(-600, -90, 160, 180); ctx.fillStyle = '#5E3A22'; ctx.fillRect(-170, -96, 70, 192); CL.clock(ctx, -135, -8, 62, 22 + MG.lin(t, 631.8, 637.1) * 0.03, { rim: '#C9A04A' }); ctx.restore(); ctx.filter = 'none';
+      if (t > DT.tStat - 0.6) MG.text.reveal(ctx, 'a detail', 150, 200, t, DT.tStat - 0.6, { font: F.display, weight: 800, size: 96, color: '#F4E6CC', style: 'rise' });
+    },
+    post: { grade: 'warm', grain: 0.055, vignette: 0.42 } });
+
+  // ---- 637.1 · dinner at 10 p.m. · the summer sun still setting at 10:30 (dining room + window)
+  const DN = { tDin: tw('dinner', 637.9), t10: tw('10', 638.9), tSun: tw('sun', 640.7), t1030: tw('10:30?', 641.9) };
+  SC.push({ id: 's04_dinner', start: 637.12, end: 642.64, transIn: { type: 'zoom', dur: 0.5, x: 1340, y: 760, amount: 1.8, from: 0.86 },
+    draw(ctx, t) {
+      const ks = MG.prog(t, DN.tSun - 0.3, 642.6, 'inOutSine'); const hour = lerp(22.0, 22.5, MG.prog(t, DN.t10, DN.t1030 + 0.3, 'inOutCubic'));
+      ctx.drawImage(CL.room(), 0, 0);
+      // window with the sunset (sun still above the horizon at 22:30)
+      ctx.save(); const wx = 980, wy = 170, ww = 700, wh = 560; const sky = ctx.createLinearGradient(0, wy, 0, wy + wh); sky.addColorStop(0, '#F3B36A'); sky.addColorStop(0.7, '#F7D39A'); sky.addColorStop(1, '#E88A5A'); ctx.fillStyle = sky; ctx.fillRect(wx, wy, ww, wh); ctx.beginPath(); ctx.rect(wx, wy, ww, wh); ctx.clip(); MG.kit.sun(ctx, wx + 420, lerp(wy + 300, wy + 440, ks), 64, t, { color: '#F06A3A', deep: '#C84A2A', corona: 0.7 }); ctx.fillStyle = '#7A5A6A'; ctx.beginPath(); ctx.moveTo(wx, wy + 470); for (let u = 0; u <= ww; u += 30) ctx.lineTo(wx + u, wy + 460 - Math.sin(u * 0.02) * 18 - (u % 90 === 0 ? 30 : 0)); ctx.lineTo(wx + ww, wy + wh); ctx.lineTo(wx, wy + wh); ctx.fill(); ctx.restore();
+      ctx.strokeStyle = '#F4EFE6'; ctx.lineWidth = 18; ctx.strokeRect(wx, wy, ww, wh); ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(wx + ww / 2, wy); ctx.lineTo(wx + ww / 2, wy + wh); ctx.moveTo(wx, wy + wh / 2); ctx.lineTo(wx + ww, wy + wh / 2); ctx.stroke();
+      // warm sunlight patch on the wall & table
+      ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = 'rgba(255,170,90,0.25)'; ctx.beginPath(); ctx.moveTo(wx, wy + wh); ctx.lineTo(wx + ww, wy + wh); ctx.lineTo(wx + ww - 300, 1080); ctx.lineTo(wx - 500, 1080); ctx.fill(); ctx.restore();
+      CL.clock(ctx, 460, 330, 150, hour);
+      // the dinner table: plates, bread, a family at 22:00
+      ctx.fillStyle = '#F4EFE6'; ctx.beginPath(); ctx.ellipse(700, 920, 620, 120, 0, 0, TAU); ctx.fill(); ctx.fillStyle = 'rgba(60,40,30,0.15)'; ctx.beginPath(); ctx.ellipse(700, 960, 600, 90, 0, 0, Math.PI); ctx.fill();
+      for (let i = 0; i < 4; i++) { const px = 320 + i * 250, py = 900 + (i % 2) * 20; MG.fx.volume(ctx, MG.path.ellipse(px, py, 70, 22), [px - 70, py - 22, 140, 44], { color: '#FBF7EE', shade: 0.25 }); ctx.fillStyle = ['#C8693F', '#E0B040', '#6F7A3A', '#B8322A'][i]; ctx.beginPath(); ctx.ellipse(px, py - 2, 36, 10, 0, 0, TAU); ctx.fill(); }
+      MG.text.reveal(ctx, 'dinner at 10 p.m.', 140, 140, t, DN.tDin - 0.1, { font: F.display, weight: 800, size: 72, color: '#2A1E18', style: 'rise' });
+      if (t > DN.t1030 - 0.2) MG.text.reveal(ctx, 'sunset 10:30', 1000, 120, t, DN.t1030 - 0.2, { font: F.display, weight: 800, size: 64, color: '#B8322A', style: 'rise' });
+    },
+    post: { grade: 'golden', grain: 0.05, vignette: 0.34 } });
+
+  // ---- 642.6 · "Franco." — the setting sun becomes a coin with his profile; 1940: the lobby clocks LONDON | MADRID | BERLIN
+  const BT = { tFr: tw('Franco.', 642.64), t1940: tw('1940,', 644.0), tHit: tw('Hitler,', 646.6), tClocks: tw('clocks', 648.0), tBerlin: tw('Berlin', 648.6) };
+  SC.push({ id: 's04_berlin', start: 642.64, end: 649.92, transIn: { type: 'zoom', dur: 0.45, x: 1400, y: 560, amount: 1.4, from: 0.9 },
+    init() { S4.franco(); },
+    draw(ctx, t) {
+      const kc = MG.prog(t, BT.t1940 - 0.4, BT.t1940 + 0.6, 'inOutCubic');
+      ctx.fillStyle = mix('#2A2026', '#E6D7BC', kc); ctx.fillRect(0, 0, W, H);
+      // the coin: Franco's portrait in a silver disk (held breath on the name)
+      if (kc < 1) { ctx.save(); ctx.globalAlpha = 1 - kc; const r = 230 * (1 + 0.05 * MG.prog(t, BT.tFr, BT.tFr + 1.2)); const cx = 960, cy = 540; MG.kit.sun(ctx, cx, cy, r, t, { variant: 'coin' }); ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r * 0.84, 0, TAU); ctx.clip(); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(S4.francoTint('#B9BCC4'), cx - r * 0.95, cy - r * 0.92, r * 1.9, r * 2.28); ctx.restore(); mono(ctx, 'Francisco Franco · Caudillo de España', cx, cy + r + 60, { size: 22, color: '#E6DFD0', align: 'center' }); ctx.restore(); }
+      if (kc > 0) { ctx.save(); ctx.globalAlpha = kc; ctx.drawImage(CL.room(), 0, 0); ctx.restore();
+        const kj = MG.prog(t, BT.tBerlin - 0.1, BT.tBerlin + 0.5, 'outBack'); const madrid = lerp(12.0, 13.0, kj);
+        [[440, 12.0, 'LONDON'], [960, madrid, 'MADRID'], [1480, 13.0, 'BERLIN']].forEach(([x, h, n], i) => { ctx.save(); ctx.globalAlpha = kc; const r = 150; CL.clock(ctx, x, 470, r, h, { label: n, labelColor: n === 'MADRID' ? C.red : '#2A1E18' }); ctx.restore(); });
+        if (t > BT.tBerlin) { const k = MG.prog(t, BT.tBerlin, BT.tBerlin + 0.6); ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = C.red; ctx.lineWidth = 6; ctx.setLineDash([14, 10]); ctx.beginPath(); ctx.moveTo(1110, 470); ctx.lineTo(1330, 470); ctx.stroke(); ctx.setLineDash([]); MG.fx.arrowHead(ctx, [[1110, 470], [1330, 470]], 22, C.red); txt(ctx, '+1 h', 1220, 440, { font: F.cond, weight: 900, size: 56, color: C.red, align: 'center' }); ctx.restore(); }
+        // desk calendar with the year
+        ctx.save(); ctx.globalAlpha = kc; ctx.translate(960, 900); ctx.fillStyle = '#7A4A2E'; ctx.fillRect(-120, 40, 240, 16); ctx.fillStyle = '#F7F0E0'; ctx.fillRect(-100, -90, 200, 130); ctx.fillStyle = C.red; ctx.fillRect(-100, -90, 200, 34); mono(ctx, 'ABRIL', 0, -64, { size: 20, color: '#F7F0E0', align: 'center' }); txt(ctx, '1940', 0, 20, { font: F.cond, weight: 900, size: 76, color: '#2A1E18', align: 'center' }); ctx.restore(); }
+    },
+    post: (t) => ({ grade: t < BT.t1940 ? 'noir' : 'warm', grain: 0.055, vignette: 0.4 }) });
+
+  // ---- 649.9 · geographically Madrid is WEST of London (Greenwich meridian, time zones)
+  const GW = { tGeo: tw('Geographically,', 649.92), tWest: tw('west', 651.6), tShould: tw('should', 653.2), tGreen: tw('Greenwich', 653.6) };
+  SC.push({ id: 's04_meridian', start: 649.92, end: 655.04, transIn: { type: 'blur', dur: 0.5 },
+    init() { this.pr = GEO.proj('mercator', { center: [-1.0, 46.6], scale: 2350, translate: [960, 540] }); const pr = this.pr; this.base = MG.cache('s4cl:mer', W, H, (x) => { x.fillStyle = '#BFD6E0'; x.fillRect(0, 0, W, H); const utc = ['United Kingdom', 'Ireland', 'Portugal', 'Morocco']; for (const f of GEO.iberia10.features) { const n = f.properties.name; GEO.draw(x, pr, f, { fill: utc.includes(n) ? '#E6E1C9' : n === 'Spain' ? '#F2C98A' : '#E9D8C0', stroke: 'rgba(40,30,30,0.35)', width: 1 }); } x.strokeStyle = 'rgba(40,30,30,0.18)'; x.lineWidth = 1; for (let lon = -20; lon <= 20; lon += 5) { const a = pr([lon, 30]), b = pr([lon, 60]); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); } MG.tex.over(x, 'fibers', { alpha: 0.45 }); }); },
+    draw(ctx, t) {
+      const pr = this.pr; ctx.drawImage(this.base, 0, 0);
+      const g0 = pr([0, 58]), g1 = pr([0, 34]); const kg = MG.prog(t, 650.0, 651.0, 'inOutSine'); ctx.save(); ctx.strokeStyle = C.red; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(g0[0], g0[1]); ctx.lineTo(g0[0], lerp(g0[1], g1[1], kg)); ctx.stroke(); ctx.restore(); mono(ctx, '0° Greenwich', g0[0] + 14, g0[1] + 40, { size: 22, color: C.red, alpha: kg });
+      const L = pr(MG.geo.cities.London), M = pr(MG.geo.cities.Madrid); GEO.label(ctx, pr, MG.geo.cities.London, { text: 'LONDON', t, t0: 650.2, dotColor: '#2A1E18', size: 36, dot: 9, halo: '#F4EFE6' }); GEO.label(ctx, pr, MG.geo.cities.Madrid, { text: 'MADRID', t, t0: 650.6, dotColor: C.red, size: 36, dot: 9, pulse: true, halo: '#F4EFE6' });
+      // the longitudes drop down to a ruler: Madrid 3.7° W, London 0.1° W
+      const kw = MG.prog(t, GW.tWest - 0.4, GW.tWest + 0.6); if (kw > 0) { ctx.save(); ctx.globalAlpha = kw; ctx.setLineDash([6, 6]); ctx.strokeStyle = '#2A1E18'; ctx.lineWidth = 2; for (const p of [L, M]) { ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(p[0], 980); ctx.stroke(); } ctx.setLineDash([]); ctx.fillStyle = '#2A1E18'; ctx.fillRect(M[0], 975, g0[0] - M[0], 6); mono(ctx, '3.7° W', M[0], 1020, { size: 24, align: 'center' }); mono(ctx, '0.1° W', L[0] + 30, 1020, { size: 20, align: 'left' }); ctx.restore(); }
+      if (t > GW.tShould - 0.2) { const k = MG.prog(t, GW.tShould - 0.2, GW.tShould + 0.5); ctx.save(); ctx.globalAlpha = k; ctx.fillStyle = 'rgba(255,255,255,0.75)'; ctx.fillRect(1180, 150, 560, 210); txt(ctx, 'should be', 1220, 230, { font: F.serif, italic: true, size: 56, color: '#2A1E18' }); txt(ctx, 'GMT', 1220, 330, { font: F.cond, weight: 900, size: 96, color: C.red }); txt(ctx, 'is CET', 1440, 330, { font: F.cond, weight: 700, size: 64, color: '#2A1E18' }); ctx.restore(); }
+    },
+    post: { grade: 'warm', grain: 0.05, vignette: 0.32 } });
+
+  // ---- 655 · more than eighty years later — a tear-off calendar runs 1940 → 2026; the hand never moves back
+  const CY = { tEighty: tw('eighty', 655.6), tNobody: tw('nobody', 656.9), tBack: tw('back.', 658.4) };
+  SC.push({ id: 's04_calendar', start: 655.04, end: 659.12, transIn: { type: 'push', dir: 'left', dur: 0.45 },
+    draw(ctx, t) {
+      ctx.drawImage(CL.room(), 0, 0); CL.clock(ctx, 560, 470, 230, 13.0 + MG.wiggle(t, 2, 0.002, 4));
+      const k = MG.prog(t, 655.3, 658.3, 'inOutQuad'); const yr = Math.round(lerp(1940, 2026, k));
+      ctx.save(); ctx.translate(1340, 520); ctx.fillStyle = '#7A4A2E'; ctx.fillRect(-190, -300, 380, 30); ctx.fillStyle = '#F7F0E0'; ctx.fillRect(-170, -270, 340, 420); ctx.fillStyle = C.red; ctx.fillRect(-170, -270, 340, 70); txt(ctx, String(yr), 0, 60, { font: F.cond, weight: 900, size: 170, color: '#2A1E18', align: 'center' }); ctx.restore();
+      // pages flying off
+      for (let i = 0; i < 12; i++) { const u = MG.fract(k * 12 - i * 0.0) ; const ph = (k * 12 + i) % 1; const kk = MG.fract(k * 18 + i / 12); if (k <= 0 || k >= 1) break; ctx.save(); const x = 1340 + kk * 520 + i * 6, y = 300 - kk * 260 + Math.sin(kk * 8 + i) * 40; ctx.translate(x, y); ctx.rotate(kk * 3 + i); ctx.globalAlpha = 1 - kk; ctx.fillStyle = '#F7F0E0'; ctx.fillRect(-60, -70, 120, 140); ctx.fillStyle = C.red; ctx.fillRect(-60, -70, 120, 22); ctx.restore(); }
+      if (t > CY.tEighty - 0.2) MG.text.reveal(ctx, '80+ years', 140, 180, t, CY.tEighty - 0.2, { font: F.cond, weight: 900, size: 110, color: '#2A1E18', style: 'rise' });
+      if (t > CY.tNobody) MG.text.reveal(ctx, 'nobody moved them back', 140, 960, t, CY.tNobody, { font: F.serif, italic: true, size: 56, color: '#5a3a2a', style: 'blur' });
+    },
+    post: { grade: 'warm', grain: 0.05, vignette: 0.32 } });
+
+  // ---- 659.1 · out of sync with the sun: the plaza sundial reads 11 while the town-hall clock says 12
+  const SY = { tSync: tw('sync', 661.4), tSun: tw('sun.', 662.1) };
+  SC.push({ id: 's04_sundial', start: 659.12, end: 662.96, transIn: { type: 'zoom', dur: 0.5, x: 560, y: 470, amount: 1.6, from: 0.9 },
+    draw(ctx, t) {
+      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#F6D7A0'); g.addColorStop(1, '#E9C890'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      // town-hall façade with its clock
+      ctx.fillStyle = '#E8D3AE'; ctx.fillRect(1100, 80, 640, 760); ctx.fillStyle = 'rgba(120,70,30,0.2)'; ctx.fillRect(1100, 80, 70, 760); for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) { ctx.fillStyle = '#5A3A2A'; ctx.fillRect(1160 + c * 140, 420 + r * 130, 70, 90); ctx.fillStyle = '#F4EFE6'; ctx.fillRect(1150 + c * 140, 510 + r * 130, 90, 10); } CL.clock(ctx, 1420, 250, 110, 12.0, { rim: '#8A6A40' }); mono(ctx, 'AYUNTAMIENTO', 1420, 400, { size: 24, align: 'center', color: '#5A3A2A' });
+      // the sundial in the plaza (perspective ellipse), gnomon shadow at XI
+      ctx.save(); ctx.translate(560, 820); ctx.fillStyle = 'rgba(80,50,30,0.25)'; ctx.beginPath(); ctx.ellipse(10, 30, 420, 120, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#DCCFB6'; ctx.beginPath(); ctx.ellipse(0, 0, 400, 110, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = '#6B5A44'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(0, 0, 400, 110, 0, 0, TAU); ctx.stroke();
+      const romans = ['VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'I', 'II', 'III', 'IV', 'V', 'VI']; romans.forEach((r, i) => { const a = Math.PI + (i / 12) * Math.PI; txt(ctx, r, Math.cos(a) * 330, Math.sin(a) * 85 + 10, { font: F.roman, weight: 700, size: 30, color: r === 'XI' ? C.red : '#4A3A2A', align: 'center' }); });
+      const sa = Math.PI + (5 / 12) * Math.PI + MG.wiggle(t, 0.3, 0.004, 3); ctx.strokeStyle = 'rgba(40,25,15,0.65)'; ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(sa) * 290, Math.sin(sa) * 76); ctx.stroke();
+      ctx.fillStyle = '#7A6040'; ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(8, 0); ctx.lineTo(0, -150); ctx.fill(); ctx.restore();
+      MG.kit.sun(ctx, 260, 170, 80, t, { color: '#F2A33A', deep: '#E07B24', corona: 0.6, rays: 0.4 });
+      if (t > SY.tSync - 0.4) { const k = MG.prog(t, SY.tSync - 0.4, SY.tSync + 0.3); ctx.save(); ctx.globalAlpha = k; txt(ctx, 'sun XI', 400, 560, { font: F.roman, weight: 900, size: 64, color: C.red, align: 'center' }); txt(ctx, 'clock 12', 1420, 900, { font: F.cond, weight: 900, size: 64, color: '#2A1E18', align: 'center' }); ctx.restore(); }
+    },
+    post: { grade: 'golden', grain: 0.05, vignette: 0.3 } });
+
+  // ---- 663 · the long Spanish day: a 24-h dial (up in the dark · lunch 15:00 · dinner 22:00) · siesta? mostly a myth
+  const DY = { tUp: tw('up', 663.5), tLunch: tw('lunch', 664.9), tThree: tw('three,', 665.5), tDinner: tw('dinner', 666.4), tSiesta: tw('siesta?', 668.0), tMyth: tw('myth.', 669.6) };
+  CL.dial = (ctx, t, cx, cy, R, o = {}) => { // 24h clock: midnight at bottom, noon at top
+    const A = (h) => Math.PI / 2 + (h / 24) * TAU; ctx.save();
+    MG.fx.shadow(ctx, MG.path.circle(cx, cy, R + 20), { dx: 12, dy: 18, blur: 30, color: 'rgba(40,20,10,0.35)' });
+    // daylight arc (sunrise ≈ 8:00, sunset ≈ 21:30 in summer, clock time) vs night
+    ctx.fillStyle = '#26324A'; ctx.beginPath(); ctx.arc(cx, cy, R + 20, 0, TAU); ctx.fill(); ctx.fillStyle = '#F6C98A'; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R + 20, A(o.rise ?? 8), A(o.set ?? 21.5)); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#F7F0E0'; ctx.beginPath(); ctx.arc(cx, cy, R * 0.78, 0, TAU); ctx.fill(); MG.tex.over(ctx, 'fibers', { alpha: 0.3, path: MG.path.circle(cx, cy, R * 0.78) });
+    for (let h = 0; h < 24; h++) { const a = A(h); ctx.strokeStyle = '#2A1E18'; ctx.lineWidth = h % 6 ? 2 : 4; ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * R * 0.78, cy + Math.sin(a) * R * 0.78); ctx.lineTo(cx + Math.cos(a) * R * 0.7, cy + Math.sin(a) * R * 0.7); ctx.stroke(); if (h % 3 === 0) txt(ctx, String(h), cx + Math.cos(a) * R * 0.6, cy + Math.sin(a) * R * 0.6 + 10, { font: F.cond, weight: 800, size: 30, color: '#2A1E18', align: 'center' }); }
+    const evs = o.events || []; for (const [h, label, t0, col] of evs) { const k = E.outBack(clamp((t - t0) / 0.45)); if (k <= 0) continue; const a = A(h); const px = cx + Math.cos(a) * (R + 20), py = cy + Math.sin(a) * (R + 20); ctx.save(); ctx.translate(px, py); ctx.scale(k, k); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(0, 0, 26, 0, TAU); ctx.fill(); ctx.strokeStyle = '#F7F0E0'; ctx.lineWidth = 4; ctx.stroke(); ctx.restore(); const lx = cx + Math.cos(a) * (R + 90), ly = cy + Math.sin(a) * (R + 90); txt(ctx, label, lx, ly + 10, { font: F.grotesk, weight: 800, size: 34, color: '#2A1E18', align: Math.cos(a) < -0.2 ? 'right' : Math.cos(a) > 0.2 ? 'left' : 'center', alpha: k }); }
+    if (o.hand !== undefined) { const a = A(o.hand); ctx.strokeStyle = C.red; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * R * 0.66, cy + Math.sin(a) * R * 0.66); ctx.stroke(); MG.kit.sun(ctx, cx + Math.cos(a) * (R + 20), cy + Math.sin(a) * (R + 20), 18, t, { corona: 0.2, halftone: 0 }); }
+    ctx.fillStyle = '#2A1E18'; ctx.beginPath(); ctx.arc(cx, cy, 10, 0, TAU); ctx.fill(); ctx.restore(); };
+  SC.push({ id: 's04_day', start: 662.96, end: 670.48, transIn: { type: 'zoom', dur: 0.5, x: 560, y: 820, amount: 1.5, from: 0.9 },
+    draw(ctx, t) {
+      ctx.drawImage(MG.tex.paper('#EAD9BB', { seed: 44, light: 0.22 }), 0, 0);
+      const hand = MG.keys(t, [[662.96, 6.5], [DY.tUp + 0.3, 7.2], [DY.tThree + 0.2, 15.0, 'inOutCubic'], [DY.tDinner + 0.5, 22.0, 'inOutCubic'], [670.5, 22.2]]);
+      CL.dial(ctx, t, 760, 560, 330, { hand, events: [[7.2, 'up · dark', DY.tUp, '#26324A'], [15, 'lunch 15:00', DY.tThree - 0.1, C.coral], [22, 'dinner 22:00', DY.tDinner + 0.2, C.red]] });
+      if (t > DY.tSiesta - 0.2) { const k = MG.prog(t, DY.tSiesta - 0.2, DY.tSiesta + 0.4); ctx.save(); ctx.globalAlpha = k; txt(ctx, 'siesta?', 1300, 470, { font: F.display, weight: 800, size: 110, color: '#2A1E18' }); ctx.restore(); }
+      if (t > DY.tMyth - 0.3) { const k = MG.prog(t, DY.tMyth - 0.3, DY.tMyth + 0.1, 'outExpo'); ctx.save(); ctx.translate(1480, 600); ctx.rotate(-0.12); ctx.scale(1.6 - 0.6 * k, 1.6 - 0.6 * k); ctx.globalAlpha = k; ctx.strokeStyle = C.red; ctx.lineWidth = 8; ctx.strokeRect(-200, -70, 400, 120); txt(ctx, 'MOSTLY A MYTH', 0, 14, { font: F.stencil, size: 54, color: C.red, align: 'center' }); ctx.restore(); ctx.save(); ctx.strokeStyle = C.red; ctx.lineWidth = 7; ctx.globalAlpha = k; ctx.beginPath(); ctx.moveTo(1290, 440); ctx.lineTo(1290 + 400 * k, 432); ctx.stroke(); ctx.restore(); }
+    },
+    post: { grade: 'warm', grain: 0.05, vignette: 0.3 } });
+
+  // ---- 670.5 · only one in six takes an afternoon nap — an apartment façade at four o'clock
+  const NP = { tOne: tw('one', 671.0), tSix: tw('six', 671.4), tNap: tw('nap.', 673.0) };
+  SC.push({ id: 's04_nap', start: 670.48, end: 673.92, transIn: { type: 'blur', dur: 0.5 },
+    draw(ctx, t) {
+      const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#F3C489'); g.addColorStop(1, '#E8B678'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = '#E9D2AA'; ctx.fillRect(260, 0, 1400, H); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(110,70,90,0.28)'; ctx.beginPath(); ctx.moveTo(260, 0); ctx.lineTo(900, 0); ctx.lineTo(260, 700); ctx.fill(); ctx.restore(); MG.tex.over(ctx, 'blotch', { alpha: 0.12, color: '#6a4a2a', scale: 3 });
+      const nap = 4; for (let i = 0; i < 6; i++) { const cx = 520 + (i % 3) * 440, cy = 300 + Math.floor(i / 3) * 420; ctx.save(); ctx.translate(cx, cy); ctx.fillStyle = '#3A2A28'; ctx.fillRect(-120, -150, 240, 280); ctx.fillStyle = '#F4EFE6'; ctx.fillRect(-140, 130, 280, 14); ctx.fillStyle = '#5A3A2A'; for (let b = 0; b < 9; b++) ctx.fillRect(-140, 150 + b * 0, 280, 0);
+        // balcony railing
+        ctx.strokeStyle = '#2A1E18'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-150, 130); ctx.lineTo(150, 130); ctx.moveTo(-150, 70); ctx.lineTo(150, 70); for (let b = -150; b <= 150; b += 25) { ctx.moveTo(b, 70); ctx.lineTo(b, 130); } ctx.stroke();
+        const down = i === nap ? MG.prog(t, NP.tOne - 0.1, NP.tSix + 0.6, 'outBounce') : 0.12 + 0.05 * Math.sin(i);
+        ctx.fillStyle = '#4E7A4A'; ctx.fillRect(-120, -150, 240, 280 * down); ctx.fillStyle = 'rgba(0,0,0,0.18)'; for (let s = 0; s < 280 * down; s += 14) ctx.fillRect(-120, -150 + s, 240, 3);
+        if (i === nap && down > 0.8) { txt(ctx, 'z', 140, -120, { font: F.brush, size: 54, color: '#2A1E18', alpha: MG.prog(t, NP.tSix + 0.6, NP.tSix + 1.0) }); txt(ctx, 'z', 170, -160, { font: F.brush, size: 40, color: '#2A1E18', alpha: MG.prog(t, NP.tSix + 0.9, NP.tSix + 1.3) }); }
+        else if (i !== nap) { const ppl = ['#2A4A6A', '#B5513C', '#6F7A3A', '#8A6B4A', '#C9A04A'][i % 5]; ctx.fillStyle = ppl; ctx.beginPath(); ctx.ellipse(-30 + (i % 2) * 60 + Math.sin(t * 2 + i) * 6, 40, 30, 48, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#E6C2A0'; ctx.beginPath(); ctx.arc(-30 + (i % 2) * 60 + Math.sin(t * 2 + i) * 6, -24, 22, 0, TAU); ctx.fill(); }
+        ctx.restore(); }
+      const k = MG.prog(t, NP.tOne - 0.1, NP.tOne + 0.4, 'outBack'); ctx.save(); ctx.translate(1780, 960); ctx.scale(k, k); txt(ctx, '1 in 6', 0, 0, { font: F.cond, weight: 900, size: 120, color: '#2A1E18', align: 'right', stroke: '#F4EFE6', strokeW: 10 }); ctx.restore();
+      MG.kit.sun(ctx, 120, 120, 60, t, { color: '#F2A33A', corona: 0.5 });
+    },
+    post: { grade: 'golden', grain: 0.05, vignette: 0.3 } });
+
+  // ---- 673.9 · a midday break is just how you make it to dinner — the dial sweeps the whole long day
+  const BR = { tBreak: tw('break', 675.6), tDin: tw('dinner.', 677.4) };
+  SC.push({ id: 's04_long', start: 673.92, end: 678.56, transIn: { type: 'zoom', dur: 0.45, x: 960, y: 540, amount: 1.4, from: 0.8 },
+    draw(ctx, t) {
+      ctx.drawImage(MG.tex.paper('#EAD9BB', { seed: 44, light: 0.22 }), 0, 0); const hand = MG.keys(t, [[673.92, 7.2], [BR.tBreak, 14.5, 'inOutSine'], [BR.tBreak + 1.0, 16.5, 'inOutSine'], [678.5, 22.6, 'inOutSine']]);
+      CL.dial(ctx, t, 960, 560, 360, { hand, events: [[7.2, 'up', 673.9, '#26324A'], [15.5, 'break', BR.tBreak - 0.2, C.coral], [22, 'dinner', BR.tDin - 0.2, C.red]] });
+      // the break wedge glows as a little resting island in the long day
+      const kb = MG.prog(t, BR.tBreak - 0.2, BR.tBreak + 0.5); if (kb > 0) { const A = (h) => Math.PI / 2 + (h / 24) * TAU; ctx.save(); ctx.globalAlpha = 0.35 * kb; ctx.fillStyle = C.coral; ctx.beginPath(); ctx.moveTo(960, 560); ctx.arc(960, 560, 280, A(14), A(17)); ctx.closePath(); ctx.fill(); ctx.restore(); }
+    },
+    post: { grade: 'warm', grain: 0.05, vignette: 0.3 } });
+
+  // ---- 678.6 · Franco dies in his bed in 1975 — night, the empty made bed, the cap on the chair, the lamp goes out
+  const ND = { tDies: tw('dies', 679.2), tBed: tw('bed', 680.1), t1975: tw('1975.', 680.6) };
+  SC.push({ id: 's04_1975', start: 678.56, end: 681.58, transIn: { type: 'dip', dur: 0.6, color: '#0E0B10' },
+    draw(ctx, t) {
+      const lamp = 1 - MG.prog(t, ND.t1975 + 0.4, ND.t1975 + 0.9, 'inOutSine'); ctx.fillStyle = '#16121A'; ctx.fillRect(0, 0, W, H);
+      // window glow (moonlight → the dawn S05 opens from)
+      const wg = ctx.createLinearGradient(0, 120, 0, 680); wg.addColorStop(0, '#2B3556'); wg.addColorStop(1, '#4A4F6E'); ctx.fillStyle = wg; ctx.fillRect(1260, 140, 420, 520); ctx.strokeStyle = '#0A080C'; ctx.lineWidth = 14; ctx.strokeRect(1260, 140, 420, 520); ctx.beginPath(); ctx.moveTo(1470, 140); ctx.lineTo(1470, 660); ctx.stroke();
+      ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = 'rgba(120,140,200,0.12)'; ctx.beginPath(); ctx.moveTo(1260, 660); ctx.lineTo(1680, 660); ctx.lineTo(1500, 1080); ctx.lineTo(700, 1080); ctx.fill(); ctx.restore();
+      // the bed
+      const bedP = new Path2D('M300 760 L1180 760 L1220 900 L260 900 Z'); ctx.fillStyle = '#E6DFD0'; ctx.fill(bedP); ctx.fillStyle = '#3A2A22'; ctx.fillRect(240, 600, 60, 360); ctx.fillRect(250, 900, 980, 40); ctx.fillStyle = '#C9C0AE'; ctx.beginPath(); ctx.ellipse(420, 740, 120, 34, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(40,30,30,0.3)'; ctx.lineWidth = 2; for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.moveTo(560 + i * 100, 770); ctx.quadraticCurveTo(600 + i * 100, 830, 580 + i * 100, 895); ctx.stroke(); }
+      // the chair with the general's cap & the newspaper
+      ctx.fillStyle = '#3A2A22'; ctx.fillRect(1300, 820, 180, 20); ctx.fillRect(1300, 840, 14, 160); ctx.fillRect(1466, 840, 14, 160); ctx.fillRect(1460, 650, 20, 190); ctx.fillStyle = '#6B6550'; ctx.beginPath(); ctx.ellipse(1390, 805, 70, 18, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#4E4A3A'; ctx.beginPath(); ctx.ellipse(1390, 790, 50, 26, 0, Math.PI, TAU); ctx.fill(); ctx.fillStyle = '#C9A04A'; ctx.fillRect(1350, 790, 80, 6); ctx.fillStyle = C.red; ctx.beginPath(); ctx.arc(1390, 778, 7, 0, TAU); ctx.fill();
+      ctx.save(); ctx.translate(820, 975); ctx.rotate(-0.05); ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 18; ctx.fillStyle = '#E0D8C5'; ctx.fillRect(-250, -66, 500, 120); ctx.shadowColor = 'transparent'; txt(ctx, 'FRANCO HA MUERTO', 0, -12, { font: F.news, size: 50, color: '#161415', align: 'center' }); mono(ctx, '20 · XI · 1975', 0, 34, { size: 24, align: 'center', color: '#2E2A28' }); ctx.restore();
+      // bedside lamp light pool
+      if (lamp > 0) { ctx.save(); ctx.globalCompositeOperation = 'screen'; const g = ctx.createRadialGradient(170, 600, 20, 170, 600, 760); g.addColorStop(0, `rgba(255,190,110,${0.55 * lamp})`); g.addColorStop(1, 'rgba(255,190,110,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore(); } ctx.fillStyle = '#2A2026'; ctx.fillRect(120, 640, 100, 300); ctx.fillStyle = mix('#3A2A22', '#F2C98A', lamp); ctx.beginPath(); ctx.moveTo(110, 560); ctx.lineTo(230, 560); ctx.lineTo(200, 480); ctx.lineTo(140, 480); ctx.fill();
+      if (t > ND.t1975 - 0.2) mono(ctx, '1975', 1470, 120, { size: 30, color: '#9AA3C4', align: 'center', alpha: MG.prog(t, ND.t1975 - 0.2, ND.t1975 + 0.3) });
+    },
+    post: { grade: 'night', grain: 0.06, vignette: 0.5 } });
 
   // ================================================================= AUDIO
   MG.segment('S04', {
@@ -788,6 +1211,30 @@
       A.sfx.paper(521.0, { dur: 0.5, gain: 0.7 });
       A.sfx.impact(NEWS.tErupt, { size: 0.35, gain: 0.5 });
       [0, 0.36, 0.72].forEach((d) => A.sfx.stamp(NEWS.tThree + 0.12 + d, { gain: 0.45 }));
+      // --- Franco → autarky → 1959 (completed)
+      A.music('march', 533.8, 547.6, { key: 'C3', bpm: 84, intensity: [[533.8, 0.2], [536.5, 0.5], [543, 0.4], [547.5, 0.15]], fadeIn: 1.5, fadeOut: 1.5, gain: 0.75 });
+      A.music('tension', 547.0, 569.5, { key: 'C3', bpm: 96, intensity: [[547, 0.3], [556, 0.5], [566, 0.65], [569.4, 0.4]], fadeIn: 1.2, fadeOut: 1.2, gain: 0.8 });
+      A.sfx.riser(570.5, { dur: 2.2, gain: 0.7 }); A.sfx.tonal(570.55, ['F2', 'C3', 'F3', 'A3'], { gain: 0.5 });
+      // --- 1960s travel-poster world
+      A.music('retro60s', 570.3, 632.6, { key: 'F3', bpm: 126, intensity: [[570.3, 0.4], [579, 0.55], [587, 0.7], [600, 0.85], [608.6, 0.7], [619.6, 0.8], [631, 0.5]], fadeIn: 1.2, fadeOut: 2.2, gain: 0.95 });
+      A.sfx.paper(578.6, { dur: 0.8, gain: 0.8 }); A.sfx.whoosh(579.3, { dur: 0.6, gain: 0.5 });
+      [0, 0.3, 0.6, 0.9].forEach((d) => A.sfx.thud(579.9 + d, { gain: 0.35 })); for (let i = 0; i < 5; i++) A.sfx.swish(581.2 + i * 0.22, { gain: 0.6 });
+      for (let i = 0; i < 12; i++) A.sfx.pop(584.7 + i * 0.07, { freq: 480 + (i % 4) * 90, gain: 0.5 });
+      A.sfx.amb('rain', 588.5, 4.2, { gain: 0.6 }); A.sfx.plane(589.8, 3.2, { gain: 0.7 }); A.sfx.whoosh(593.0, { dur: 0.45, gain: 0.55, dir: -1 });
+      A.sfx.amb('crowd', 595.5, 4.6, { gain: 0.7 }); A.sfx.amb('sea', 599.6, 9.2, { gain: 0.8 }); A.sfx.plane(600.0, 3.2, { gain: 0.5 });
+      [0, 0.12, 0.24, 0.36, 0.48, 0.6].forEach((d) => A.sfx.tick(604.3 + d, { gain: 0.6 })); A.sfx.chime(605.0, { note: 'C6', gain: 0.7 });
+      A.sfx.swell(608.6, { dur: 1.2, gain: 0.5 }); A.sfx.amb('sea', 615.0, 4.6, { gain: 0.7 }); A.sfx.amb('city', 617.0, 2.6, { gain: 0.6 });
+      for (let i = 0; i < 8; i++) A.sfx.typekey(619.8 + i * 0.16, { gain: 0.5 }); A.sfx.whoosh(623.3, { dur: 0.7, gain: 0.45 }); A.sfx.amb('city', 623.4, 2.2, { gain: 0.8 });
+      A.sfx.paper(630.3, { dur: 0.6, gain: 0.8 }); A.sfx.amb('wind', 625.4, 6.4, { gain: 0.5 });
+      // --- sun vs clock (sneaky), a held breath on "Franco."
+      A.music('sneaky', 632.0, 642.4, { key: 'D3', bpm: 108, intensity: [[632, 0.35], [637, 0.6], [642.3, 0.5]], fadeIn: 1.5, fadeOut: 0.3, gain: 0.95 });
+      A.sfx.clock(633.0, { dur: 9.4, bpm: 60, gain: 0.45 }); A.sfx.sub(642.64, { gain: 0.6 }); A.sfx.ding(642.7, { note: 'C5', gain: 0.6 });
+      A.music('sneaky', 643.9, 679.0, { key: 'D3', bpm: 108, intensity: [[643.9, 0.45], [650, 0.6], [659, 0.55], [667.4, 0.7], [673.9, 0.55], [678.6, 0.2]], fadeIn: 0.8, fadeOut: 1.4, gain: 0.95 });
+      A.sfx.clock(643.9, { dur: 5.8, bpm: 60, gain: 0.5 }); A.sfx.click(648.7, { gain: 1.2 }); A.sfx.tock(648.75, { gain: 1 });
+      for (let i = 0; i < 18; i++) A.sfx.paper(655.4 + i * 0.16, { dur: 0.12, gain: 0.35 });
+      A.sfx.birds(659.2, 3.6, { gain: 0.6 }); A.sfx.stamp(669.35, { gain: 0.7 }); A.sfx.slide(671.1, { dur: 0.5, gain: 0.8 });
+      // --- 1975: hush
+      A.music('lament', 678.3, 683.2, { key: 'D3', bpm: 60, intensity: 0.35, fadeIn: 1.0, fadeOut: 1.8, gain: 0.8 }); A.sfx.click(681.0, { gain: 0.8 });
     },
   });
 })();
