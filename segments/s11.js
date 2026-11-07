@@ -1,4 +1,8 @@
-/* S11 — PLAN (placeholder, rewritten at the end) */
+/* S11 · 1638.53 → 1750.00 · where Spain wins · the unusual choice · live to enjoy life · the real empire · end title
+   Finale beats (1706–1750): ballpoint doodles on a café napkin (enjoy life ≈ work) → the napkin map (German retirees
+   stream to the coasts) → the beach (an abuelo declines the reverse trip; the retiree wins the argument) → parchment
+   empire (silver in, inflation & war out; the morion becomes a sun hat) → every arc now points INTO Spain → the coast at
+   golden hour (pays · sunbathes · goes home) → the sun sets under the end title. */
 (function () {
   const MG = window.MG; const P = MG.PAL; const F = MG.F; const { clamp, lerp } = MG;
   const S11 = {}; // local helpers / engine workarounds live here
@@ -975,6 +979,303 @@
   };
 
   // =====================================================================================================
+  // SCENES 9–10 — "There's a saying": ballpoint doodles on a café napkin → the napkin map (German retirees)
+  // =====================================================================================================
+  const INKB = '#22408F';
+  const tSp = Tw('spaniards', 1706.10), tEnjoy = Tw('enjoy', 1707.14), tGer = Tw('germans', 1708.50), tWorkW = Tw('work.', 1709.62), tOver = Tw('oversimplification,', 1710.74), tObv = Tw('obviously.', 1711.86);
+  const tGerm = Tw('german', 1713.38), tRet = Tw('retirees', 1713.70), tMove = Tw('move', 1714.50), tSpan = Tw('spanish', 1714.98), tCoast = Tw('coast', 1715.46), tDroves = Tw('droves', 1716.18);
+  const LN = (a, b, n = 10) => { const p = []; for (let i = 0; i <= n; i++) p.push([lerp(a[0], b[0], i / n), lerp(a[1], b[1], i / n)]); return p; };
+  S11.circ = (cx, cy, r, n = 30, a0 = -Math.PI / 2, a1) => { const p = []; const e = a1 ?? a0 + MG.TAU; for (let i = 0; i <= n; i++) { const a = lerp(a0, e, i / n); p.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]); } return p; };
+  S11.wob = (strokes, seed = 1, amp = 1.6) => strokes.map((s, j) => s.map((p, i) => [p[0] + MG.noise2(i * 0.37 + j * 3.1, seed) * amp, p[1] + MG.noise2(i * 0.37 + j * 3.1 + 40, seed) * amp]));
+  /** progressive ballpoint strokes; k 0..1 over the total length. returns the pen tip */
+  S11.doodle = (ctx, strokes, k, o = {}) => {
+    if (k <= 0) return null; const lens = strokes.map((s) => { let L = 0; for (let i = 1; i < s.length; i++) L += Math.hypot(s[i][0] - s[i - 1][0], s[i][1] - s[i - 1][1]); return L; }); const tot = lens.reduce((a, b) => a + b, 0) || 1;
+    let left = clamp(k) * tot, tip = null; ctx.save(); ctx.strokeStyle = o.color || INKB; ctx.lineWidth = o.w || 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.globalAlpha *= o.alpha ?? 0.9;
+    for (let i = 0; i < strokes.length && left > 0; i++) { const s = strokes[i]; const f = Math.min(1, left / (lens[i] || 1)); const pts = f < 1 ? MG.path.trim(s, 0, f) : s; if (pts.length > 1) { ctx.beginPath(); pts.forEach((p, j) => (j ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); tip = pts[pts.length - 1]; } left -= lens[i]; }
+    ctx.restore(); return tip;
+  };
+  S11.DES = () => S11._des || (S11._des = S11.wob([
+    S11.circ(-410, -205, 46), ...Array.from({ length: 10 }, (_, i) => { const a = i / 10 * MG.TAU; return LN([-410 + Math.cos(a) * 62, -205 + Math.sin(a) * 62], [-410 + Math.cos(a) * 90, -205 + Math.sin(a) * 90], 3); }),
+    LN([-460, -70], [-350, 110]), LN([-350, 110], [-150, 110]), LN([-160, 110], [-130, 185], 4), LN([-365, 100], [-415, 185], 4), LN([-440, -40], [-372, 70], 6), LN([-420, -55], [-355, 55], 6),
+    S11.circ(-430, -70, 32), [[-452, -76], [-438, -82], [-428, -74], [-418, -82], [-404, -76]], S11.circ(-428, -64, 15, 10, 0.35, Math.PI - 0.35),
+    LN([-410, -40], [-330, 80]), [[-330, 80], [-280, 52], [-240, 58]], [[-240, 58], [-200, 80], [-168, 90]], [[-168, 90], [-150, 80]],
+    [[-400, -25], [-462, -52], [-452, -100]], [[-392, -15], [-330, -30], [-300, -78]], S11.circ(-298, -108, 22, 12, 0, Math.PI), LN([-320, -108], [-276, -108], 4), LN([-298, -86], [-298, -66], 3), LN([-312, -64], [-284, -64], 3),
+  ], 3, 1.6));
+  S11.DDE = () => S11._dde || (S11._dde = S11.wob([
+    S11.circ(410, -205, 48), ...Array.from({ length: 12 }, (_, i) => { const a = i / 12 * MG.TAU; return LN([410 + Math.cos(a) * 36, -205 + Math.sin(a) * 36], [410 + Math.cos(a) * 44, -205 + Math.sin(a) * 44], 2); }), LN([410, -205], [410, -240], 4), LN([410, -205], [384, -205], 4),
+    LN([150, 95], [470, 95], 10), LN([175, 95], [175, 190], 4), LN([445, 95], [445, 190], 4), [[225, 92], [235, 22], [318, 22], [322, 92]], LN([198, 82], [262, 82], 3), LN([198, 72], [258, 72], 3),
+    S11.circ(430, -40, 32), S11.circ(419, -44, 9, 10), S11.circ(441, -44, 9, 10), LN([408, -22], [430, -22], 3), [[430, -8], [424, 6], [430, 34], [436, 6], [430, -8]],
+    LN([432, -8], [440, 112], 8), [[422, 8], [380, 54], [332, 66]], [[438, 12], [400, 62], [340, 80]], LN([402, 112], [492, 112], 6), LN([492, 112], [500, 4], 6), LN([410, 112], [402, 190], 4), LN([486, 112], [490, 190], 4),
+    [[472, -84], [478, -70], [472, -64], [466, -70], [472, -84]], [[490, -60], [495, -48], [490, -43], [485, -48], [490, -60]],
+  ], 7, 1.4));
+  S11.DAPPROX = () => S11.wob([[...Array(13)].map((_, i) => [-70 + i * 12, -14 + Math.sin(i * 0.9) * 10]), [...Array(13)].map((_, i) => [-70 + i * 12, 22 + Math.sin(i * 0.9) * 10])], 9, 1.2);
+  S11.napTable = () => MG.cache('s11:napTable', W, H, (x) => {
+    const r = MG.rng(12); for (let j = 0; j < 14; j++) { const y0 = j * 80; x.fillStyle = MG.col.mix('#4a2e26', '#62402e', r()); x.fillRect(0, y0, W, 80); x.strokeStyle = 'rgba(20,10,8,0.22)'; x.lineWidth = 2; for (let k = 0; k < 6; k++) { x.beginPath(); const yy = y0 + 8 + k * 12; x.moveTo(0, yy); for (let xx = 0; xx <= W; xx += 60) x.lineTo(xx, yy + Math.sin(xx * 0.006 + j + k) * 4); x.stroke(); } x.fillStyle = 'rgba(10,5,5,0.5)'; x.fillRect(0, y0 + 77, W, 3); }
+    MG.tex.over(x, 'grain', { alpha: 0.1 });
+    // plate with tapas (top-left, cut by frame) + a wine glass (right)
+    x.save(); x.shadowColor = 'rgba(0,0,0,0.45)'; x.shadowBlur = 30; x.shadowOffsetY = 14; x.fillStyle = '#F4EFE6'; x.beginPath(); x.arc(120, 90, 260, 0, MG.TAU); x.fill(); x.restore(); x.strokeStyle = 'rgba(30,60,120,0.5)'; x.lineWidth = 6; x.beginPath(); x.arc(120, 90, 230, 0, MG.TAU); x.stroke();
+    for (const [a, b, c] of [[60, 120, '#C8423B'], [170, 70, '#F2C46B'], [150, 190, '#6F7A3A'], [230, 140, '#E9A24A']]) { x.fillStyle = c; x.beginPath(); x.ellipse(a, b, 42, 30, a * 0.02, 0, MG.TAU); x.fill(); x.fillStyle = 'rgba(255,255,255,0.3)'; x.beginPath(); x.ellipse(a - 10, b - 8, 16, 8, 0, 0, MG.TAU); x.fill(); }
+    x.save(); x.shadowColor = 'rgba(0,0,0,0.4)'; x.shadowBlur = 24; x.shadowOffsetY = 10; x.fillStyle = 'rgba(240,235,230,0.25)'; x.beginPath(); x.arc(1780, 930, 92, 0, MG.TAU); x.fill(); x.restore(); x.fillStyle = 'rgba(126,31,43,0.85)'; x.beginPath(); x.arc(1780, 930, 70, 0, MG.TAU); x.fill(); x.strokeStyle = 'rgba(255,255,255,0.55)'; x.lineWidth = 4; x.beginPath(); x.arc(1780, 930, 92, 3.6, 5.2); x.stroke();
+  });
+  S11.napSpr = (seed) => MG.cache('s11:nap' + seed, 1180, 840, (x) => { x.save(); x.shadowColor = 'rgba(20,8,6,0.5)'; x.shadowBlur = 26; x.shadowOffsetY = 12; x.fillStyle = '#F7F1E4'; x.fillRect(40, 40, 1100, 760); x.restore(); MG.tex.over(x, 'fibers', { alpha: 0.55 });
+    x.strokeStyle = 'rgba(160,140,110,0.35)'; x.lineWidth = 3; x.setLineDash([2, 6]); x.strokeRect(80, 80, 1020, 680); x.setLineDash([]); x.strokeRect(70, 70, 1040, 700);
+    const g = x.createLinearGradient(40, 0, 1140, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(120,100,80,0.08)'); g.addColorStop(0.505, 'rgba(255,255,255,0.12)'); g.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = g; x.fillRect(40, 40, 1100, 760);
+    const g2 = x.createLinearGradient(0, 40, 0, 800); g2.addColorStop(0, 'rgba(255,255,255,0)'); g2.addColorStop(0.5, 'rgba(120,100,80,0.08)'); g2.addColorStop(0.505, 'rgba(255,255,255,0.12)'); g2.addColorStop(1, 'rgba(0,0,0,0.04)'); x.fillStyle = g2; x.fillRect(40, 40, 1100, 760); });
+  S11.pen = (ctx, tip, t) => { if (!tip) return; ctx.save(); ctx.translate(tip[0], tip[1]); ctx.rotate(-0.95 + Math.sin(t * 7) * 0.02); ctx.save(); ctx.translate(16, 22); ctx.globalAlpha = 0.3; ctx.fillStyle = '#100604'; ctx.fillRect(0, -8, 330, 16); ctx.restore(); ctx.fillStyle = '#C9CED6'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(34, -8); ctx.lineTo(34, 8); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#F4EEE2'; ctx.fillRect(34, -9, 230, 18); ctx.fillStyle = INKB; ctx.fillRect(250, -10, 70, 20); ctx.fillRect(200, -12, 10, 6); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.fillRect(40, -7, 210, 4); ctx.restore(); };
+  S11.tcam = (ctx, c) => { ctx.translate(960 + (c.dx || 0), 540 + (c.dy || 0)); ctx.scale(c.z, c.z); ctx.translate(-c.x, -c.y); };
+  S11.candle = (ctx, t) => { const f = 0.85 + 0.15 * Math.sin(t * 13) * Math.sin(t * 7.3); MG.fx.glow(ctx, 210, 930, 520, '#FFB766', 0.35 * f); ctx.fillStyle = 'rgba(240,230,210,0.3)'; ctx.beginPath(); ctx.arc(210, 930, 64, 0, MG.TAU); ctx.fill(); ctx.fillStyle = '#F4E9D2'; ctx.beginPath(); ctx.arc(210, 930, 44, 0, MG.TAU); ctx.fill(); MG.fx.glow(ctx, 210, 925, 90, '#FFE2A0', 0.9 * f); ctx.fillStyle = '#FFF4D0'; ctx.beginPath(); ctx.ellipse(210, 925, 8, 12, 0, 0, MG.TAU); ctx.fill(); };
+  S11.flag = (ctx, x, y, k, kind) => { if (k <= 0) return; ctx.save(); ctx.beginPath(); ctx.rect(x - 4, y - 4, 96 * k + 4, 70); ctx.clip(); const cs = kind === 'es' ? [['#C8231B', 0.25], ['#F2B21B', 0.5], ['#C8231B', 0.25]] : [['#1e1a1d', 1 / 3], ['#D5281B', 1 / 3], ['#F2B21B', 1 / 3]]; let yy = y; for (const [c, h] of cs) { ctx.fillStyle = c; ctx.globalAlpha = 0.85; ctx.fillRect(x, yy, 92, 60 * h + 0.5); yy += 60 * h; } ctx.globalAlpha = 1; ctx.strokeStyle = INKB; ctx.lineWidth = 3; ctx.strokeRect(x, y, 92, 60); ctx.restore(); };
+  const sayingScene = {
+    id: 's11_saying', start: 1706.05, end: 1713.0,
+    transIn: { dur: 0.6, ease: 'linear', type: (ctx, A, B, p) => { const e = MG.ease.inOutQuart(p); const sm = Math.sin(p * Math.PI) * 80; ctx.fillStyle = '#2a1a16'; ctx.fillRect(0, 0, W, H); for (let i = 0; i < 5; i++) { const k = (i / 4 - 0.5) * sm; ctx.globalAlpha = 1.6 / 5; ctx.drawImage(A, 0, -H * e + k); ctx.drawImage(B, 0, H * (1 - e) + k); } ctx.globalAlpha = 1; } },
+    post: { grade: 'warm', vignette: 0.45 },
+    draw(ctx, t) {
+      const c = MG.keys(t, [[1706.05, { x: 690, y: 548, z: 1.32 }], [tEnjoy + 0.55, { x: 705, y: 548, z: 1.32 }, 'inOut'], [tGer + 0.15, { x: 1220, y: 548, z: 1.32 }, 'cam'], [tWorkW + 0.35, { x: 1210, y: 552, z: 1.32 }, 'linear'], [tOver + 0.5, { x: 960, y: 560, z: 0.97 }, 'cam'], [1713.0, { x: 960, y: 565, z: 0.95 }, 'linear']]);
+      const hh = MG.cam.handheld(t, 1.5, 61); c.dx = hh.dx; c.dy = hh.dy;
+      ctx.save(); S11.tcam(ctx, c); ctx.drawImage(S11.napTable(), 0, 0); ctx.fillStyle = '#3a241e'; ctx.fillRect(-600, -600, 600, 2300); ctx.fillRect(W, -600, 600, 2300); ctx.fillRect(-600, -600, 3200, 600); ctx.fillRect(-600, H, 3200, 600);
+      // napkin #2 (under) and napkin #1 (the doodles) which is pulled away on "obviously"
+      ctx.save(); ctx.translate(975, 572); ctx.rotate(0.02); ctx.drawImage(S11.napSpr(2), -590, -420); ctx.restore();
+      const sl = pg(t, tObv + 0.25, 1713.0, 'inCubic');
+      ctx.save(); ctx.translate(960 + sl * 1500, 560 - sl * 950); ctx.rotate(-0.035 + sl * 0.7); ctx.scale(1 + sl * 0.12, 1 + sl * 0.12); ctx.drawImage(S11.napSpr(1), -590, -420);
+      const k1 = pg(t, tSp - 0.05, tEnjoy + 0.3), k2 = pg(t, tGer - 0.05, tWorkW + 0.15), k3 = pg(t, tOver - 0.05, tOver + 0.6);
+      let tip = S11.doodle(ctx, S11.DES(), k1); S11.flag(ctx, -610, 214, pg(t, tEnjoy - 0.2, tEnjoy + 0.3), 'es');
+      MG.text.reveal(ctx, 'ENJOY LIFE', -250, 268, t, tEnjoy - 0.05, { font: F.marker, size: 74, color: INKB, align: 'center', style: 'wipe', by: 'line' });
+      const tip2 = S11.doodle(ctx, S11.DDE(), k2); if (tip2 && k2 < 1) tip = tip2; S11.flag(ctx, 40, 214, pg(t, tWorkW - 0.45, tWorkW), 'de');
+      MG.text.reveal(ctx, 'WORK', 300, 268, t, tWorkW - 0.12, { font: F.marker, size: 74, color: INKB, align: 'center', style: 'wipe', by: 'line' });
+      const tip3 = S11.doodle(ctx, S11.DAPPROX(), k3, { w: 7 }); if (tip3 && k3 < 1) tip = tip3;
+      ctx.restore();
+      // the pen follows whatever is being drawn; rests between strokes
+      const drawing = (k1 > 0 && k1 < 1) || (k2 > 0 && k2 < 1) || (k3 > 0 && k3 < 1); if (sl < 0.05) { ctx.save(); ctx.translate(960, 560); ctx.rotate(-0.035); const rest = t < tGer - 0.05 ? [-150, 200] : t < tOver - 0.05 ? [480, 230] : [120, 120]; const tp = drawing && tip ? tip : rest; S11.pen(ctx, tp, t); ctx.restore(); }
+      S11.candle(ctx, t);
+      ctx.restore();
+    },
+  };
+  S11.napPr = () => { if (S11._npr) return S11._npr; const pr = MG.geo.proj('conic', { center: [-1, 42], scale: 1, translate: [0, 0] }); pr.fitExtent([[-470, -330], [470, 330]], { type: 'MultiPoint', coordinates: [[-18.5, 27.4], [15.5, 55.2], [-10.5, 44], [15, 36]] }); S11._npr = pr; return pr; };
+  S11.hatch = (ctx, pr, f, k, color, gap = 9) => { if (k <= 0) return; const p = MG.geo.path2d(pr, f); const b = MG.geo.bbox(pr, f); ctx.save(); ctx.clip(p); ctx.beginPath(); ctx.rect(b[0] - 20, b[1] - 20, (b[2] + 40) * k, b[3] + 40); ctx.clip(); ctx.strokeStyle = color; ctx.globalAlpha = 0.8; ctx.lineWidth = gap * 0.62; ctx.lineCap = 'round'; ctx.beginPath(); for (let d = -b[3]; d < b[2] + b[3]; d += gap) { ctx.moveTo(b[0] + d, b[1] + b[3] + 10); ctx.lineTo(b[0] + d + b[3] + 20, b[1] - 10); } ctx.stroke(); ctx.restore(); };
+  S11.RET = { from: [[13.40, 52.52], [9.99, 53.55], [11.58, 48.14], [6.96, 50.94], [8.68, 50.11], [9.18, 48.78]], to: [[[-0.30, 38.50], 'Costa Blanca', [26, 10]], [[-4.55, 36.62], 'Costa del Sol', [-26, -14]], [[2.90, 39.62], 'Mallorca', [24, -8]], [[-15.9, 28.3], 'Canarias', [-30, 54]]] };
+  const retireScene = {
+    id: 's11_retire', start: 1713.0, end: 1716.55,
+    post: { grade: 'warm', vignette: 0.45 },
+    draw(ctx, t) {
+      const c = MG.keys(t, [[1713.0, { x: 960, y: 565, z: 0.95 }], [tMove, { x: 940, y: 600, z: 1.05 }, 'inOut'], [1716.55, { x: 900, y: 640, z: 1.2 }, 'inOut']]); const hh = MG.cam.handheld(t, 1.5, 62); c.dx = hh.dx; c.dy = hh.dy;
+      ctx.save(); S11.tcam(ctx, c); ctx.drawImage(S11.napTable(), 0, 0); ctx.fillStyle = '#3a241e'; ctx.fillRect(-600, -600, 600, 2300); ctx.fillRect(W, -600, 600, 2300); ctx.fillRect(-600, -600, 3200, 600); ctx.fillRect(-600, H, 3200, 600);
+      ctx.save(); ctx.translate(975, 572); ctx.rotate(0.02); ctx.drawImage(S11.napSpr(2), -590, -420);
+      const pr = S11.napPr(); const G = MG.geo; G.init();
+      // the pen inks the coastlines out from Spain
+      const wipe = pg(t, 1713.02, 1713.75, 'outCubic'); const sp = pr([-3.7, 40.2]);
+      ctx.save(); ctx.beginPath(); ctx.rect(-520, -360, 1040, 720); ctx.clip(); ctx.beginPath(); ctx.arc(sp[0], sp[1], 40 + wipe * 1000, 0, MG.TAU); ctx.clip();
+      S11.hatch(ctx, pr, G.country('Germany'), pg(t, tGerm - 0.1, tGerm + 0.45), '#D5281B'); S11.hatch(ctx, pr, G.country('Spain'), pg(t, tSpan - 0.1, tSpan + 0.5), '#F2A33A');
+      G.draw(ctx, pr, G.land50 || G.world110, { stroke: INKB, width: 2.2 }); G.draw(ctx, pr, G.borders50, { stroke: MG.col.a(INKB, 0.35), width: 1.2 });
+      for (const n of ['Germany', 'Spain']) G.draw(ctx, pr, G.country(n), { stroke: INKB, width: 3 });
+      ctx.restore();
+      const lab = (ll, s, t0, o = {}) => { const p = pr(ll); MG.text.reveal(ctx, s, p[0] + (o.dx || 0), p[1] + (o.dy || 0), t, t0, { font: o.font || F.marker, size: o.size || 36, color: INKB, align: o.align || 'center', style: 'wipe', by: 'line' }); };
+      lab([10.4, 51.0], 'GERMANY', tGerm - 0.05, { dy: -62 }); lab([-3.8, 40.0], 'SPAIN', tSpan - 0.05, { dy: 12 });
+      // destinations on the coast
+      S11.RET.to.forEach(([ll, name, off], i) => { const t0 = tCoast - 0.3 + i * 0.12; const k = pg(t, t0, t0 + 0.35); if (k <= 0) return; const p = pr(ll); S11.doodle(ctx, [S11.circ(p[0], p[1], 14, 16)], k, { w: 4 }); MG.text.reveal(ctx, name, p[0] + off[0], p[1] + off[1], t, t0 + 0.1, { font: F.brush, size: 30, color: INKB, align: off[0] < 0 ? 'right' : 'left', style: 'wipe', by: 'line' }); });
+      // retirees: ink routes from German cities, then dots streaming down them in droves
+      const routes = S11.RET.from.map((a, i) => { const b = S11.RET.to[i % 4][0]; const A = pr(a), B = pr(b); const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2; const dx = B[0] - A[0], dy = B[1] - A[1]; const cc = [mx + dy * 0.18 * (i % 2 ? 1 : -1), my - dx * 0.18 * (i % 2 ? 1 : -1)]; const pts = []; for (let q = 0; q <= 30; q++) { const u = q / 30; pts.push([(1 - u) * (1 - u) * A[0] + 2 * (1 - u) * u * cc[0] + u * u * B[0], (1 - u) * (1 - u) * A[1] + 2 * (1 - u) * u * cc[1] + u * u * B[1]]); } return pts; });
+      routes.forEach((pts, i) => { const t0 = tRet + 0.1 + i * 0.12; const k = pg(t, t0, t0 + 0.7, 'inOutSine'); if (k <= 0) return; const seg = MG.path.trim(pts, 0, k); ctx.save(); ctx.strokeStyle = MG.col.a(INKB, 0.75); ctx.lineWidth = 2.6; ctx.setLineDash([10, 8]); ctx.beginPath(); seg.forEach((p, j) => (j ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); ctx.restore(); const a0 = pts[0]; ctx.fillStyle = INKB; ctx.beginPath(); ctx.arc(a0[0], a0[1], 6, 0, MG.TAU); ctx.fill(); if (k >= 1) MG.fx.arrowHead(ctx, pts.slice(-3), 18, INKB);
+        const dv = pg(t, tCoast - 0.2, tDroves + 0.2); const n = Math.round(4 + dv * 10); for (let q = 0; q < n; q++) { const u = MG.fract(t * 0.42 + q / n + i * 0.13); if (u > k) continue; const p = MG.path.along(pts, u); ctx.fillStyle = '#F7F1E4'; ctx.beginPath(); ctx.arc(p[0], p[1], 7, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = INKB; ctx.lineWidth = 2.5; ctx.stroke(); ctx.fillStyle = MG.col.a(INKB, 0.5); ctx.beginPath(); ctx.arc(p[0], p[1] - 2, 4, Math.PI, 0); ctx.fill(); } });
+      ctx.restore(); S11.candle(ctx, t); ctx.restore();
+    },
+  };
+  // =====================================================================================================
+  // SCENE 11 — the beach: retirees settle in; a Spanish abuelo declines the reverse trip; who won the argument
+  // =====================================================================================================
+  const tRem = Tw('remaining', 1717.34), tRev = Tw('reverse,', 1719.82), tDont = Tw("don't", 1719.06), tWho = Tw('who', 1721.42), tWon = Tw('won', 1722.10), tArg = Tw('argument.', 1722.74);
+  S11.skyline = () => MG.cache('s11:skyline', 2600, 320, (x) => { const r = MG.rng(21); let px = 0; while (px < 2600) { const w = 40 + r() * 60, h = 80 + r() * 230; x.fillStyle = MG.col.mix('#C9B4A8', '#E6D3C0', r()); x.fillRect(px, 320 - h, w, h); x.fillStyle = 'rgba(90,70,90,0.25)'; for (let f = 320 - h + 8; f < 314; f += 10) x.fillRect(px + 4, f, w - 8, 3); px += w + 6 + r() * 30; } x.globalCompositeOperation = 'source-atop'; x.fillStyle = 'rgba(240,215,190,0.35)'; x.fillRect(0, 0, 2600, 320); });
+  S11.waveTile = () => MG.cache('s11:waveTile', 240, 120, (x) => { x.fillStyle = '#E9E2D4'; x.fillRect(0, 0, 240, 120); x.strokeStyle = '#3A6E9E'; x.lineWidth = 16; for (const y0 of [30, 90]) { x.beginPath(); for (let xx = -10; xx <= 250; xx += 5) { const yy = y0 + Math.sin(xx / 240 * MG.TAU * 2) * 14; xx < -5 ? x.moveTo(xx, yy) : x.lineTo(xx, yy); } x.stroke(); } x.strokeStyle = '#C8693F'; x.lineWidth = 6; x.beginPath(); for (let xx = -10; xx <= 250; xx += 5) { const yy = 60 + Math.sin(xx / 240 * MG.TAU * 2 + Math.PI) * 14; xx < -5 ? x.moveTo(xx, yy) : x.lineTo(xx, yy); } x.stroke(); });
+  S11.umbrella = (ctx, x, y, h, c1, c2, open = 1, t = 0) => { ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#E9E2D4'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(4, -h); ctx.stroke(); const R = 190 * open, ry = 60 * open; const sw = Math.sin(t * 1.3) * 0.02; ctx.translate(4, -h); ctx.rotate(sw); for (let k = 0; k < 8; k++) { const a0 = Math.PI + k / 8 * Math.PI, a1 = a0 + Math.PI / 8; ctx.fillStyle = k % 2 ? c1 : c2; ctx.beginPath(); ctx.moveTo(0, -ry); ctx.lineTo(Math.cos(a0) * R, Math.sin(a0) * ry * 0.2 + 6); ctx.quadraticCurveTo(Math.cos((a0 + a1) / 2) * R * 1.02, 24, Math.cos(a1) * R, Math.sin(a1) * ry * 0.2 + 6); ctx.closePath(); ctx.fill(); } ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-R, 6); ctx.quadraticCurveTo(0, -ry * 1.4, R, 6); ctx.stroke(); ctx.restore(); };
+  S11.palm = (ctx, x, y, h, t, s = 1) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const sw = Math.sin(t * 0.9 + x * 0.01) * 0.04; ctx.strokeStyle = '#8a6a48'; ctx.lineWidth = 24; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(30, -h * 0.5, 10 + sw * 200, -h); ctx.stroke(); ctx.translate(10 + sw * 200, -h); for (let k = 0; k < 7; k++) { const a = -Math.PI * 0.95 + k / 6 * Math.PI * 0.9 + sw; ctx.fillStyle = k % 2 ? '#3E6B4A' : '#4F7F55'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(Math.cos(a) * 150, Math.sin(a) * 150 - 40, Math.cos(a) * 230, Math.sin(a) * 230 + 40); ctx.quadraticCurveTo(Math.cos(a) * 120, Math.sin(a) * 120 + 10, 0, 0); ctx.fill(); } ctx.restore(); };
+  S11.hawaii = (ctx, U) => { const r = MG.rng(3); for (let k = 0; k < 18; k++) { const x = -0.6 * U + r() * 1.2 * U, y = -1.3 * U + r() * 1.3 * U; ctx.fillStyle = k % 2 ? '#F6D06F' : '#F4EEE2'; for (let q = 0; q < 5; q++) { const a = q / 5 * MG.TAU; ctx.beginPath(); ctx.arc(x + Math.cos(a) * 0.05 * U, y + Math.sin(a) * 0.05 * U, 0.04 * U, 0, MG.TAU); ctx.fill(); } } };
+  S11.shades = (hat) => (ctx, U, [hx, hy]) => { ctx.fillStyle = '#1b1a20'; for (const sg of [-1, 1]) { ctx.beginPath(); ctx.ellipse(hx + sg * 0.17 * U, hy - 0.02 * U, 0.12 * U, 0.08 * U, 0, 0, MG.TAU); ctx.fill(); } ctx.strokeStyle = '#1b1a20'; ctx.lineWidth = 0.03 * U; ctx.beginPath(); ctx.moveTo(hx - 0.05 * U, hy - 0.04 * U); ctx.lineTo(hx + 0.05 * U, hy - 0.04 * U); ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fillRect(hx - 0.24 * U, hy - 0.07 * U, 0.06 * U, 0.02 * U);
+    if (hat) { const br = MG.path.ellipse(hx, hy - 0.42 * U, 0.75 * U, 0.14 * U); MG.fx.volume(ctx, br, [hx - 0.75 * U, hy - 0.56 * U, 1.5 * U, 0.28 * U], { color: '#E8C978', cel: true, outline: '#2a1a16', shade: 0.35 }); const cr = MG.path.smooth([[hx - 0.42 * U, hy - 0.44 * U], [hx - 0.36 * U, hy - 0.78 * U], [hx + 0.36 * U, hy - 0.78 * U], [hx + 0.42 * U, hy - 0.44 * U]]); MG.fx.volume(ctx, cr, [hx - 0.42 * U, hy - 0.8 * U, 0.84 * U, 0.4 * U], { color: '#EBD08A', cel: true, outline: '#2a1a16', shade: 0.3 }); ctx.fillStyle = hat; ctx.fillRect(hx - 0.4 * U, hy - 0.56 * U, 0.8 * U, 0.09 * U); } };
+  S11.cocktail = (ctx, tg, ang, U) => { ctx.save(); ctx.translate(tg[0], tg[1] - 0.05 * U); const g = MG.path.poly([[-0.14 * U, -0.4 * U], [0.14 * U, -0.4 * U], [0.02 * U, -0.18 * U], [0.02 * U, 0], [-0.02 * U, 0], [-0.02 * U, -0.18 * U]]); ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.fill(g); ctx.fillStyle = '#F2A33A'; ctx.beginPath(); ctx.moveTo(-0.12 * U, -0.38 * U); ctx.lineTo(0.12 * U, -0.38 * U); ctx.lineTo(0.02 * U, -0.2 * U); ctx.closePath(); ctx.fill(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 2; ctx.stroke(g); ctx.fillStyle = '#E0323B'; ctx.beginPath(); ctx.arc(0.1 * U, -0.42 * U, 0.05 * U, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#2FA7A0'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -0.38 * U); ctx.lineTo(-0.08 * U, -0.62 * U); ctx.stroke(); ctx.restore(); };
+  const beachScene = {
+    id: 's11_beach', start: 1716.55, end: 1723.85,
+    transIn: { type: 'zoom', dur: 0.7, x: 870, y: 700, amount: 2.4, from: 0.8 },
+    post: { grade: 'golden', vignette: 0.32 },
+    draw(ctx, t) {
+      const cx = MG.keys(t, [[1716.55, 760], [1718.2, 980, 'inOutSine'], [tDont - 0.5, 2480, 'inOutCubic'], [tRev + 0.5, 2490, 'linear'], [tWho - 0.2, 920, 'inOutCubic'], [1723.85, 900, 'linear']]);
+      const z = lerp(1, 1.08, pg(t, tWho - 0.2, 1723.85, 'inOutSine')); const hh = MG.cam.handheld(t, 2, 63);
+      ctx.save(); ctx.translate(960 + hh.dx, 620 + hh.dy); ctx.scale(z, z); ctx.translate(-960, -620);
+      S11.sky(ctx, [[0, '#8FBCE0'], [0.45, '#F4DCB0'], [1, '#F3C58A']], 'beach11'); MG.kit.sun(ctx, 260 - cx * 0.04, 150, 66, t, { corona: 0.8, rays: 0.3 });
+      MG.sprite(ctx, S11.skyline(), 300 - cx * 0.25, 432, { ax: 0, ay: 1 });
+      const sea = ctx.createLinearGradient(0, 430, 0, 610); sea.addColorStop(0, '#3E7FB8'); sea.addColorStop(1, '#7FC6D6'); ctx.fillStyle = sea; ctx.fillRect(0, 428, W, 190);
+      MG.fx.particles(ctx, { n: 60, seed: 12, t, area: [0, 440, W, 150], vel: [4, 0], size: [2, 5], color: 'rgba(255,250,230,0.8)', life: 2.5, shape: 'dot' });
+      const sand = ctx.createLinearGradient(0, 600, 0, 1080); sand.addColorStop(0, '#F1D7A8'); sand.addColorStop(1, '#E3B57E'); ctx.fillStyle = sand; ctx.fillRect(0, 600, W, 500);
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 6; ctx.beginPath(); for (let xx = 0; xx <= W; xx += 20) { const yy = 606 + Math.sin(xx * 0.012 + t * 1.6) * 6 + Math.sin(t * 0.8) * 4; xx ? ctx.lineTo(xx, yy) : ctx.moveTo(xx, yy); } ctx.stroke();
+      const X = (wx, f = 1) => (wx - cx) * f + 960;
+      // R3: socks-and-sandals with a metal detector, strolling the shoreline
+      { const wx = 1250 + (t - 1716.55) * 40; const x = X(wx, 0.8), y = 690; const U = 55; S11.runLegs(ctx, x, y, U * 0.9, t * 4, 1, '#C9B48A', '#F4EEE2'); S11.person(ctx, { x, y, s: 0.55, skin: '#F0A890', shirt: '#9CB4C8', hair: { style: 'bald', color: '#EDEAE4' }, age: 1, belly: true, turn: 0.5, mood: 'smile', seed: 31, arms: [{ hand: [0.9, -0.3], pose: 'fist', front: true, prop: (c, tg) => { c.strokeStyle = '#3a3a40'; c.lineWidth = 3; c.beginPath(); c.moveTo(tg[0], tg[1]); c.lineTo(tg[0] + 50, tg[1] + 80); c.stroke(); c.fillStyle = '#2a2a30'; c.beginPath(); c.ellipse(tg[0] + 56, tg[1] + 84, 14, 5, 0, 0, MG.TAU); c.fill(); } }, { hand: [0.2, -0.2], pose: 'open' }] }, t); }
+      // R2: white bun, reading under an umbrella
+      { const x = X(430, 0.9), y = 770; S11.umbrella(ctx, x + 30, y + 30, 260, '#F4EEE2', '#2FA7A0', 1, t); S11.legs(ctx, { x, y, s: 0.7, trousers: '#E8B394', shoe: '#F4EEE2', dir: 1 }, t); S11.person(ctx, { x, y, s: 0.7, skin: '#F2B49C', shirt: '#8DB6D9', hair: { style: 'bun', color: '#EDEAE4' }, glasses: '#2a2020', age: 1, turn: 0.4, mood: 'smile', look: [0.4, 0.5], seed: 32, arms: [{ hand: [0.5, -0.55], pose: 'open', front: true, prop: (c, tg) => { c.save(); c.translate(tg[0] + 10, tg[1] - 10); c.rotate(-0.2); c.fillStyle = '#C8423B'; c.fillRect(-26, -34, 52, 40); c.fillStyle = '#F4EEE2'; c.fillRect(-22, -30, 44, 32); c.restore(); } }, { hand: [0.3, -0.5], pose: 'open', front: true }] }, t); }
+      // R1: the main retiree on his lounger (the argument's winner)
+      const r1x = X(900), r1y = 850; const cheers = MG.win(t, tWon - 0.2, tArg + 0.6, 0.2, 0.3);
+      S11.umbrella(ctx, r1x - 120, r1y + 30, 330, '#F2A33A', '#F4EEE2', pg(t, 1716.6, 1717.3, 'outBack'), t); MG.fx.contact(ctx, r1x + 60, r1y + 40, 260, 22, 0.35, '#5a3a2a');
+      { ctx.save(); ctx.strokeStyle = '#E9E2D4'; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(r1x - 200, r1y - 150); ctx.lineTo(r1x - 40, r1y); ctx.lineTo(r1x + 240, r1y); ctx.moveTo(r1x - 60, r1y); ctx.lineTo(r1x - 90, r1y + 40); ctx.moveTo(r1x + 220, r1y); ctx.lineTo(r1x + 240, r1y + 40); ctx.stroke(); ctx.fillStyle = '#2D6FA6'; ctx.beginPath(); ctx.moveTo(r1x - 205, r1y - 160); ctx.lineTo(r1x - 30, r1y - 12); ctx.lineTo(r1x + 240, r1y - 12); ctx.lineTo(r1x + 240, r1y + 4); ctx.lineTo(r1x - 48, r1y + 4); ctx.lineTo(r1x - 214, r1y - 146); ctx.closePath(); ctx.fill(); ctx.restore(); }
+      { const hx = r1x - 40, hy = r1y - 14; S11.limb(ctx, [[hx, hy], [hx + 110, hy - 26], [hx + 220, hy - 8]], 34, 26, '#F0A890'); ctx.fillStyle = '#C8423B'; ctx.fillRect(hx - 10, hy - 22, 70, 30); MG.fx.volume(ctx, MG.path.ellipse(hx + 236, hy - 14, 22, 14), [hx + 214, hy - 28, 44, 28], { color: '#F4EEE2', cel: true, outline: '#2a1a16' });
+        S11.person(ctx, { x: hx, y: hy, s: 0.95, lean: -0.95, skin: '#F2A98F', shirt: '#2FA7A0', pattern: S11.hawaii, hair: { style: 'bald', color: '#EDEAE4' }, age: 0.8, belly: true, nose: 1.25, turn: 0.35, mood: 'grin', open: cheers * 0.4, seed: 33, prop: S11.shades('#C8423B'), arms: [{ hand: cheers > 0 ? [0.75, -2.3] : [0.55, -1.75], pose: 'fist', front: true, prop: S11.cocktail }, { hand: [-0.45, -2.0], pose: 'open' }] }, t); }
+      // promenade (wave mosaic) in the foreground
+      ctx.save(); ctx.translate(-((cx * 1.15) % 240), 0); ctx.fillStyle = MG.tex.pattern(ctx, S11.waveTile()); ctx.fillRect(0, 960, W + 480, 140); ctx.restore(); ctx.fillStyle = 'rgba(60,40,40,0.25)'; ctx.fillRect(0, 956, W, 6); ctx.fillStyle = '#E9E2D4'; ctx.fillRect(0, 930, W, 28); ctx.fillStyle = 'rgba(60,40,40,0.2)'; ctx.fillRect(0, 952, W, 6);
+      for (const px of [300, 1500, 2700, 3900]) S11.palm(ctx, X(px, 1.15), 975, 420, t, 1);
+      // the signpost and the Spanish abuelo who doesn't do the reverse
+      { const sx = X(2560, 1.15), sy = 1000; ctx.fillStyle = '#5a4a42'; ctx.fillRect(sx - 8, sy - 620, 16, 620); const arrow = (y, dir, txt, c) => { ctx.save(); ctx.translate(sx, y); const w = 360; const p = MG.path.poly(dir > 0 ? [[0, -34], [w, -34], [w + 40, 0], [w, 34], [0, 34]] : [[0, -34], [-w, -34], [-w - 40, 0], [-w, 34], [0, 34]]); MG.fx.volume(ctx, p, dir > 0 ? [0, -34, w + 40, 68] : [-w - 40, -34, w + 40, 68], { color: c, cel: true, outline: '#2a1a16', shade: 0.25 }); MG.text.draw(ctx, txt, dir * (w / 2 + 6), 14, { font: F.grotesk, weight: 800, size: 38, color: '#FFF8EA', align: 'center', tracking: 0.06 }); ctx.restore(); }; arrow(sy - 560, -1, 'PLAYA', '#2D6FA6'); arrow(sy - 470, 1, 'DEUTSCHLAND', '#3B3236');
+        const tA = tDont - 1.2; const walkIn = pg(t, tA, tDont - 0.1, 'outSine'), back = pg(t, tRev - 0.1, tRev + 1.6, 'inSine'); const ax = lerp(sx + 520, sx + 110, walkIn) - back * 900; const dir = back > 0 ? -1 : -1; const moving = (walkIn > 0 && walkIn < 1) || back > 0; const shake = t > tDont + 0.2 && t < tRev + 0.1 ? Math.sin(t * 16) * 0.5 : 0; const lookUp = t > tDont - 0.15 && t < tRev;
+        if (t > tA - 0.1) { const y = 990; S11.runLegs(ctx, ax, y - 175, 92, moving ? t * 6 : 0.4, dir, '#5a5048', '#2a1e1e'); S11.person(ctx, { x: ax, y: y - 175, s: 0.92, skin: '#D9A07A', shirt: '#E9E2D4', cardigan: '#7a5a48', collar: '#F4EEE2', hair: { style: 'cap', color: '#3a3036' }, age: 1, nose: 1.3, mustache: true, turn: lookUp ? 0.6 + shake * 0.4 : -0.5, look: lookUp ? [0.6, -0.9] : [-0.6, 0], mood: lookUp && t > tDont + 0.3 ? 'frown' : 'smile', seed: 34, flip: true, arms: [{ hand: [0.55, -0.15], pose: 'fist', front: true, prop: (c, tg) => { c.strokeStyle = '#6a4a2a'; c.lineWidth = 7; c.beginPath(); c.moveTo(tg[0], tg[1] - 6); c.lineTo(tg[0] + 6, tg[1] + 170); c.stroke(); } }, { hand: t > tDont + 0.3 && t < tRev + 0.2 ? [0.7 + Math.sin(t * 14) * 0.15, -1.3] : [-0.3, -0.2], pose: 'open' }] }, t); }
+      }
+      // who won the argument: the napkin doodle's ink comes back around the retiree
+      const ik = pg(t, tWho - 0.1, tWho + 0.5); if (ik > 0) { const hx = r1x - 40, hy = r1y - 14; const ring = []; for (let i = 0; i <= 40; i++) { const a = -2.4 + i / 40 * MG.TAU * 1.06; ring.push([hx + 60 + Math.cos(a) * 300, hy - 120 + Math.sin(a) * 200 + MG.noise2(i * 0.3, 2) * 8]); } S11.doodle(ctx, [ring], ik, { w: 7 }); MG.text.reveal(ctx, 'ENJOY LIFE', hx + 420, hy - 260, t, tWon - 0.25, { font: F.marker, size: 66, color: INKB, align: 'left', style: 'wipe', by: 'line' }); S11.flag(ctx, hx + 430, hy - 230, pg(t, tWon - 0.1, tWon + 0.3), 'es'); S11.doodle(ctx, [[[hx + 560, hy - 200], [hx + 590, hy - 170], [hx + 650, hy - 250]]], pg(t, tArg - 0.15, tArg + 0.2), { w: 9 }); }
+      ctx.restore();
+    },
+  };
+
+  // =====================================================================================================
+  // SCENE 12 — five centuries ago: the parchment empire, silver in, inflation & war out → "today it conquers no one"
+  // =====================================================================================================
+  const tFive = Tw('five', 1723.94), tConq = Tw('conquered', 1725.86), tHalf = Tw('half', 1726.42), tLittle = Tw('little', 1727.70), tInfl = Tw('inflation', 1728.78), tWar = Tw('war.', 1729.54), tToday = Tw('today,', 1730.70), tNo = Tw('no', 1731.94);
+  S11.EMP = ['Mexico', 'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Costa Rica', 'Panama', 'Cuba', 'Dominican Rep.', 'Puerto Rico', 'Colombia', 'Venezuela', 'Ecuador', 'Peru', 'Bolivia', 'Chile', 'Argentina', 'Paraguay', 'Uruguay', 'Philippines'];
+  S11.hatchMap = (ctx, pr, f, k) => { if (k <= 0.02) return; const p = MG.geo.path2d(pr, f); const b = MG.geo.bbox(pr, f); ctx.save(); ctx.clip(p); ctx.globalAlpha = 0.35 * k; ctx.strokeStyle = '#3a3040'; ctx.lineWidth = 0.8; ctx.beginPath(); for (let d = -b[3]; d < b[2]; d += 4) { ctx.moveTo(b[0] + d, b[1] + b[3]); ctx.lineTo(b[0] + d + b[3], b[1]); } ctx.stroke(); ctx.restore(); };
+  S11.empPr = () => S11._epr || (S11._epr = MG.geo.proj('natural', { rotate: [20, 0], center: [0, 8], scale: 330, translate: [960, 560] }));
+  S11.morion = (ctx, x, y, s, k) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const br = MG.path.smooth([[-60, 0], [-40, 8], [0, 12], [40, 8], [60, 0], [70, -14], [40, -4], [0, -2], [-40, -4], [-70, -14]]); MG.fx.volume(ctx, br, [-70, -16, 140, 30], { color: '#C9CED6', cel: true, outline: '#2a1a16', shade: 0.4, hi: 0.4 }); const dome = MG.path.smooth([[-36, -4], [-34, -36], [-10, -56], [10, -60], [34, -38], [36, -4]]); MG.fx.volume(ctx, dome, [-36, -62, 72, 60], { color: '#D9DDE3', cel: true, outline: '#2a1a16', shade: 0.4, hi: 0.5 }); const crest = MG.path.smooth([[-30, -40], [-20, -76], [0, -88], [22, -78], [32, -44], [10, -58], [-10, -58]]); MG.fx.volume(ctx, crest, [-30, -90, 64, 50], { color: '#B9BEC8', cel: true, outline: '#2a1a16', shade: 0.4 }); ctx.restore(); void k; };
+  S11.strawHat = (ctx, x, y, s) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const br = MG.path.ellipse(0, 0, 78, 18); MG.fx.volume(ctx, br, [-78, -18, 156, 36], { color: '#E8C978', cel: true, outline: '#2a1a16', shade: 0.35 }); const cr = MG.path.smooth([[-40, -2], [-36, -46], [36, -46], [40, -2]]); MG.fx.volume(ctx, cr, [-40, -48, 80, 48], { color: '#EBD08A', cel: true, outline: '#2a1a16', shade: 0.3 }); ctx.fillStyle = '#C8231B'; ctx.fillRect(-39, -16, 78, 11); ctx.restore(); };
+  const empireScene = {
+    id: 's11_empire', start: 1723.85, end: 1733.0,
+    transIn: { dur: 0.9, ease: 'linear', type: (ctx, A, B, p) => { ctx.drawImage(A, 0, 0); const k = MG.smoothstep(0, 0.5, p); if (k > 0) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(190,150,90,${0.7 * k})`; ctx.fillRect(0, 0, W, H); ctx.restore(); } const q = MG.smoothstep(0.35, 1, p); if (q > 0) { ctx.save(); ctx.globalAlpha = q; ctx.drawImage(B, 0, 0); ctx.restore(); } } },
+    post: (t) => ({ grade: t < tToday + 0.4 ? 'archival' : 'warm', vignette: 0.42, sat: lerp(0.85, 1.05, pg(t, tToday, tNo + 0.4)) }),
+    draw(ctx, t) {
+      const pr = S11.empPr(); const G = MG.geo; G.init(); const mod = pg(t, tToday - 0.1, tNo + 0.4, 'inOutSine');
+      const es = pr([-3.7, 40.2]), mid = pr([-28, 33]); const cmk = MG.keys(t, [[1723.85, { x: 960, y: 560, z: 1.0 }], [tLittle - 0.4, { x: 960, y: 560, z: 1.04 }, 'inOutSine'], [tInfl + 0.1, { x: mid[0], y: mid[1], z: 1.75 }, 'inOutCubic'], [tToday, { x: mid[0] + 20, y: mid[1], z: 1.8 }, 'linear'], [1733.0, { x: es[0], y: es[1], z: 2.7 }, 'inOutCubic']]); const z = cmk.z, fx = cmk.x, fy = cmk.y;
+      ctx.save(); ctx.translate(960, 560); ctx.scale(z, z); ctx.translate(-fx, -fy);
+      // ocean: indigo engraving → modern blue
+      ctx.fillStyle = MG.col.mix('#CDB78C', '#E8DCC4', mod); ctx.fillRect(-1000, -1000, 4000, 3000); MG.tex.over(ctx, 'blotch', { alpha: 0.2 * (1 - mod), color: '#7a5a3a', scale: 3 });
+      G.draw(ctx, pr, { type: 'Sphere' }, { fill: MG.col.mix('#2E3E62', '#3A78AE', mod), stroke: 'rgba(90,60,30,0.7)', width: 2.5 });
+      ctx.save(); G.clip(ctx, pr, { type: 'Sphere' }); ctx.globalAlpha = 0.25 * (1 - mod); ctx.strokeStyle = '#C9D2E8'; ctx.lineWidth = 1.2; for (let y = -200; y < 1300; y += 14) { ctx.beginPath(); for (let x = -200; x <= 2200; x += 40) ctx.lineTo(x, y + Math.sin(x * 0.02 + y) * 2); ctx.stroke(); } ctx.restore();
+      G.draw(ctx, pr, G.land50 || G.world110, { fill: MG.col.mix('#E2D0A4', '#EADFC8', mod), stroke: MG.col.mix('#6a4a2a', '#8a7a6a', mod), width: 1.3 });
+      G.graticule(ctx, pr, { color: MG.col.a('#E9DDBD', 0.25 * (1 - mod)), step: [30, 30] });
+      // the empire spreads (silver wash) — and drains away "today"
+      const spread = pg(t, tConq - 0.2, tHalf + 0.9); const ea = 1 - pg(t, tToday + 0.1, tNo + 0.2, 'inOutSine');
+      if (spread > 0 && ea > 0) S11.EMP.forEach((n, i) => { const f = G.country(n); if (!f) return; const k = pg(spread, i / S11.EMP.length * 0.7, i / S11.EMP.length * 0.7 + 0.3); if (k <= 0) return; G.draw(ctx, pr, f, { fill: `rgba(150,160,182,${0.92 * k * ea})`, stroke: `rgba(60,40,30,${0.7 * k * ea})`, width: 1.1 }); S11.hatchMap(ctx, pr, f, k * ea); });
+      G.draw(ctx, pr, G.country('Spain'), { fill: MG.col.mix('#B8923A', '#F2A33A', mod), stroke: '#5a3a1a', width: 1.5 });
+      // silver fleet: Potosí → Cartagena → Havana → Seville, and the Manila galleon to Acapulco
+      const C = G.cities; const legs = [[C.Potosi, C.Cartagena], [C.Cartagena, C.Havana], [C.Havana, C.Seville], [C.Manila, C.Acapulco]]; const rk = pg(t, tConq + 0.1, tLittle - 0.1) * ea;
+      if (rk > 0) legs.forEach(([a, b], i) => { const k = pg(rk, i * 0.18, i * 0.18 + 0.5); if (k <= 0) return; G.route(ctx, pr, a, b, { progress: k, color: `rgba(30,20,20,${0.5 * ea})`, width: 5, lift: 18, n: 60 }); G.route(ctx, pr, a, b, { progress: k, color: `rgba(236,240,248,${ea})`, width: 2.8, dash: [9, 6], dashOffset: -t * 30, lift: 18, n: 60, head: 4, headColor: '#FFFFFF' }); });
+      // coins: arrive in Seville and leak straight out to the bankers (Genoa, Antwerp)
+      const ck = MG.win(t, tLittle - 0.6, tInfl + 0.6, 0.3, 0.4) * ea; if (ck > 0) { const sv = pr(C.Seville); const outs = [pr(C.Genoa), pr(C.Antwerp)]; const hv = pr(C.Havana); for (let i = 0; i < 16; i++) { const u = MG.fract(t * 0.8 + i / 16); const leg = i % 3; let p; if (u < 0.55) { const q = u / 0.55; p = [lerp(hv[0], sv[0], q), lerp(hv[1], sv[1], q) - Math.sin(q * Math.PI) * 30]; } else { const q = (u - 0.55) / 0.45; const o = outs[leg % 2]; p = [lerp(sv[0], o[0], q), lerp(sv[1], o[1], q) - Math.sin(q * Math.PI) * 24]; } ctx.globalAlpha = ck; MG.kit.sun(ctx, p[0], p[1], 6, t, { variant: 'coin', corona: 0, halftone: 0 }); } ctx.globalAlpha = 1; }
+      // what was left: inflation (a price line shooting up) and war (smoke + crossed swords)
+      const ik = pg(t, tInfl - 0.15, tInfl + 0.55) * ea; if (ik > 0) { const o = pr([-48, 47]); const pts = []; for (let i = 0; i <= 20; i++) { const u = i / 20; pts.push([o[0] + u * 130, o[1] - Math.pow(u, 2.2) * 110 + MG.noise2(i, 4) * 4]); } ctx.save(); ctx.globalAlpha = ik; ctx.strokeStyle = 'rgba(240,232,210,0.7)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(o[0], o[1] - 120); ctx.lineTo(o[0], o[1]); ctx.lineTo(o[0] + 140, o[1]); ctx.stroke(); MG.fx.ink(ctx, MG.path.trim(pts, 0, ik), { width: 5, color: '#C8231B', taper: [0.05, 0.05] }); MG.text.draw(ctx, 'INFLATION', o[0] + 65, o[1] + 34, { font: F.oldSC, size: 28, color: '#F1E6CC', align: 'center', tracking: 0.08 }); ctx.restore(); }
+      const wk = pg(t, tWar - 0.2, tWar + 0.4) * ea; if (wk > 0) { const o = pr([16, 51]); ctx.save(); ctx.globalAlpha = wk; for (let i = 0; i < 6; i++) { const u = MG.fract(t * 0.5 + i / 6); ctx.fillStyle = `rgba(200,195,190,${0.5 * (1 - u)})`; ctx.beginPath(); ctx.arc(o[0] + 30 + MG.noise2(i, 1) * 20, o[1] - 20 - u * 60, 10 + u * 16, 0, MG.TAU); ctx.fill(); } ctx.translate(o[0] + 30, o[1] + 4); for (const sg of [-1, 1]) { ctx.save(); ctx.rotate(sg * 0.7); ctx.fillStyle = '#D9DDE3'; ctx.fillRect(-3, -34, 6, 56); ctx.fillStyle = '#8a6a2a'; ctx.fillRect(-12, 18, 24, 5); ctx.fillRect(-3, 22, 6, 14); ctx.restore(); } ctx.restore(); MG.text.draw(ctx, 'WAR', o[0] + 30, o[1] - 52, { font: F.oldSC, size: 28, color: '#3a2412', align: 'center', tracking: 0.08, stroke: 'rgba(241,230,204,0.9)', strokeW: 6 }); }
+      // the conquistador's helmet sits on Spain… and becomes a sun hat
+      const hk = pg(t, tConq - 0.3, tConq + 0.2, 'outBack'); if (hk > 0) { const p = es; const sw = pg(t, tNo - 0.25, tNo + 0.2, 'inOutCubic'); const flip = Math.abs(Math.cos(sw * Math.PI)); const y = p[1] - 30 - Math.sin(sw * Math.PI) * 40; ctx.save(); ctx.translate(p[0], y); ctx.scale(Math.max(0.05, flip) * hk, hk); if (sw < 0.5) S11.morion(ctx, 0, 0, 0.6, 1); else S11.strawHat(ctx, 0, 0, 0.55); ctx.restore(); }
+      ctx.restore();
+      if (mod < 1) { ctx.save(); ctx.globalAlpha = 1 - mod; MG.text.reveal(ctx, '1500s', 150, 150, t, tFive - 0.05, { font: F.old, italic: true, size: 72, color: '#F1E6CC', style: 'rise', by: 'line', stroke: 'rgba(40,24,18,0.75)', strokeW: 8 }); ctx.restore(); }
+    },
+  };
+  // =====================================================================================================
+  // SCENE 13 — "and half the world comes to Spain voluntarily": every arc now points INTO Spain
+  // =====================================================================================================
+  const tComes = Tw('comes', 1734.02), tVol = Tw('voluntarily.', 1734.82);
+  S11.ORIG = ['NewYork', 'London', 'Paris', 'Berlin', 'Amsterdam', 'Stockholm', 'Rome', 'Moscow', 'MexicoCity', 'BuenosAires', 'SaoPaulo', 'Bogota', 'Lima', 'Havana', 'Istanbul', 'Athens', 'Dakar', 'Casablanca', 'Lisbon', 'Brussels'];
+  S11.plane = (ctx, x, y, ang, s) => { ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.scale(s, s); ctx.fillStyle = '#FFF8EA'; ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(-10, -3); ctx.lineTo(-14, 0); ctx.lineTo(-10, 3); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.moveTo(2, 0); ctx.lineTo(-6, -11); ctx.lineTo(-2, 0); ctx.lineTo(-6, 11); ctx.closePath(); ctx.fill(); ctx.restore(); };
+  const globeScene = {
+    id: 's11_globe', start: 1733.0, end: 1736.1,
+    transIn: { type: S11.matchDissolve, dur: 0.6, x: 960, y: 540, aTo: 0.85, bFrom: 1.25 },
+    post: { grade: 'golden', vignette: 0.36 },
+    draw(ctx, t) {
+      S11.sky(ctx, [[0, '#2B2650'], [0.6, '#5A3A66'], [1, '#C77A6E']], 'globe11'); MG.fx.particles(ctx, { n: 70, seed: 52, t, area: [0, 0, W, H * 0.7], vel: [0, 0], size: [1, 2.2], color: 'rgba(255,248,230,0.6)', life: 5 });
+      const e = MG.ease.inOutSine(pg(t, 1733.0, 1736.1)); const sc = lerp(520, 470, e); const cen = [lerp(-14, -24, e), lerp(36, 30, e)];
+      const pr = MG.geo.globe(ctx, { center: cen, scale: sc, x: 960, y: 570, relief: true, border: 'rgba(40,25,15,0.3)', atmosphere: '#FFC98A', light: [-0.6, -0.4] });
+      MG.geo.draw(ctx, pr, MG.geo.country('Spain'), { fill: 'rgba(242,163,58,0.9)', stroke: '#7a3f10', width: 1.5 });
+      const C = MG.geo.cities; const dst = [-3.7, 40.2]; const md = pr(dst);
+      S11.ORIG.forEach((n, i) => { const a = C[n]; if (!a) return; if (window.d3.geoDistance(a, [cen[0], cen[1]]) > 1.45) return; const t0 = 1733.05 + (i % 10) * 0.11 + Math.floor(i / 10) * 0.35; const k = pg(t, t0, t0 + 1.1, 'inOutCubic'); if (k <= 0) return; const lift = 30 + window.d3.geoDistance(a, dst) * 90;
+        const r = MG.geo.route(ctx, pr, a, dst, { progress: k, color: 'rgba(255,214,150,0.85)', width: 2.2, lift, n: 56, glow: 'rgba(255,200,120,0.6)' }); if (k < 1 && r.pts.length > 2) { const q = MG.path.along(r.pts, k), q0 = MG.path.along(r.pts, Math.max(0, k - 0.02)); S11.plane(ctx, q[0], q[1], Math.atan2(q[1] - q0[1], q[0] - q0[0]), 1.1); } const p0 = pr(a); ctx.fillStyle = '#FFE6B8'; ctx.beginPath(); ctx.arc(p0[0], p0[1], 3.5, 0, MG.TAU); ctx.fill(); });
+      // Spain glows as they arrive
+      const gl = pg(t, tComes - 0.2, tVol + 0.4); if (md && gl > 0) { MG.fx.glow(ctx, md[0], md[1], 140, '#FFD68A', 0.7 * gl); MG.geo.pulse(ctx, pr, dst, t, { color: '#FFE6B8', r: 50, rings: 3 }); }
+      if (md) { ctx.save(); ctx.shadowColor = 'rgba(30,10,30,0.7)'; ctx.shadowBlur = 16; MG.text.reveal(ctx, 'voluntarily.', md[0] + 70, md[1] - 70, t, tVol - 0.1, { font: F.serif, italic: true, size: 76, color: '#FFF1D6', style: 'rise', by: 'line' }); ctx.restore(); }
+    },
+  };
+
+  // =====================================================================================================
+  // SCENE 14 — the coast at golden hour: pays · sunbathes · goes home → "a real empire" → the sun sets into the end title
+  // =====================================================================================================
+  const tPays = Tw('pays,', 1736.14), tSunb = Tw('sunbathes,', 1736.90), tHome = Tw('home.', 1738.10), tGoes = Tw('goes', 1737.86), tMaybe = Tw('maybe', 1739.30), tEmp = Tw('empire', 1740.42), tPlace = Tw('place', 1742.10), tWants = Tw('wants', 1744.10);
+  S11.coastBG = () => MG.cache('s11:coastBG', 4600, 760, (x) => { // hills + towns along the horizon (horizon at y = 700)
+    const hill = (x0, x1, h, c, seed) => { const r = MG.rng(seed); x.fillStyle = c; x.beginPath(); x.moveTo(x0, 700); for (let px = x0; px <= x1; px += 40) { const u = (px - x0) / (x1 - x0); x.lineTo(px, 700 - Math.sin(u * Math.PI) * h - r() * 14); } x.lineTo(x1, 700); x.closePath(); x.fill(); };
+    hill(-200, 1500, 260, '#B98A7A', 3); hill(200, 1200, 170, '#A57264', 4); hill(3000, 4800, 300, '#B98A7A', 5); hill(3300, 4600, 190, '#9E6A60', 6);
+    const r = MG.rng(9); for (let i = 0; i < 26; i++) { const px = 260 + i * 34, h = 30 + r() * 40; x.fillStyle = MG.col.mix('#EBD9C0', '#F4E8D6', r()); x.fillRect(px, 700 - h - (i > 8 && i < 16 ? 60 : 0), 30, h); } x.fillStyle = '#E9D8BC'; x.fillRect(650, 520, 40, 120); x.beginPath(); x.moveTo(645, 520); x.lineTo(670, 470); x.lineTo(695, 520); x.fill();
+    for (let i = 0; i < 18; i++) { const px = 3350 + i * 60, h = 120 + r() * 200; x.fillStyle = MG.col.mix('#D8C2B4', '#EDDCCD', r()); x.fillRect(px, 700 - h, 46, h); x.fillStyle = 'rgba(80,50,70,0.25)'; for (let f = 700 - h + 8; f < 694; f += 12) x.fillRect(px + 5, f, 36, 4); }
+    x.globalCompositeOperation = 'source-atop'; const g = x.createLinearGradient(0, 300, 0, 700); g.addColorStop(0, 'rgba(255,200,160,0.35)'); g.addColorStop(1, 'rgba(120,70,100,0.25)'); x.fillStyle = g; x.fillRect(0, 0, 4600, 760); });
+  S11.chiringuito = (ctx, x, y, t) => { ctx.save(); ctx.translate(x, y); MG.fx.contact(ctx, 0, 6, 260, 24, 0.35, '#5a3a2a'); for (const px of [-200, 200]) { ctx.fillStyle = '#8a5a38'; ctx.fillRect(px - 9, -360, 18, 360); } const roof = MG.path.poly([[-280, -350], [0, -470], [280, -350], [250, -330], [-250, -330]]); MG.fx.volume(ctx, roof, [-280, -470, 560, 140], { color: '#D9B46A', cel: true, outline: '#2a1a16', shade: 0.35 }); ctx.strokeStyle = 'rgba(120,80,30,0.6)'; ctx.lineWidth = 3; for (let k = -260; k < 260; k += 22) { ctx.beginPath(); ctx.moveTo(k, -335); ctx.lineTo(k * 0.5, -440); ctx.stroke(); } const bar = MG.path.poly([[-230, -150], [230, -150], [230, 0], [-230, 0]]); MG.fx.volume(ctx, bar, [-230, -150, 460, 150], { color: '#2D6FA6', cel: true, outline: '#2a1a16', shade: 0.3 }); ctx.fillStyle = '#F4EEE2'; ctx.fillRect(-240, -165, 480, 18); MG.text.draw(ctx, 'CHIRINGUITO', 0, -60, { font: F.retro, size: 44, color: '#FFF1D6', align: 'center' }); ctx.restore(); };
+  S11.towel = (ctx, x, y) => { ctx.save(); ctx.translate(x, y); ctx.transform(1, 0, -0.5, 0.32, 0, 0); for (let k = 0; k < 7; k++) { ctx.fillStyle = k % 2 ? '#F4EEE2' : '#E0323B'; ctx.fillRect(-260 + k * 74, -120, 74, 240); } ctx.restore(); };
+  S11.suitcase = (ctx, x, y, s) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const b = MG.path.poly([[-40, -120], [40, -120], [40, 0], [-40, 0]]); MG.fx.volume(ctx, b, [-40, -120, 80, 120], { color: '#C8423B', cel: true, outline: '#2a1a16', shade: 0.35 }); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-14, -120); ctx.lineTo(-14, -180); ctx.lineTo(14, -180); ctx.lineTo(14, -120); ctx.stroke(); ctx.fillStyle = '#2a1a16'; ctx.beginPath(); ctx.arc(-24, 6, 8, 0, MG.TAU); ctx.arc(24, 6, 8, 0, MG.TAU); ctx.fill(); ctx.restore(); };
+  S11.tourist = (ctx, x, y, o, t) => S11.person(ctx, { x, y, s: o.s || 0.9, skin: o.skin || '#F2C2A8', shirt: '#8DB6D9', pattern: S11.hawaii, hair: { style: 'cap', color: '#C9A04A' }, nose: 1.15, turn: o.turn ?? 0.4, mood: o.mood || 'grin', open: o.open || 0, seed: 41, flip: o.flip, lean: o.lean, look: o.look, prop: o.shades ? S11.shades(null) : null, arms: o.arms || [{ hand: [0.4, -0.3], pose: 'open' }, { hand: [-0.3, -0.2], pose: 'open' }] }, t);
+  const coastScene = {
+    id: 's11_coast', start: 1736.1, end: 1750.0,
+    transIn: { type: 'zoom', dur: 0.6, x: 960, y: 420, amount: 3, from: 0.7 },
+    post: (t) => ({ grade: 'golden', vignette: 0.36 + 0.2 * pg(t, 1745, 1749.5), bloom: 0.12, fade: pg(t, 1748.7, 1750.0, 'inSine'), fadeColor: [0.06, 0.03, 0.09] }),
+    draw(ctx, t) {
+      // camera: pan the three stations, then pull back to the whole coast at sunset
+      const cam = MG.keys(t, [[1736.1, { x: 760, y: 1010, z: 1.0 }], [tPays + 0.35, { x: 800, y: 1010, z: 1.0 }, 'outSine'], [tSunb + 0.25, { x: 1650, y: 1020, z: 1.0 }, 'inOutCubic'], [tGoes + 0.1, { x: 2480, y: 1010, z: 1.0 }, 'inOutCubic'], [tHome + 0.6, { x: 2600, y: 980, z: 0.95 }, 'outSine'], [tEmp + 0.6, { x: 2150, y: 760, z: 0.42 }, 'inOutCubic'], [1750, { x: 2150, y: 720, z: 0.4 }, 'linear']]);
+      const hh = MG.cam.handheld(t, 1.6, 64); const sunY = lerp(560, 760, pg(t, tPlace, 1749.4, 'inOutSine')); const dusk = pg(t, tMaybe, 1749, 'inOutSine');
+      // sky in screen space (golden → rose → violet)
+      const sky = ctx.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, MG.col.mix('#F4C68E', '#3B2850', dusk)); sky.addColorStop(0.55, MG.col.mix('#F8D7A2', '#C9707A', dusk)); sky.addColorStop(1, MG.col.mix('#F3C58A', '#F0A070', dusk)); ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.translate(960 + hh.dx, 540 + hh.dy); ctx.scale(cam.z, cam.z); ctx.translate(-cam.x, -cam.y);
+      // the sun (the film's motif) sets over the sea
+      MG.kit.sun(ctx, 2150, sunY, 150, t, { corona: 1, rays: 0.4 * (1 - dusk) });
+      // planes coming in, contrails converging on the coast
+      for (let i = 0; i < 7; i++) { const t0 = 1738.6 + i * 0.7; const u = pg(t, t0, t0 + 4.5, 'inOutSine'); if (u <= 0 || u >= 1) continue; const sx = [-600, 4800, -300, 5000, 1200, 3500, -500][i], sy = [-300, -200, 200, 100, -500, -500, 500][i]; const ex = 3400, ey = 600; const x = lerp(sx, ex, u), y = lerp(sy, ey, u) - Math.sin(u * Math.PI) * 120; ctx.save(); ctx.strokeStyle = `rgba(255,245,230,${0.5 * (1 - u * 0.5)})`; ctx.lineWidth = 6; ctx.setLineDash([]); ctx.beginPath(); ctx.moveTo(lerp(sx, ex, Math.max(0, u - 0.3)), lerp(sy, ey, Math.max(0, u - 0.3)) - Math.sin(Math.max(0, u - 0.3) * Math.PI) * 120); ctx.lineTo(x, y); ctx.stroke(); ctx.restore(); S11.plane(ctx, x, y, Math.atan2(ey - sy, ex - sx), 3.2); }
+      // horizon hills & towns, then the sea
+      ctx.drawImage(S11.coastBG(), -200, -60); const sea = ctx.createLinearGradient(0, 700, 0, 960); sea.addColorStop(0, MG.col.mix('#E9A97A', '#B86A78', dusk)); sea.addColorStop(1, MG.col.mix('#3E7FB8', '#3A4A7A', dusk)); ctx.fillStyle = sea; ctx.fillRect(-1600, 700, 7800, 260);
+      ctx.save(); ctx.globalCompositeOperation = 'screen'; for (let i = 0; i < 26; i++) { const y = 712 + i * 9, w = 260 - i * 6 + Math.sin(t * 2 + i) * 30; ctx.fillStyle = `rgba(255,210,150,${0.5 - i * 0.015})`; ctx.fillRect(2150 - w / 2 + Math.sin(t * 1.5 + i * 1.3) * 20, y, w, 3); } ctx.restore();
+      ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = 7; ctx.beginPath(); for (let xx = -1600; xx <= 6200; xx += 40) { const yy = 962 + Math.sin(xx * 0.008 + t * 1.6) * 7; xx === -1600 ? ctx.moveTo(xx, yy) : ctx.lineTo(xx, yy); } ctx.stroke();
+      const sand = ctx.createLinearGradient(0, 960, 0, 2300); sand.addColorStop(0, MG.col.mix('#F1D3A0', '#C99078', dusk)); sand.addColorStop(1, MG.col.mix('#E0B07A', '#7A4A5A', dusk)); ctx.fillStyle = sand; ctx.fillRect(-1600, 962, 7800, 1400);
+      // station 1 — PAYS (the bar takes the coin)
+      S11.chiringuito(ctx, 600, 1240, t); { const k = MG.win(t, tPays - 0.3, tPays + 0.9, 0.2, 0.3); S11.tourist(ctx, 900, 1080, { turn: -0.6, flip: false, arms: [{ hand: [-0.95, -0.95], pose: 'point', front: true }, { hand: [0.3, -0.2], pose: 'open' }] }, t); S11.runLegs(ctx, 900, 1080, 90, 0.3, -1, '#E9D4A0', '#F4EEE2'); if (k > 0) { MG.kit.sun(ctx, 812 - k * 60, 970 - Math.sin(k * Math.PI) * 50, 18, t, { variant: 'coin', corona: 0, halftone: 0 }); MG.fx.glow(ctx, 790, 960, 70, '#FFF1C0', 0.7 * k); } }
+      // station 2 — SUNBATHES (and turns a little red)
+      S11.umbrella(ctx, 1450, 1250, 380, '#2FA7A0', '#F4EEE2', 1, t); S11.towel(ctx, 1700, 1250); { const red = pg(t, tSunb - 0.1, tSunb + 0.8); const skin = MG.col.mix('#F2C2A8', '#F07A68', red); S11.limb(ctx, [[1700, 1220], [1830, 1210], [1950, 1226]], 34, 26, skin); S11.tourist(ctx, 1700, 1222, { skin, lean: -Math.PI / 2 + 0.12, turn: 0.2, mood: 'smile', shades: true, arms: [{ hand: [-0.3, -2.0], pose: 'open' }, { hand: [0.5, -1.9], pose: 'open', front: true }] }, t); if (red > 0) for (let i = 0; i < 5; i++) { const u = MG.fract(t * 1.3 + i / 5); ctx.strokeStyle = `rgba(255,170,90,${0.6 * (1 - u)})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(1640 + i * 40, 1150 - u * 60); ctx.quadraticCurveTo(1650 + i * 40, 1120 - u * 60, 1640 + i * 40, 1090 - u * 60); ctx.stroke(); } }
+      // station 3 — GOES HOME (suitcase rolling to the airport, a plane lifts off)
+      { const g = pg(t, tGoes - 0.3, tHome + 1.6, 'inSine'); const x = lerp(2380, 3000, g); const walking = g > 0 && g < 1; S11.suitcase(ctx, x + 120, 1240, 1); S11.runLegs(ctx, x, 1075, 90, walking ? t * 7 : 0.3, 1, '#E9D4A0', '#F4EEE2'); S11.tourist(ctx, x, 1075, { skin: '#F07A68', turn: 0.6, mood: 'smile', arms: [{ hand: [1.2, -0.45], pose: 'fist', front: true }, { hand: [-0.4, -0.3], pose: 'open' }] }, t);
+        const tk = pg(t, tHome - 0.2, tHome + 2.4, 'inSine'); if (tk > 0 && tk < 1) { const px = lerp(3250, 4400, tk), py = lerp(640, 120, tk * tk); ctx.strokeStyle = 'rgba(255,245,230,0.5)'; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(3250, 640); ctx.quadraticCurveTo(lerp(3250, px, 0.6), 640, px, py); ctx.stroke(); S11.plane(ctx, px, py, -0.45, 4); } }
+      ctx.restore();
+      // the end title rises above the setting sun
+      const sy2 = 540 + (sunY - cam.y) * cam.z;
+      const ta = pg(t, tPlace - 0.1, tPlace + 1.2); if (ta > 0) { ctx.save(); ctx.shadowColor = 'rgba(60,20,40,0.45)'; ctx.shadowBlur = 30; ctx.shadowOffsetY = 10; MG.text.reveal(ctx, 'SPAIN', 960, Math.min(420, sy2 - 160), t, tPlace - 0.1, { font: F.display, weight: 900, size: 240, color: '#FFF3DC', align: 'center', tracking: 0.12, style: 'rise', by: 'char' }); ctx.restore(); }
+      ctx.save(); ctx.shadowColor = 'rgba(60,20,40,0.5)'; ctx.shadowBlur = 14; MG.text.reveal(ctx, 'A PLACE THE WORLD COMES TO', 960, Math.min(420, sy2 - 160) + 84, t, tWants - 0.2, { font: F.mono, weight: 700, size: 38, color: '#FFF0D8', align: 'center', tracking: 0.26, style: 'track', by: 'line' }); ctx.restore();
+    },
+  };
+
+  // =====================================================================================================
+  // S11 SCORE — hopeful (numbers) · warm (why) · hopeful (accepting) · ambient church · flamenco (choice) ·
+  // tension recap → fiesta (night) · sneaky (Germans, napkin) · warm beach · epic empire · hopeful → triumph finale, resolve
+  // =====================================================================================================
+  S11.audio = (A) => {
+    A.music('hopeful', 1638.4, 1652.4, { key: 'G3', bpm: 92, intensity: [[1638.4, 0.4], [1642.8, 0.55], [1646.1, 0.7], [1650.3, 0.8], [1652.0, 0.5]], fadeIn: 1.0, fadeOut: 0.8 });
+    A.sfx.swell(1639.0, { dur: 1.2, gain: 0.4 }); A.sfx.slide(1643.2, { gain: 0.4 }); A.sfx.ding(1644.4, { note: 'G5', gain: 0.45 }); for (let i = 0; i < 6; i++) A.sfx.blip(1646.9 + i * 0.08, { note: ['D6', 'G6', 'B6', 'D7', 'B6', 'G6'][i], gain: 0.25 }); A.sfx.thud(1648.3, { gain: 0.35 }); A.sfx.chime(1650.35, { note: 'G6', gain: 0.45 }); A.sfx.riser(1651.0, { dur: 1.2, gain: 0.25 });
+    A.music('warm', 1652.0, 1664.3, { key: 'D3', bpm: 96, intensity: [[1652, 0.45], [1655.4, 0.6], [1658.8, 0.55], [1661.3, 0.62], [1664, 0.45]], fadeIn: 0.4, fadeOut: 0.8 });
+    A.sfx.pop(1653.1, { freq: 500, gain: 0.3 }); A.sfx.splash(1654.6, { gain: 0.2 }); A.sfx.swell(1655.6, { dur: 0.8, gain: 0.3 }); A.sfx.heartbeat && A.sfx.heartbeat(1656.8, { n: 3, gain: 0.35 }); A.sfx.heartbeat && A.sfx.heartbeat(1661.4, { n: 3, gain: 0.35 }); A.sfx.ding(1663.3, { note: 'D6', gain: 0.35 });
+    A.music('hopeful', 1663.8, 1675.3, { key: 'A3', bpm: 100, intensity: [[1663.8, 0.45], [1667.7, 0.6], [1671, 0.7], [1674.3, 0.55]], fadeIn: 0.6, fadeOut: 0.9 });
+    A.sfx.chime(1665.0, { note: 'E6', gain: 0.3 }); A.sfx.chime(1667.8, { note: 'A6', gain: 0.35 }); A.sfx.ding(1671.1, { note: 'C#6', gain: 0.35 }); for (let i = 0; i < 3; i++) A.sfx.blip(1672.6 + i * 0.2, { note: ['A5', 'C#6', 'E6'][i], gain: 0.3 });
+    A.music('ambient', 1675.0, 1681.0, { key: 'D3', bpm: 60, intensity: 0.45, fadeIn: 0.5, fadeOut: 0.8 }); A.sfx.churchBell(1675.4, { note: 'G3', gain: 0.4 }); A.sfx.churchBell(1677.6, { note: 'D3', gain: 0.3 }); A.sfx.sub(1677.7, { gain: 0.3 }); A.sfx.amb('room', 1675.2, 5.4, { gain: 0.35 });
+    A.music('flamenco', 1680.6, 1684.6, { key: 'E3', bpm: 104, intensity: [[1680.6, 0.5], [1682.7, 0.75], [1684.3, 0.5]], fadeIn: 0.3, fadeOut: 0.6 }); A.sfx.amb('crowd', 1680.8, 3.4, { gain: 0.3 }); A.sfx.stamp(1683.3, { gain: 0.35 });
+    A.music('tension', 1684.2, 1695.2, { key: 'C3', bpm: 100, intensity: [[1684.2, 0.35], [1688, 0.45], [1692, 0.55], [1694.7, 0.4]], fadeIn: 0.4, fadeOut: 0.6 });
+    for (const tt of [1685.5, 1688.2, 1690.2, 1692.1, 1694.0]) A.sfx.thud(tt, { gain: 0.3 }); A.sfx.glitch && A.sfx.glitch(1692.1, { gain: 0.25 });
+    A.music('fiesta', 1694.6, 1706.4, { key: 'A3', bpm: 112, intensity: [[1694.6, 0.5], [1697.6, 0.65], [1701.5, 0.75], [1704, 0.6], [1706, 0.4]], fadeIn: 0.4, fadeOut: 0.8 });
+    A.sfx.ding(1695.6, { note: 'A6', gain: 0.35 }); A.sfx.sizzle(1697.9, 1.4, { gain: 0.4 }); A.sfx.churchBell(1700.6, { note: 'A3', gain: 0.35 }); A.sfx.churchBell(1701.6, { note: 'E4', gain: 0.3 }); A.sfx.amb('crowd', 1701.6, 4.4, { gain: 0.4 }); A.sfx.cheer && A.sfx.cheer(1703.4, { gain: 0.2 });
+    A.music('sneaky', 1705.9, 1716.8, { key: 'D3', bpm: 108, intensity: [[1705.9, 0.4], [1708.5, 0.55], [1710.6, 0.45], [1713.4, 0.55], [1716.4, 0.4]], fadeIn: 0.5, fadeOut: 0.8 });
+    A.sfx.whoosh(1706.0, { dur: 0.6, gain: 0.4, dir: -1 }); for (let i = 0; i < 14; i++) A.sfx.slide(1706.2 + i * 0.1, { gain: 0.08 }); for (let i = 0; i < 12; i++) A.sfx.slide(1708.6 + i * 0.1, { gain: 0.08 }); A.sfx.tick(1709.7, { gain: 0.4 }); for (let i = 0; i < 4; i++) A.sfx.slide(1710.8 + i * 0.12, { gain: 0.1 });
+    A.sfx.paper(1712.3, { dur: 0.7, gain: 0.55 }); A.sfx.swish(1713.1, { gain: 0.3 }); for (let i = 0; i < 10; i++) A.sfx.blip(1715.3 + i * 0.12, { note: ['D5', 'F5', 'A5'][i % 3], gain: 0.12 });
+    A.music('warm', 1716.4, 1724.2, { key: 'G3', bpm: 96, intensity: [[1716.4, 0.45], [1719, 0.5], [1721.4, 0.62], [1723.8, 0.4]], fadeIn: 0.5, fadeOut: 0.8 });
+    A.sfx.amb('sea', 1716.5, 7.4, { gain: 0.55 }); A.sfx.birds(1716.8, 6.5, { gain: 0.25 }); A.sfx.pop(1716.9, { freq: 260, gain: 0.3 }); A.sfx.whoosh(1718.6, { dur: 0.7, gain: 0.3 }); A.sfx.whoosh(1720.7, { dur: 0.7, gain: 0.3 }); A.sfx.slide(1721.6, { gain: 0.2 }); A.sfx.ding(1722.15, { note: 'E7', gain: 0.25 }); A.sfx.chime(1722.8, { note: 'G6', gain: 0.4 });
+    A.music('epic', 1723.6, 1731.0, { key: 'D3', bpm: 90, intensity: [[1723.6, 0.45], [1726.4, 0.7], [1728.7, 0.75], [1730.5, 0.35]], fadeIn: 0.7, fadeOut: 0.6 });
+    A.sfx.paper(1723.95, { dur: 0.8, gain: 0.5 }); A.sfx.tonal(1725.9, ['D2', 'A2', 'D3', 'F3'], { gain: 0.4 }); A.sfx.creak(1727.0, { gain: 0.4 }); A.sfx.coins(1727.8, { n: 14, spread: 1.4, gain: 0.45 }); A.sfx.sub(1728.8, { gain: 0.35 }); A.sfx.cannon && A.sfx.cannon(1729.6, { gain: 0.35 }); A.sfx.downlifter(1730.6, { dur: 1.2, gain: 0.35 }); A.sfx.pop(1732.0, { freq: 420, gain: 0.4 }); A.sfx.chime(1732.1, { note: 'A6', gain: 0.35 });
+    A.music('hopeful', 1730.8, 1736.6, { key: 'D3', bpm: 92, intensity: [[1730.8, 0.35], [1733, 0.6], [1735, 0.7], [1736.4, 0.55]], fadeIn: 0.8, fadeOut: 0.8 });
+    A.sfx.whoosh(1733.0, { dur: 0.6, gain: 0.35 }); A.sfx.plane(1733.4, 2.6, { gain: 0.2 }); A.sfx.swell(1734.9, { dur: 1.1, gain: 0.35 });
+    A.music('triumph', 1736.0, 1749.8, { key: 'D3', bpm: 84, intensity: [[1736, 0.5], [1739.3, 0.6], [1742.1, 0.8], [1745, 0.6], [1748, 0.35], [1749.6, 0.1]], fadeIn: 0.6, fadeOut: 2.4 });
+    A.sfx.whoosh(1736.1, { dur: 0.5, gain: 0.35 }); A.sfx.register ? A.sfx.register(1736.3, { gain: 0.4 }) : A.sfx.coins(1736.3, { n: 3, spread: 0.2, gain: 0.5 }); A.sfx.swell(1737.1, { dur: 0.7, gain: 0.3 }); for (let i = 0; i < 8; i++) A.sfx.tick(1737.9 + i * 0.14, { gain: 0.2 }); A.sfx.plane(1738.3, 3.5, { gain: 0.3 });
+    A.sfx.amb('sea', 1736.2, 13, { gain: 0.45 }); A.sfx.birds(1738.5, 5, { gain: 0.2 }); A.sfx.whoosh(1739.5, { dur: 1.4, gain: 0.3 }); A.sfx.swell(1742.1, { dur: 1.4, gain: 0.4 }); A.sfx.chime(1742.2, { note: 'D6', gain: 0.4 }); A.sfx.tonal(1745.5, ['D2', 'A2', 'D3', 'F#3', 'A3'], { gain: 0.3 });
+  };
+
+  // =====================================================================================================
   // placeholder scenes (filled in below)
   // =====================================================================================================
   const ph = (id, a, b, label) => ({ id, start: a, end: b, draw(ctx, t) { MG.kit.paper(ctx, '#E9CFA8'); MG.text.draw(ctx, label, 960, 540, { font: F.mono, size: 40, align: 'center', color: C.plum }); } });
@@ -990,13 +1291,13 @@
       alleyScene,
       paellaScene,
       streetScene,
-      ph('s11_saying', 1706.05, 1713.0, 'SAYING'),
-      ph('s11_retire', 1713.0, 1716.55, 'RETIREES MAP'),
-      ph('s11_beach', 1716.55, 1723.85, 'BEACH'),
-      ph('s11_empire', 1723.85, 1733.0, 'EMPIRE'),
-      ph('s11_globe', 1733.0, 1736.1, 'GLOBE'),
-      ph('s11_coast', 1736.1, 1750.0, 'COAST'),
+      sayingScene,
+      retireScene,
+      beachScene,
+      empireScene,
+      globeScene,
+      coastScene,
     ],
-    audio(A) {},
+    audio(A) { S11.audio(A); },
   });
 })();
