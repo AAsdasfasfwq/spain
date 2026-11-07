@@ -298,7 +298,7 @@
       else if (kind === 'city') { F('lowpass', 500); lvl = 0.22; }
       else if (kind === 'room') { F('lowpass', 300); lvl = 0.08; }
       else if (kind === 'cicadas') { F('bandpass', 5200, 3); const am = ac.createGain(); chain.connect(am); chain = am; lfo(am.gain, 38, 0.5, 0.5); const am2 = ac.createGain(); chain.connect(am2); chain = am2; lfo(am2.gain, 0.4, 0.4, 0.6); lvl = 0.06; }
-      else if (kind === 'hum') { const o2 = osc('sawtooth', 50, lt, len); const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 400; o2.connect(f); f.connect(g); lvl = 0.05; }
+      else if (kind === 'hum') { const o2 = osc('sawtooth', 50, lt, len); const f = ac.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 400; o2.connect(f); const hl = ac.createGain(); hl.gain.value = 0.06; f.connect(hl); hl.connect(g); lvl = 0.02; }
       else if (kind === 'space') { F('lowpass', 300); lvl = 0.12; }
       const lv = ac.createGain(); lv.gain.value = lvl; chain.connect(lv); lv.connect(g); A.out(g, { bus: 'amb', verb: o.verb ?? 0.2, pan: o.pan }); src.start(lt, (t * 1.7) % 5); src.stop(lt + len + 0.1);
       if (kind === 'crowd' && o.cheer) { /* cheer swell at o.cheer (abs) */ const tc = L(o.cheer); g.gain.setValueAtTime(G, Math.max(lt, tc - 0.2)); g.gain.linearRampToValueAtTime(G * 2.6, tc + 0.4); g.gain.linearRampToValueAtTime(G, tc + 2.5); }

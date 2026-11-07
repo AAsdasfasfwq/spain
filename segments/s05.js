@@ -1518,6 +1518,234 @@
     post: { grade: 'warm', vignette: 0.34, temp: 0.05 },
   });
 
+  /* =====================================================================
+     F · PILLAR 2 · FASHION (801.38 → 858.37) — warm piano (Ortega's past) → pulse (fashion), sneaky rivalry layer
+     ===================================================================== */
+  const tFash = T('fashion.', 802.35), tMeet = T('Meet', 803.54), tAman = T('Amancio', 803.95);
+  const tRail = T('railroad', 806.35), tDrops = T('drops', 807.87), t13 = T('thirteen', 808.90), tAppr = T('apprentice.', 810.50);
+  const t1975 = T('1975,', 811.78), tOpens = T('opens', 813.38), tCor = T('Coruña.', 814.94);
+  const tInd = T('Inditex,', 817.66), tBrands = [T('Zara,', 818.90), T('Bershka,', 819.62), T('Massimo', 820.46), T('Pull&Bear.', 821.54)];
+  const t5500 = T('5,500', 823.30), tHund = T('hundred', 825.70);
+  const tMoves = T('moves', 828.34), tRich = T('richest', 831.30), tShares = T('shares', 833.22), tBern = T('Bernard', 834.66), tDoing = T('doing.', 836.02);
+  const tIdea = T('idea?', 837.70), tFast = T('Fast', 838.82);
+  const tTwo = T('two', 842.18), tSixM = T('six', 844.02);
+  const tRunw = T('runway,', 845.86), t14 = T('fourteen', 846.74), tHang = T('hanging', 848.18);
+  const tHalf = T('Half', 849.33), tSp = T('Spain,', 851.73), tPt = T('Portugal,', 852.37), tMa = T('Morocco,', 853.21);
+  const tEvery2 = T('Everyone', 855.49), tCopy = T('copy', 857.01);
+  /** executive caricature (origin = feet, ≈ 640·s tall). o: {suit, skin, hair, wide, long (face), tie, mood, look, arm:'hang'|'wave'|'point'|'up', walk, flip, sit} */
+  S5.exec = (ctx, x, y, s, t, o = {}) => {
+    const tt = tw(t); const skin = o.skin || '#E0A887', sd = MG.col.shade(skin, 0.3), suit = o.suit || '#1F3354', w = o.wide || 1, Lf = o.long || 1;
+    ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s); if (!o.noShadow) MG.fx.contact(ctx, 0, 4, 120, 18, 0.4);
+    const wk = o.walk ? Math.sin(tt * 8) : 0;
+    if (!o.sit) for (const sg of [-1, 1]) { const sw = wk * sg * 16; S5.form(ctx, [[sg * 14 - 26, -300], [sg * 14 + 26, -300], [sg * 30 + sw + 20, -16], [sg * 30 + sw - 20, -16]], { poly: true, color: o.trousers || MG.col.shade(suit, 0.1), shade: 0.35, ow: 3 }); S5.form(ctx, [[sg * 30 + sw - 26, -20], [sg * 30 + sw + 34, -20], [sg * 30 + sw + 38, 0], [sg * 30 + sw - 26, 0]], { color: '#211A1C', shade: 0.3, ow: 2.5 }); }
+    ctx.translate(0, Math.sin(t * 1.6 + (o.seed || 0)) * 2 - (o.walk ? Math.abs(wk) * 6 : 0));
+    const arm = (sg, mode) => { const S = [sg * 92 * w, -505]; let E, Hd; if (mode === 'wave' && sg > 0) { const a = Math.sin(t * 9) * 0.25; E = [sg * 150 * w, -600]; Hd = [sg * (170 + a * 60) * w, -720]; } else if (mode === 'point' && sg > 0) { E = [sg * 170 * w, -470]; Hd = [sg * 250 * w, -500]; } else if (mode === 'up') { E = [sg * 150 * w, -610]; Hd = [sg * 150 * w, -720]; } else { E = [sg * 112 * w, -410]; Hd = [sg * 104 * w, -320]; }
+      MG.fx.ink(ctx, [S, E, Hd], { width: 54, color: '#1a1416', taper: [0, 0] }); MG.fx.ink(ctx, [S, E, Hd], { width: 46, color: suit, taper: [0, 0] }); ctx.fillStyle = '#F4F1EA'; ctx.beginPath(); ctx.arc(Hd[0], Hd[1], 22, 0, MG.TAU); ctx.fill(); S5.form(ctx, [[Hd[0] - 20, Hd[1]], [Hd[0] + 20, Hd[1]], [Hd[0] + 22, Hd[1] + 30], [Hd[0], Hd[1] + 40], [Hd[0] - 22, Hd[1] + 30]], { color: skin, shadeColor: sd, shade: 0.4, ow: 2.5 }); };
+    arm(-1, o.armL || 'hang');
+    S5.form(ctx, [[-96 * w, -525], [96 * w, -525], [110 * w, -420], [102 * w, -290], [-102 * w, -290], [-110 * w, -420]], { color: suit, shade: 0.45, hi: 0.18, rim: o.rim || '#7FA6D8', ow: 3.5 });
+    S5.form(ctx, [[-36, -527], [36, -527], [0, o.tie ? -400 : -440]], { poly: true, color: '#F4F1EA', shade: 0.2, ow: 2.5 });
+    if (o.tie) S5.form(ctx, [[-10, -520], [10, -520], [14, -420], [0, -400], [-14, -420]], { poly: true, color: o.tie, shade: 0.3, ow: 2 });
+    for (const sg of [-1, 1]) S5.form(ctx, [[sg * 38, -527], [sg * 8, o.tie ? -400 : -440], [sg * 30, -380], [sg * 64 * w, -505]], { poly: true, color: MG.col.light(suit, 0.08), shade: 0.3, ow: 2.5 });
+    arm(1, o.armR || 'hang');
+    // head
+    ctx.fillStyle = sd; ctx.fillRect(-24, -560, 48, 40);
+    const hy = -612; const hp = [[-60 * w, hy - 6], [-56 * w, hy - 64 * Lf], [-28, hy - 92 * Lf], [28, hy - 92 * Lf], [56 * w, hy - 64 * Lf], [60 * w, hy - 6], [50 * w, hy + 40], [22, hy + 70 * Lf], [-22, hy + 70 * Lf], [-50 * w, hy + 40]];
+    for (const sg of [-1, 1]) S5.form(ctx, [[sg * 58 * w, hy - 20], [sg * 74 * w, hy - 26], [sg * 74 * w, hy + 10], [sg * 58 * w, hy + 16]], { color: skin, shadeColor: sd, shade: 0.4, ow: 2.5 });
+    S5.form(ctx, hp, { color: skin, shadeColor: sd, shade: 0.42, hi: 0.18, rim: '#FFE2C0', ow: 3 });
+    const lk = o.look || [0.2, 0]; const bl = MG.kit.blink(tt, o.seed || 7);
+    for (const sg of [-1, 1]) MG.kit.eye(ctx, sg * 22, hy - 6, { r: 8, look: lk, blink: bl, skin, lid: o.lid ?? 0.2 });
+    for (const sg of [-1, 1]) MG.kit.brow(ctx, sg * 22, hy - 26, { w: 26, angle: sg * (o.browA ?? 0.12), thick: 6, color: MG.col.shade(o.hair || '#C9C6C2', 0.25), flip: sg > 0 });
+    S5.form(ctx, [[-2, hy - 6], [-14, hy + 26], [0, hy + 32], [12, hy + 24]], { color: skin, shadeColor: sd, shade: 0.5, ow: 2.5 });
+    S5.mouth(ctx, 0, hy + 46 * Lf, { w: 34, mood: o.mood || 'smile', open: o.open || 0 });
+    MG.fx.ink(ctx, [[-30, hy + 30], [-34, hy + 46]], { width: 2.5, color: A('#6a3a2a', 0.5), taper: [0.3, 0.3] }); MG.fx.ink(ctx, [[30, hy + 30], [34, hy + 46]], { width: 2.5, color: A('#6a3a2a', 0.5), taper: [0.3, 0.3] });
+    const hc = o.hair || '#C9C6C2'; S5.form(ctx, o.part ? [[-62 * w, hy - 20], [-60 * w, hy - 70 * Lf], [-30, hy - 104 * Lf], [24, hy - 104 * Lf], [58 * w, hy - 74 * Lf], [62 * w, hy - 22], [50 * w, hy - 56 * Lf], [-8, hy - 84 * Lf], [-46 * w, hy - 60 * Lf]] : [[-64 * w, hy - 18], [-62 * w, hy - 66 * Lf], [-36, hy - 98 * Lf], [10, hy - 108 * Lf], [50 * w, hy - 92 * Lf], [66 * w, hy - 56], [64 * w, hy - 18], [52 * w, hy - 50], [20, hy - 74 * Lf], [-30, hy - 70 * Lf], [-54 * w, hy - 46]], { color: hc, shade: 0.35, hi: 0.3, ow: 3 });
+    ctx.restore();
+  };
+  S5.ortega = (ctx, x, y, s, t, o = {}) => S5.exec(ctx, x, y, s, t, { suit: '#1F3354', hair: '#CFCAC4', wide: 1.08, long: 1, seed: 11, ...o });
+  S5.arnault = (ctx, x, y, s, t, o = {}) => S5.exec(ctx, x, y, s, t, { suit: '#2B2B33', hair: '#E4E0DA', wide: 0.9, long: 1.14, tie: '#4A2A3A', part: true, mood: 'smirk', seed: 13, rim: '#B8B8C8', skin: '#E6B394', browA: -0.05, ...o });
+  /** tailor's shop (cached): shelves of fabric bolts, a mirror, a cutting table */
+  S5.shop = () => MG.cache('s5shop', W + 300, H, (x, w, h) => {
+    x.fillStyle = '#5A3A2C'; x.fillRect(0, 0, w, h); MG.tex.over(x, 'fibers', { alpha: 0.5 });
+    const cols = ['#C8423B', '#1F4E8C', '#E9B949', '#2FA7A0', '#F4EEE2', '#8E6FA6', '#3B3236', '#E86F5A', '#6F7A3A'];
+    for (let sh = 0; sh < 4; sh++) { const sy = 120 + sh * 170; x.fillStyle = '#7A5038'; x.fillRect(0, sy + 120, w, 20); x.fillStyle = 'rgba(0,0,0,0.3)'; x.fillRect(0, sy + 140, w, 8); for (let i = 0; i < 26; i++) { const bx = 30 + i * 84 + (sh % 2) * 40, c = cols[(i * 7 + sh * 3) % cols.length]; S5.form(x, [[bx - 34, sy + 120], [bx - 34, sy + 30], [bx + 34, sy + 30], [bx + 34, sy + 120]], { poly: true, color: c, shade: 0.4, hi: 0.25, ow: 2 }); x.fillStyle = MG.col.shade(c, 0.2); x.beginPath(); x.ellipse(bx, sy + 30, 34, 10, 0, 0, MG.TAU); x.fill(); x.strokeStyle = 'rgba(30,20,20,0.5)'; x.lineWidth = 2; x.stroke(); } }
+    x.fillStyle = '#3a2620'; x.fillRect(0, 820, w, h - 820); for (let i = 0; i < 30; i++) { x.fillStyle = i % 2 ? '#4a3026' : '#422a22'; x.fillRect(i * 80, 820, 80, h - 820); }
+    const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(20,10,10,0.35)'); g.addColorStop(0.5, 'rgba(20,10,10,0)'); g.addColorStop(1, 'rgba(20,10,10,0.45)'); x.fillStyle = g; x.fillRect(0, 0, w, h);
+  });
+  S5.dressForm = (ctx, x, y, s, col = '#E9DCC4', dress) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); ctx.strokeStyle = '#3a2a22'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -260); ctx.moveTo(-70, 0); ctx.lineTo(70, 0); ctx.stroke(); S5.form(ctx, [[-60, -520], [60, -520], [74, -460], [52, -380], [70, -270], [-70, -270], [-52, -380], [-74, -460]], { color: col, shade: 0.4, hi: 0.3, ow: 3 }); S5.form(ctx, [[-14, -540], [14, -540], [14, -516], [-14, -516]], { poly: true, color: '#3a2a22', ow: 2 });
+    if (dress) { S5.form(ctx, [[-62, -500], [62, -500], [56, -400], [120, -150], [-120, -150], [-56, -400]], { color: dress, shade: 0.42, hi: 0.25, ow: 3 }); ctx.fillStyle = A('#ffffff', 0.25); for (let i = 0; i < 9; i++) { ctx.beginPath(); ctx.arc(-70 + (i % 3) * 70, -420 + Math.floor(i / 3) * 90, 9, 0, MG.TAU); ctx.fill(); } }
+    ctx.restore(); };
+  S5.bolt = (ctx, x, y, r, len, ang, col) => { ctx.save(); ctx.translate(x, y); ctx.rotate(ang); S5.form(ctx, [[-len / 2, -r], [len / 2, -r], [len / 2, r], [-len / 2, r]], { poly: true, color: col, shade: 0.45, hi: 0.3, ow: 3 }); ctx.fillStyle = MG.col.shade(col, 0.25); ctx.beginPath(); ctx.ellipse(len / 2, 0, r * 0.35, r, 0, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); };
+  // ---------- 27 · tailor: "Second, fashion. Meet Amancio Ortega." ----------
+  add({ id: 's05_tailor', start: 801.38,
+    transIn: { type: S5.trSweep((ctx, edge) => { ctx.save(); ctx.filter = 'blur(3px)'; S5.bolt(ctx, edge + 200, 540, 330, 900, 1.45, '#C8423B'); ctx.restore(); }, -1), dur: 0.8, ease: 'linear' },
+    draw(ctx, t) {
+      const c = S5.cam(ctx, t, [[801.38, { x: 1010, y: 560, zoom: 1.0 }], [tMeet, { x: 980, y: 560, zoom: 1.04 }, 'inOutSine'], [805.6, { x: 990, y: 600, zoom: 1.16 }, 'inOutSine']], 2, 71); void c;
+      MG.sprite(ctx, S5.shop(), -150, 0, { ax: 0, ay: 0 });
+      S5.dressForm(ctx, 330, 900, 1.05, '#E9DCC4', '#F2A33A');
+      // the "Nº 02" clothing tag swings in on "fashion"
+      const tg = pr(t, tFash - 0.3, tFash + 0.2, 'outBack'); if (tg > 0) { ctx.save(); ctx.translate(1510, 140); ctx.rotate(Math.sin(t * 2.2) * 0.08 + (1 - tg) * 0.8); S5.ink(ctx, [[0, -160], [0, 0]], 3, '#2a1a16', t); S5.form(ctx, [[-90, 0], [90, 0], [90, 230], [-90, 230]], { poly: true, color: '#F4EEE2', shade: 0.2, ow: 3 }); ctx.fillStyle = '#5A3A2C'; ctx.beginPath(); ctx.arc(0, 26, 9, 0, MG.TAU); ctx.fill(); MG.text.draw(ctx, 'Nº', 0, 96, { font: F.mono, weight: 700, size: 30, color: P.ink2, align: 'center' }); MG.text.draw(ctx, '02', 0, 196, { font: F.cond, weight: 900, size: 110, color: P.rojo, align: 'center' }); ctx.restore(); }
+      // spotlight pool; Ortega steps into it on "Meet"
+      const sk = pr(t, tMeet - 0.5, tMeet + 0.2); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = A('#2a1a20', 0.45 * sk); ctx.fillRect(-300, -100, W + 600, H + 200); ctx.restore(); if (sk > 0) { MG.fx.glow(ctx, 1000, 560, 620, '#FFE6B8', 0.35 * sk); ctx.save(); ctx.globalAlpha = 0.25 * sk; ctx.fillStyle = '#FFE6B8'; ctx.beginPath(); ctx.ellipse(1000, 905, 260, 46, 0, 0, MG.TAU); ctx.fill(); ctx.restore(); }
+      const wk = pr(t, tMeet - 0.9, tAman + 0.1, 'outSine'); S5.ortega(ctx, lerp(1500, 1000, wk), 905, 0.95, t, { walk: wk > 0 && wk < 1, mood: 'smile', look: wk < 1 ? [-0.6, 0] : [0, 0.05], armR: t > tAman + 0.2 && t < tAman + 1.4 ? 'wave' : 'hang' });
+      ctx.restore();
+      const nk = pr(t, tAman - 0.05, tAman + 0.4, 'outBack'); if (nk > 0) { ctx.save(); ctx.translate(1240, 700); ctx.scale(nk, nk); S5.form(ctx, [[0, -46], [420, -46], [420, 40], [0, 40]], { poly: true, color: '#F4EEE2', shade: 0.15, ow: 3 }); MG.text.draw(ctx, 'AMANCIO ORTEGA', 210, 12, { font: F.grotesk, weight: 800, size: 40, color: P.ink, align: 'center', tracking: 0.04 }); ctx.restore(); }
+      S5.kick(ctx, 'pillar 2 · fashion', 120, 120, t, tFash - 0.1, { color: '#F4EEE2' });
+    }, post: { grade: 'warm', vignette: 0.42 } });
+  // ---------- 28 · childhood: railroad father → tracks become a tape measure → apprentice at 13 ----------
+  add({ id: 's05_childhood', start: 805.60,
+    transIn: { type: S5.trPush(330, 560, 2.4, 0.5), dur: 0.7 },
+    draw(ctx, t) {
+      const cx = MG.keys(t, [[805.6, 700], [tDrops - 0.2, 900, 'inOutSine'], [t13 + 0.2, 1700, 'inOutCubic'], [811.62, 1900, 'inOutSine']]); const hh = MG.cam.handheld(t, 1.5, 72);
+      MG.fx.vgrad(ctx, [[0, '#E9D6B0'], [1, '#C9A97A']]); MG.tex.over(ctx, 'blotch', { alpha: 0.3, color: '#7a5a3a', scale: 3 });
+      ctx.save(); ctx.translate(-cx + 960 + hh.dx, hh.dy);
+      // paper hills
+      ctx.fillStyle = '#C7A577'; ctx.beginPath(); ctx.moveTo(-400, 720); for (let x = -400; x <= 3400; x += 80) ctx.lineTo(x, 640 + Math.sin(x * 0.004) * 50); ctx.lineTo(3400, 1100); ctx.lineTo(-400, 1100); ctx.fill();
+      // the rails → a tailor's tape measure (unrolls along the same line)
+      const morph = pr(t, tDrops - 0.2, t13 - 0.1, 'inOutSine');
+      for (let x = -400; x < 3400; x += 46) { ctx.fillStyle = A('#5a3a22', 1 - morph); ctx.fillRect(x, 800, 24, 34); }
+      ctx.fillStyle = A('#4a4448', 1 - morph); ctx.fillRect(-400, 798, 3800, 8); ctx.fillRect(-400, 826, 3800, 8);
+      if (morph > 0) { ctx.save(); ctx.globalAlpha = morph; ctx.fillStyle = '#F2C230'; ctx.fillRect(-400, 790, 3800, 52); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 2; ctx.strokeRect(-400, 790, 3800, 52); ctx.fillStyle = '#2a1a16'; for (let k = 0; k < 160; k++) { const x = -400 + k * 24; ctx.fillRect(x, 790, 2, k % 5 ? 12 : 22); if (k % 5 === 0) MG.text.draw(ctx, String(k / 5), x + 4, 834, { font: F.mono, weight: 700, size: 18, color: '#2a1a16' }); } ctx.restore(); }
+      // the father and the steam engine (paper cut-outs)
+      ctx.save(); ctx.translate(380, 800); S5.form(ctx, [[0, -230], [360, -230], [380, -40], [0, -40]], { poly: true, color: '#3B3236', shade: 0.4, ow: 3 }); S5.form(ctx, [[260, -330], [340, -330], [340, -230], [260, -230]], { poly: true, color: '#3B3236', shade: 0.3, ow: 3 }); S5.form(ctx, [[30, -300], [80, -300], [80, -230], [30, -230]], { poly: true, color: '#2a2428', ow: 3 }); for (const wx of [70, 190, 310]) { ctx.fillStyle = '#C8423B'; ctx.beginPath(); ctx.arc(wx, -34, 40, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 4; ctx.stroke(); }
+        for (let i = 0; i < 5; i++) { const u = MG.fract(t * 0.6 + i / 5); ctx.fillStyle = A('#F4EEE2', 0.7 * (1 - u)); ctx.beginPath(); ctx.arc(55 - u * 60, -310 - u * 160, 24 + u * 40, 0, MG.TAU); ctx.fill(); } ctx.restore();
+      ctx.save(); ctx.translate(820, 790); S5.form(ctx, [[-40, -260], [40, -260], [50, -120], [-50, -120]], { color: '#2D4A6E', shade: 0.4, ow: 3 }); S5.form(ctx, [[-24, -120], [24, -120], [28, 0], [-28, 0]], { poly: true, color: '#3a3438', ow: 3 }); S5.form(ctx, [[-28, -320], [28, -320], [32, -270], [-32, -270]], { color: '#D9A07A', shade: 0.4, ow: 3 }); S5.form(ctx, [[-36, -326], [36, -326], [44, -312], [-44, -312]], { poly: true, color: '#2D4A6E', ow: 2.5 }); MG.fx.ink(ctx, [[-10, -290], [10, -290]], { width: 6, color: '#3a2a22' }); ctx.restore();
+      // the boy: 13, then at the tailor's table
+      const bx = lerp(980, 1700, pr(t, tDrops - 0.1, t13 + 0.4, 'inOutSine')); ctx.save(); ctx.translate(bx, 790); S5.form(ctx, [[-26, -170], [26, -170], [32, -80], [-32, -80]], { color: '#F4EEE2', shade: 0.35, ow: 3 }); S5.form(ctx, [[-18, -80], [18, -80], [20, 0], [-20, 0]], { poly: true, color: '#4E5872', ow: 3 }); S5.form(ctx, [[-22, -222], [22, -222], [26, -182], [-26, -182]], { color: '#E3A882', shade: 0.4, ow: 3 }); S5.form(ctx, [[-24, -226], [24, -226], [20, -206], [-20, -206]], { poly: true, color: '#2a1e18', ow: 2 }); MG.kit.eye(ctx, -8, -200, { r: 4, look: [0.6, 0], skin: '#E3A882' }); MG.kit.eye(ctx, 8, -200, { r: 4, look: [0.6, 0], skin: '#E3A882' }); ctx.restore();
+      const k13 = pr(t, t13 - 0.2, t13 + 0.3, 'outBack'); if (k13 > 0) { ctx.save(); ctx.translate(bx, 470); ctx.scale(k13, k13); ctx.fillStyle = '#2a1a16'; ctx.beginPath(); ctx.moveTo(0, 60); ctx.lineTo(-12, 30); ctx.lineTo(12, 30); ctx.fill(); MG.text.draw(ctx, '13', 0, 20, { font: F.cond, weight: 900, size: 120, color: P.rojo, align: 'center', stroke: '#F4EEE2', strokeW: 6 }); ctx.restore(); }
+      // tailor's table (apprentice): cloth, chalk, scissors
+      ctx.save(); ctx.translate(2050, 790); S5.form(ctx, [[-260, -150], [260, -150], [260, -120], [-260, -120]], { poly: true, color: '#8a5a38', shade: 0.3, ow: 3 }); for (const lx of [-230, 230]) S5.form(ctx, [[lx - 12, -120], [lx + 12, -120], [lx + 12, 0], [lx - 12, 0]], { poly: true, color: '#6a4028', ow: 2.5 }); S5.form(ctx, [[-200, -170], [160, -170], [180, -150], [-180, -150]], { poly: true, color: '#1F4E8C', shade: 0.3, ow: 2.5 }); const sn = Math.max(0, Math.sin(t * 10)) * 0.4 * pr(t, tAppr - 0.6, tAppr); ctx.save(); ctx.translate(60, -176); for (const sg of [-1, 1]) { ctx.save(); ctx.rotate(sg * sn); S5.form(ctx, [[0, -4], [-90, -4], [-96, 0], [0, 4]], { poly: true, color: '#C9CED6', ow: 2 }); ctx.restore(); } ctx.restore(); ctx.restore();
+      ctx.restore();
+      S5.lead(ctx, 'railroad worker', 380, 230, t, tRail - 0.1, { color: '#2a1608', size: 64 }); S5.lead(ctx, "tailor's apprentice", 1500, 230, t, tAppr - 0.45, { color: '#2a1608', size: 64 });
+      ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(200,160,110,0.35)'; ctx.fillRect(0, 0, W, H); ctx.restore();
+    }, post: { grade: 'archival', vignette: 0.46 } });
+  // ---------- 29 · A Coruña 1975: the first store pops up on the map ----------
+  add({ id: 's05_coruna', start: 811.62,
+    transIn: { type: 'push', dir: 'left', dur: 0.7, ease: 'inOutCubic' },
+    draw(ctx, t) {
+      const COR = [-8.41, 43.36]; const z = pr(t, 811.62, tOpens + 0.3, 'inOutCubic'); const scale = Math.exp(lerp(Math.log(3600), Math.log(14000), z)); const cen = [lerp(-3.6, -7.9, z), lerp(40.0, 42.9, z)];
+      const prj = MG.geo.proj('spain', { center: cen, scale, translate: [960, 560] });
+      MG.kit.seaBg(ctx, '#9FB9CC'); for (const n of ['Portugal', 'France']) MG.geo.draw(ctx, prj, MG.geo.country(n, '10'), { fill: '#E6DCC8', stroke: 'rgba(60,40,30,0.3)', width: 1.2 }); MG.geo.slab(ctx, prj, MG.geo.country('Spain', '10'), { depth: 14, top: '#E9B949', side: '#B9821E', stroke: 'rgba(60,30,10,0.5)', width: 1.5 });
+      const p = prj(COR); const pk = pr(t, tOpens - 0.3, tOpens + 0.2, 'outBounce'); if (pk > 0) { ctx.save(); ctx.translate(p[0], p[1]); MG.fx.contact(ctx, 0, 6, 120, 18, 0.4); ctx.scale(1, pk); S5.form(ctx, [[-110, -170], [110, -170], [110, 0], [-110, 0]], { poly: true, color: '#F4EEE2', shade: 0.25, ow: 3 }); S5.form(ctx, [[-90, -110], [-10, -110], [-10, 0], [-90, 0]], { poly: true, color: '#3a4a5a', ow: 2.5 }); ctx.fillStyle = '#F3C67A'; ctx.fillRect(10, -110, 80, 80); for (let k = 0; k < 7; k++) { ctx.fillStyle = k % 2 ? '#F4EEE2' : '#2a2428'; ctx.beginPath(); ctx.moveTo(-120 + k * 34, -170); ctx.lineTo(-86 + k * 34, -170); ctx.lineTo(-90 + k * 34, -130); ctx.lineTo(-116 + k * 34, -130); ctx.fill(); } S5.form(ctx, [[-90, -230], [90, -230], [90, -178], [-90, -178]], { poly: true, color: '#2a2428', ow: 2.5 }); MG.text.draw(ctx, 'ZARA', 0, -190, { font: F.fashion, weight: 400, size: 44, color: '#F4EEE2', align: 'center', tracking: 0.12 }); ctx.restore(); }
+      const yk = pr(t, t1975 - 0.1, t1975 + 0.4, 'outBack'); if (yk > 0 && p) { ctx.save(); ctx.translate(p[0] + 170, p[1] - 60); ctx.scale(yk, yk); S5.form(ctx, [[-90, -50], [90, -50], [90, 40], [-90, 40]], { poly: true, color: '#C9A04A', shade: 0.3, hi: 0.3, ow: 3 }); MG.text.draw(ctx, '1975', 0, 22, { font: F.roman, weight: 900, size: 58, color: '#3a2412', align: 'center' }); ctx.restore(); }
+      if (p) MG.text.reveal(ctx, 'A CORUÑA', p[0] - 140, p[1] + 70, t, tCor - 0.2, { font: F.grotesk, weight: 800, size: 46, color: P.ink, align: 'right', tracking: 0.06, stroke: 'rgba(250,244,232,0.9)', strokeW: 8, style: 'rise', by: 'line' });
+    }, post: { grade: 'warm', vignette: 0.34 } });
+  // ---------- 30 · Inditex today: four hangers slide in on their names ----------
+  S5.garment = (ctx, k, col) => { if (k === 0) S5.form(ctx, [[-70, 0], [70, 0], [110, 60], [80, 80], [70, 60], [70, 300], [-70, 300], [-70, 60], [-80, 80], [-110, 60]], { poly: true, color: col, shade: 0.4, hi: 0.25, ow: 3 }); else if (k === 1) S5.form(ctx, [[-50, 0], [50, 0], [60, 120], [110, 330], [-110, 330], [-60, 120]], { color: col, shade: 0.4, hi: 0.25, ow: 3 }); else if (k === 2) { S5.form(ctx, [[-80, 0], [80, 0], [120, 70], [96, 300], [-96, 300], [-120, 70]], { color: col, shade: 0.42, hi: 0.2, ow: 3 }); S5.form(ctx, [[-20, 0], [20, 0], [0, 120]], { poly: true, color: '#F4EEE2', ow: 2 }); } else { S5.form(ctx, [[-80, 0], [80, 0], [130, 80], [100, 120], [86, 100], [86, 290], [-86, 290], [-86, 100], [-100, 120], [-130, 80]], { color: col, shade: 0.4, hi: 0.25, ow: 3 }); S5.form(ctx, [[-36, -10], [36, -10], [30, 40], [-30, 40]], { color: MG.col.shade(col, 0.2), ow: 2 }); } };
+  add({ id: 's05_inditex', start: 816.02,
+    transIn: { type: 'zoom', dur: 0.6, x: 1050, y: 470, amount: 2.6, from: 0.7 },
+    draw(ctx, t) {
+      const pan = lerp(0, 220, pr(t, 816.02, 822.82, 'inOutSine')); const hh = MG.cam.handheld(t, 1.5, 73);
+      MG.fx.vgrad(ctx, [[0, '#EFE9DF'], [1, '#DCD2C2']]); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = A(P.sombra, 0.08); for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.moveTo(i * 320 - pan * 0.5, 0); ctx.lineTo(i * 320 + 120 - pan * 0.5, 0); ctx.lineTo(i * 320 - 500 - pan * 0.5, H); ctx.lineTo(i * 320 - 620 - pan * 0.5, H); ctx.fill(); } ctx.restore();
+      ctx.save(); ctx.translate(-pan + hh.dx, hh.dy);
+      ctx.strokeStyle = '#8a8f99'; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(180, 320); ctx.lineTo(2100, 320); ctx.moveTo(200, 320); ctx.lineTo(200, 1000); ctx.moveTo(2080, 320); ctx.lineTo(2080, 1000); ctx.stroke(); ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(180, 315); ctx.lineTo(2100, 315); ctx.stroke();
+      const hk = pr(t, tInd - 0.3, tInd + 0.3, 'outBack'); if (hk > 0) { ctx.save(); ctx.translate(1140, 230); ctx.scale(hk, hk); S5.form(ctx, [[-260, -50], [260, -50], [260, 50], [-260, 50]], { poly: true, color: '#1E1A1D', shade: 0.2, ow: 3 }); MG.text.draw(ctx, 'INDITEX', 0, 24, { font: F.wide, weight: 800, size: 64, color: '#F4EEE2', align: 'center', tracking: 0.12 }); ctx.restore(); }
+      const names = ['ZARA', 'BERSHKA', 'MASSIMO DUTTI', 'PULL&BEAR'], cols = ['#1E1A1D', '#C8423B', '#8a6a4a', '#2FA7A0'];
+      names.forEach((n, i) => { const t0 = tBrands[i] - 0.35; const k = pr(t, t0, t0 + 0.55, 'outBack'); if (k <= 0) return; const x = lerp(2500, 520 + i * 420, k); const sw = Math.sin((t - t0) * 6) * 0.12 * Math.exp(-(t - t0) * 2); ctx.save(); ctx.translate(x, 320); ctx.rotate(sw); ctx.strokeStyle = '#5a5a60'; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(0, -10, 16, Math.PI, 0); ctx.moveTo(0, 6); ctx.lineTo(0, 40); ctx.moveTo(-110, 80); ctx.lineTo(0, 40); ctx.lineTo(110, 80); ctx.stroke(); ctx.translate(0, 70); S5.garment(ctx, i, cols[i]); ctx.save(); ctx.translate(60, 140); ctx.rotate(0.15); S5.form(ctx, [[0, 0], [190, 0], [190, 70], [0, 70]], { poly: true, color: '#F4EEE2', shade: 0.15, ow: 2.5 }); MG.text.draw(ctx, n, 95, 46, { font: F.grotesk, weight: 800, size: n.length > 9 ? 24 : 32, color: P.ink, align: 'center', tracking: 0.04 }); ctx.restore(); ctx.restore(); });
+      ctx.restore();
+      S5.kick(ctx, 'today', 120, 120, t, 816.1);
+    }, post: { grade: 'neutral', vignette: 0.3 } });
+  // ---------- 31 · 5,500+ stores in ~100 countries: the shop lights come on at dusk ----------
+  S5.storeDots = () => { if (S5._sd) return S5._sd; MG.geo.init(); const fs = (MG.geo.world110 || MG.geo.world50).features.filter((f) => !/Antarctica|Greenland/.test(f.properties.name)); const d3 = window.d3; const out = []; fs.forEach((f, i) => { if (MG.hash(i * 3.3) > 0.62 && !/Spain|France|Italy|Germany|Mexico|United States|China|Portugal|United Kingdom|Russia|Japan|Brazil|Turkey|Poland/.test(f.properties.name)) return; const c = d3.geoCentroid(f); const n = /Spain/.test(f.properties.name) ? 18 : /France|Italy|Mexico|Portugal|China|Russia|Germany|United States/.test(f.properties.name) ? 6 : 2; for (let k = 0; k < n; k++) { const ll = [c[0] + (MG.hash(i * 7 + k) - 0.5) * 5, c[1] + (MG.hash(i * 11 + k) - 0.5) * 3.5]; if (d3.geoContains(f, ll) || k === 0) out.push({ ll: d3.geoContains(f, ll) ? ll : c, h: MG.hash(i * 5.1 + k * 1.3) }); } }); S5._sd = out; return out; };
+  add({ id: 's05_stores', start: 822.82,
+    transIn: { type: 'whip', dir: 'left', dur: 0.45 },
+    draw(ctx, t) {
+      const prj = MG.geo.proj('natural', { rotate: [-12, 0], center: [0, 12], scale: lerp(330, 350, pr(t, 822.82, 827.22, 'inOutSine')), translate: [960, 560] }); const dusk = pr(t, 822.82, 823.6);
+      MG.fx.vgrad(ctx, [[0, MG.col.mix('#5A6A8A', '#141A36', dusk)], [1, MG.col.mix('#8A7A8A', '#2A2448', dusk)]]); MG.geo.draw(ctx, prj, { type: 'Sphere' }, { fill: MG.col.mix('#3E6A92', '#1A2448', dusk) });
+      MG.geo.draw(ctx, prj, MG.geo.land50 || MG.geo.world110, { fill: MG.col.mix('#D9CDB4', '#2E3456', dusk), stroke: 'rgba(160,180,220,0.3)', width: 1 }); MG.geo.draw(ctx, prj, MG.geo.country('Spain'), { fill: MG.col.mix('#E9B949', '#5a4a3a', dusk * 0.6) });
+      const D = S5.storeDots(); ctx.save(); ctx.globalCompositeOperation = 'screen'; let on = 0; for (const d of D) { const t0 = t5500 - 0.4 + d.h * 2.4; const k = pr(t, t0, t0 + 0.25); if (k <= 0) continue; on++; const p = prj(d.ll); if (!p) continue; const fl = 0.8 + 0.2 * Math.sin(t * 5 + d.h * 30); MG.fx.glow(ctx, p[0], p[1], 16, '#FFC870', 0.9 * k * fl); ctx.fillStyle = '#FFF1CC'; ctx.fillRect(p[0] - 1.5, p[1] - 1.5, 3, 3); } ctx.restore();
+      const n = Math.round(lerp(0, 5500, pr(t, t5500 - 0.4, t5500 + 1.4, 'outCubic'))); if (t > t5500 - 0.4) { MG.text.draw(ctx, n.toLocaleString('en-US') + (n >= 5500 ? '+' : ''), 150, 900, { font: F.cond, weight: 900, size: 150, color: '#FFE3A8' }); MG.text.reveal(ctx, 'STORES', 160, 960, t, t5500 + 0.2, { font: F.mono, weight: 700, size: 34, color: '#F4EEE2', tracking: 0.3, style: 'track', by: 'line' }); }
+      MG.text.reveal(ctx, '≈100 COUNTRIES', 1780, 960, t, tHund - 0.2, { font: F.mono, weight: 700, size: 40, color: '#FFE3A8', align: 'right', tracking: 0.22, style: 'track', by: 'line' }); void on;
+    }, post: { grade: 'night', vignette: 0.36 } });
+  // ---------- 32 · seesaw: Ortega vs Arnault, a share chart tips it ----------
+  add({ id: 's05_seesaw', start: 827.22,
+    transIn: { type: S5.trSpot(960, 560), dur: 0.8, ease: 'linear' },
+    draw(ctx, t) {
+      MG.fx.vgrad(ctx, [[0, '#231C2A'], [1, '#3A2C38']]); MG.fx.glow(ctx, 960, 620, 900, '#FFE6B8', 0.28);
+      // the share chart behind (LVMH): rises & falls → tips the seesaw
+      const ck = pr(t, tShares - 0.3, tShares + 0.6); const share = (u) => Math.sin(u * 9.5 + 0.6) * 0.55 + Math.sin(u * 23) * 0.18; const uNow = clamp((t - (tShares - 0.3)) / (836.98 - tShares + 0.3));
+      if (ck > 0) { ctx.save(); ctx.globalAlpha = ck; ctx.strokeStyle = 'rgba(244,238,226,0.25)'; ctx.lineWidth = 1.5; for (let g = 0; g < 5; g++) { ctx.beginPath(); ctx.moveTo(360, 160 + g * 50); ctx.lineTo(1560, 160 + g * 50); ctx.stroke(); } const pts = []; for (let i = 0; i <= 60; i++) { const u = i / 60 * uNow; pts.push([360 + u * 1200, 260 - share(u) * 90]); } MG.fx.ink(ctx, pts, { width: 5, color: '#E9B949', taper: [0, 0] }); const lp = pts[pts.length - 1]; ctx.fillStyle = '#FFF1CC'; ctx.beginPath(); ctx.arc(lp[0], lp[1], 7, 0, MG.TAU); ctx.fill(); MG.text.draw(ctx, 'ARNAULT’S COMPANY · SHARES', 360, 130, { font: F.mono, weight: 700, size: 24, color: '#F4EEE2', tracking: 0.2 }); ctx.restore(); }
+      // tilt: before shares, a slow rocking; after, follows the chart (Arnault up when shares rise)
+      const rock = Math.sin((t - 827.2) * 1.8) * 0.12 * pr(t, tMoves - 0.3, tMoves + 0.3); const fol = t > tShares ? -share(uNow) * 0.2 : 0; const ang = MG.follow('s5saw', (q) => (q > tShares ? -share(clamp((q - (tShares - 0.3)) / (836.98 - tShares + 0.3))) * 0.2 : Math.sin((q - 827.2) * 1.8) * 0.12 * pr(q, tMoves - 0.3, tMoves + 0.3)), t, 827.22, 30, 8); void rock; void fol;
+      const fx = 960, fy = 900; ctx.save(); ctx.fillStyle = '#5a3a2a'; ctx.beginPath(); ctx.moveTo(fx - 70, fy + 120); ctx.lineTo(fx + 70, fy + 120); ctx.lineTo(fx, fy); ctx.fill(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.stroke(); ctx.restore(); MG.fx.contact(ctx, fx, fy + 124, 700, 30, 0.45);
+      ctx.save(); ctx.translate(fx, fy); ctx.rotate(ang); S5.form(ctx, [[-640, -16], [640, -16], [640, 16], [-640, 16]], { poly: true, color: '#C9A27A', shade: 0.35, hi: 0.3, ow: 3 }); ctx.restore();
+      const end = (sg) => [fx + Math.cos(ang) * 560 * sg, fy + Math.sin(ang) * 560 * sg];
+      const L = end(-1), R = end(1); const arnOn = pr(t, tBern - 0.5, tBern, 'outBack');
+      S5.ortega(ctx, L[0], L[1] - 14, 0.62, t, { noShadow: true, mood: ang > 0.03 ? 'smile' : 'neutral', look: [0.7, -0.2], armR: ang > 0.05 ? 'up' : 'hang' });
+      if (arnOn > 0.01) { ctx.save(); S5.arnault(ctx, R[0], R[1] - 14 - (1 - Math.min(1, arnOn)) * 420, 0.62, t, { noShadow: true, flip: true, look: [0.7, -0.2], armR: ang < -0.05 ? 'up' : 'hang', mood: ang < -0.03 ? 'smile' : 'smirk' }); ctx.restore(); }
+      // the No.1 medal (sun disk) floats over whoever is higher
+      const hiSide = arnOn > 0.6 ? (L[1] < R[1] ? L : R) : L; const mk = pr(t, tMoves - 0.2, tMoves + 0.3); if (mk > 0) { const px = hiSide[0], py = hiSide[1] - 560; ctx.save(); ctx.globalAlpha = mk; MG.kit.sun(ctx, px, py, 46, t, { corona: 0.6 }); MG.text.draw(ctx, 'Nº1', px, py + 14, { font: F.cond, weight: 900, size: 40, color: '#3a2412', align: 'center' }); ctx.restore(); }
+      MG.text.reveal(ctx, 'ORTEGA', L[0], L[1] + 80, t, 827.3, { font: F.grotesk, weight: 800, size: 40, color: '#F4EEE2', align: 'center', tracking: 0.08, style: 'rise', by: 'line' });
+      if (arnOn > 0.01) MG.text.reveal(ctx, 'ARNAULT', R[0], R[1] + 80, t, tBern - 0.1, { font: F.grotesk, weight: 800, size: 40, color: '#F4EEE2', align: 'center', tracking: 0.08, style: 'rise', by: 'line' });
+      MG.text.reveal(ctx, "Europe's richest", 960, 1040, t, tRich - 0.3, { font: F.serif, italic: true, size: 52, color: '#FFE3A8', align: 'center', style: 'rise', by: 'word' });
+    }, post: { grade: 'warm', vignette: 0.45 } });
+  // ---------- 33 · "Fast fashion": letters on hangers race in on a moving rail ----------
+  add({ id: 's05_idea', start: 836.98,
+    transIn: { type: 'whip', dir: 'left', dur: 0.4 },
+    draw(ctx, t) {
+      MG.fx.vgrad(ctx, [[0, '#F4EEE2'], [1, '#E2D6C2']]); const v = 1 - pr(t, tFast - 0.6, tFast + 0.2, 'outCubic'); const off = (t - 836.98) * 2600 * v + (v < 1 ? 0 : 0);
+      ctx.strokeStyle = '#8a8f99'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(-20, 330); ctx.lineTo(W + 20, 330); ctx.stroke();
+      if (v > 0.05) { ctx.save(); ctx.globalAlpha = 0.5 * v; for (let i = 0; i < 18; i++) { const x = MG.mod(i * 160 - off, W + 200) - 100; ctx.strokeStyle = '#5a5a60'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(x, 330); ctx.lineTo(x, 380); ctx.moveTo(x - 60, 410); ctx.lineTo(x, 380); ctx.lineTo(x + 60, 410); ctx.stroke(); } ctx.restore(); }
+      const word = 'FAST FASHION'; const kk = pr(t, tFast - 0.6, tFast + 0.2, 'outCubic');
+      if (kk > 0) for (let i = 0; i < word.length; i++) { const ch = word[i]; if (ch === ' ') continue; const tx = 240 + i * 124; const x = lerp(tx + 2200, tx, kk); const sw = Math.sin((t - tFast) * 7 + i) * 0.1 * Math.exp(-Math.max(0, t - tFast) * 2) * (kk >= 1 ? 1 : 0); ctx.save(); ctx.translate(x, 330); ctx.rotate(sw); ctx.strokeStyle = '#5a5a60'; ctx.lineWidth = 5; ctx.beginPath(); ctx.arc(0, -8, 12, Math.PI, 0); ctx.moveTo(0, 4); ctx.lineTo(0, 40); ctx.moveTo(-52, 64); ctx.lineTo(0, 40); ctx.lineTo(52, 64); ctx.stroke(); ctx.fillStyle = 'rgba(40,20,30,0.25)'; MG.text.draw(ctx, ch, 10, 250, { font: F.cond, weight: 900, size: 230, color: 'rgba(40,20,30,0.22)', align: 'center' }); MG.text.draw(ctx, ch, 0, 240, { font: F.cond, weight: 900, size: 230, color: i < 4 ? P.rojo : P.ink, align: 'center' }); ctx.restore(); }
+      MG.text.reveal(ctx, 'his big idea?', 960, 900, t, tIdea - 0.6, { font: F.serif, italic: true, size: 64, color: P.ink2, align: 'center', style: 'rise', by: 'word' });
+    }, post: { grade: 'neutral', vignette: 0.3 } });
+  // ---------- 34 · two weeks instead of six months: the tailor's tape as a timeline ----------
+  add({ id: 's05_weeks', start: 840.34,
+    transIn: { type: 'push', dir: 'up', dur: 0.6, ease: 'inOutCubic' },
+    draw(ctx, t) {
+      MG.fx.vgrad(ctx, [[0, '#EFE6D6'], [1, '#DCCFB8']]); MG.tex.over(ctx, 'fibers', { alpha: 0.5 }); const un = pr(t, 840.34, 841.2, 'outCubic'); const X0 = 150, PX = 62; // px per week
+      ctx.save(); ctx.beginPath(); ctx.rect(0, 0, X0 + un * 1700, H); ctx.clip(); ctx.fillStyle = '#F2C230'; ctx.fillRect(X0, 520, 26 * PX + 60, 90); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.strokeRect(X0, 520, 26 * PX + 60, 90); for (let w = 0; w <= 26; w++) { const x = X0 + 20 + w * PX; ctx.fillStyle = '#2a1a16'; ctx.fillRect(x - 1.5, 520, 3, w % 2 ? 18 : 34); if (w % 2 === 0) MG.text.draw(ctx, String(w), x, 594, { font: F.mono, weight: 700, size: 24, color: '#2a1a16', align: 'center' }); } MG.text.draw(ctx, 'WEEKS', X0 + 26 * PX + 50, 650, { font: F.mono, weight: 700, size: 22, color: P.ink2, align: 'right', tracking: 0.2 }); ctx.restore();
+      ctx.fillStyle = '#C9C2B2'; ctx.beginPath(); ctx.arc(X0 - 10, 565, 70, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.stroke();
+      // fast: a garment tag zips to week 2
+      const fk = pr(t, tTwo - 0.25, tTwo + 0.15, 'outBack'); if (fk > 0) { const x = lerp(X0 + 20, X0 + 20 + 2 * PX, fk); ctx.save(); ctx.translate(x, 500); S5.ink(ctx, [[0, 0], [0, -80]], 3, '#2a1a16', t); S5.form(ctx, [[-70, -230], [70, -230], [70, -80], [-70, -80]], { poly: true, color: P.rojo, shade: 0.3, ow: 3 }); MG.text.draw(ctx, '2', 0, -126, { font: F.cond, weight: 900, size: 100, color: '#F4EEE2', align: 'center' }); ctx.restore(); MG.text.reveal(ctx, 'WEEKS', X0 + 20 + 2 * PX + 90, 360, t, tTwo, { font: F.cond, weight: 900, size: 64, color: P.rojo, style: 'rise', by: 'line' }); MG.text.reveal(ctx, 'ZARA', X0 + 20 + 2 * PX + 90, 420, t, tTwo + 0.15, { font: F.mono, weight: 700, size: 28, color: P.ink2, tracking: 0.25, style: 'track', by: 'line' }); }
+      // the usual: a slow marker crawls all the way to 26 weeks
+      const sk = pr(t, tTwo + 0.3, tSixM + 0.3, 'inOutSine'); if (sk > 0) { const x = lerp(X0 + 20, X0 + 20 + 26 * PX, sk); ctx.save(); ctx.translate(x, 630); S5.ink(ctx, [[0, 0], [0, 70]], 3, '#2a1a16', t); S5.form(ctx, [[-70, 70], [70, 70], [70, 200], [-70, 200]], { poly: true, color: '#8a8f99', shade: 0.3, ow: 3 }); MG.text.draw(ctx, '26', 0, 165, { font: F.cond, weight: 900, size: 80, color: '#F4EEE2', align: 'center' }); ctx.restore(); S5.ink(ctx, [[X0 + 20, 660], [x, 660]], 4, A('#5a5a60', 0.6), t); }
+      MG.text.reveal(ctx, '6 MONTHS · THE USUAL', X0 + 20 + 26 * PX - 10, 900, t, tSixM - 0.1, { font: F.mono, weight: 700, size: 32, color: P.ink2, align: 'right', tracking: 0.18, style: 'track', by: 'line' });
+    }, post: { grade: 'neutral', vignette: 0.3 } });
+  // ---------- 35 · runway → 14 days → the mall: the same dress travels with the camera ----------
+  add({ id: 's05_runway', start: 845.38,
+    transIn: { type: 'whip', dir: 'left', dur: 0.4 },
+    draw(ctx, t) {
+      const cx = MG.keys(t, [[845.38, 0], [t14 - 0.3, 60, 'inOutSine'], [t14 + 0.2, 1500, 'inOutCubic'], [tHang - 0.3, 1600, 'linear'], [tHang + 0.2, 3000, 'inOutCubic'], [849.33, 3080, 'linear']]);
+      ctx.save(); ctx.translate(-cx, 0);
+      // zone 1: the runway (dark, flash bulbs)
+      ctx.fillStyle = '#1E1A22'; ctx.fillRect(-200, 0, 1800, H); ctx.fillStyle = '#3a3440'; ctx.beginPath(); ctx.moveTo(760, 300); ctx.lineTo(1160, 300); ctx.lineTo(1500, H); ctx.lineTo(420, H); ctx.fill(); MG.fx.glow(ctx, 960, 360, 520, '#FFE6B8', 0.3); for (let i = 0; i < 10; i++) { const on = MG.hash(Math.floor(t * 8) + i * 7) > 0.8; if (on) MG.fx.glow(ctx, i % 2 ? 300 + i * 30 : 1500 - i * 30, 620 + (i % 3) * 60, 60, '#FFFFFF', 0.9); }
+      // zone 2: the calendar (14 days flip)
+      ctx.fillStyle = '#EFE6D6'; ctx.fillRect(1600, 0, 1500, H); const dk = Math.floor(lerp(1, 14, pr(t, t14 - 0.2, t14 + 1.0))); ctx.save(); ctx.translate(2420, 420); S5.form(ctx, [[-170, -200], [170, -200], [170, 200], [-170, 200]], { poly: true, color: '#F4EEE2', shade: 0.15, ow: 3 }); ctx.fillStyle = P.rojo; ctx.fillRect(-170, -200, 340, 80); MG.text.draw(ctx, 'DAY', 0, -142, { font: F.mono, weight: 700, size: 34, color: '#F4EEE2', align: 'center', tracking: 0.3 }); MG.text.draw(ctx, String(dk), 0, 120, { font: F.cond, weight: 900, size: 220, color: P.ink, align: 'center' }); ctx.restore();
+      // zone 3: the mall rail
+      ctx.fillStyle = '#E6DCCB'; ctx.fillRect(3100, 0, 1900, H); ctx.strokeStyle = '#8a8f99'; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(3200, 300); ctx.lineTo(4900, 300); ctx.stroke(); for (let i = 0; i < 9; i++) { const x = 3300 + i * 190; if (Math.abs(x - 4040) < 120) continue; ctx.save(); ctx.translate(x, 300); ctx.strokeStyle = '#5a5a60'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 30); ctx.moveTo(-70, 56); ctx.lineTo(0, 30); ctx.lineTo(70, 56); ctx.stroke(); ctx.translate(0, 56); ctx.globalAlpha = 0.7; S5.garment(ctx, i % 4, ['#C8C2B8', '#8DB6D9', '#3B3236', '#E86F5A'][i % 4]); ctx.restore(); } MG.text.draw(ctx, 'MALL', 3300, 180, { font: F.wide, weight: 800, size: 54, color: A(P.ink, 0.4), tracking: 0.3 });
+      // the dress: worn on the runway → carried through the calendar → hanging on the rail
+      const ph1 = pr(t, t14 - 0.3, t14 + 0.2), ph2 = pr(t, tHang - 0.3, tHang + 0.2); const dx = lerp(lerp(960, 2420 + 0, ph1), 4040, ph2); const dy = lerp(lerp(760, 430, ph1), 356, ph2);
+      if (ph1 < 0.02) { const wk = Math.sin(t * 9); const mz = lerp(0.8, 1.05, pr(t, 845.38, t14)); ctx.save(); ctx.translate(960, 980); ctx.scale(mz, mz); ctx.fillStyle = '#D9A07A'; for (const sg of [-1, 1]) ctx.fillRect(sg * 18 - 8 + wk * sg * 6, -180, 16, 180); ctx.translate(0, -560); S5.garment(ctx, 1, '#E9B949'); ctx.fillStyle = '#D9A07A'; ctx.beginPath(); ctx.arc(0, -60, 44, 0, MG.TAU); ctx.fill(); ctx.fillStyle = '#2a1e18'; ctx.beginPath(); ctx.arc(0, -78, 44, Math.PI, 0); ctx.fill(); ctx.restore(); }
+      else { ctx.save(); ctx.translate(dx, dy); ctx.rotate(Math.sin(t * 3) * 0.05 * (1 - ph2)); ctx.strokeStyle = '#5a5a60'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(0, -56); ctx.lineTo(0, -26); ctx.moveTo(-70, 0); ctx.lineTo(0, -26); ctx.lineTo(70, 0); ctx.stroke(); S5.garment(ctx, 1, '#E9B949'); if (ph2 > 0.8) { ctx.save(); ctx.translate(80, 150); ctx.rotate(0.2); S5.form(ctx, [[0, 0], [130, 0], [130, 60], [0, 60]], { poly: true, color: '#F4EEE2', ow: 2.5 }); MG.text.draw(ctx, '€29.95', 65, 42, { font: F.mono, weight: 700, size: 26, color: P.ink, align: 'center' }); ctx.restore(); } ctx.restore(); }
+      ctx.restore();
+      { const ra = 1 - pr(t, t14 - 0.3, t14); if (ra > 0) { ctx.save(); ctx.globalAlpha = ra; MG.text.reveal(ctx, 'RUNWAY', 120, 140, t, tRunw - 0.4, { font: F.wide, weight: 800, size: 54, color: '#F4EEE2', tracking: 0.3, style: 'track', by: 'line' }); ctx.restore(); } }
+    }, post: { grade: 'neutral', vignette: 0.34 } });
+  // ---------- 36 · half the production stays close: pins on a sewing-pattern map, threads to Arteixo ----------
+  add({ id: 's05_nearby', start: 849.33,
+    transIn: { type: 'zoom', dur: 0.6, x: 4040 - 3080, y: 520, amount: 2.4, from: 0.7 },
+    draw(ctx, t) {
+      const prj = MG.geo.proj('conic', { center: [-5.5, 38.0], scale: lerp(3300, 3500, pr(t, 849.33, 855.49, 'inOutSine')), translate: [960, 560] });
+      MG.fx.vgrad(ctx, [[0, '#EDE4D0'], [1, '#E2D6BE']]); MG.tex.over(ctx, 'fibers', { alpha: 0.6 }); ctx.save(); ctx.strokeStyle = 'rgba(160,120,80,0.25)'; ctx.lineWidth = 1; for (let g = 0; g < W; g += 40) { ctx.beginPath(); ctx.moveTo(g, 0); ctx.lineTo(g, H); ctx.stroke(); } for (let g = 0; g < H; g += 40) { ctx.beginPath(); ctx.moveTo(0, g); ctx.lineTo(W, g); ctx.stroke(); } ctx.restore();
+      for (const n of ['Spain', 'Portugal', 'Morocco', 'France', 'Algeria']) { const f = MG.geo.country(n, '10'); if (!f) continue; const hl = /Spain|Portugal|Morocco/.test(n); MG.geo.draw(ctx, prj, f, { fill: hl ? 'rgba(242,163,58,0.38)' : 'rgba(122,74,42,0.06)', stroke: hl ? '#6a3a1a' : 'rgba(122,74,42,0.45)', width: hl ? 3 : 1.4 }); }
+      ctx.save(); ctx.setLineDash([12, 8]); MG.geo.draw(ctx, prj, MG.geo.country('Spain', '10'), { stroke: 'rgba(122,74,42,0.6)', width: 1 }); ctx.restore();
+      const ART = [-8.51, 43.30]; const ap = prj(ART); ctx.fillStyle = P.ink; ctx.beginPath(); ctx.arc(ap[0], ap[1], 9, 0, MG.TAU); ctx.fill(); MG.text.draw(ctx, 'ARTEIXO', ap[0] + 18, ap[1] - 12, { font: F.mono, weight: 700, size: 26, color: P.ink, tracking: 0.15 }); MG.text.draw(ctx, 'HQ', ap[0] + 18, ap[1] + 18, { font: F.mono, size: 20, color: P.ink2, tracking: 0.2 });
+      const PINS = [[tSp, [[-3.7, 40.4], [-0.4, 39.5], [2.2, 41.4], [-5.9, 37.4], [-1.1, 37.9], [-4.4, 41.6]], '#C8423B'], [tPt, [[-8.6, 41.2], [-8.4, 40.2], [-9.1, 38.7]], '#2FA7A0'], [tMa, [[-5.8, 35.75], [-7.6, 33.6], [-6.8, 34.0], [-5.0, 34.0]], '#1F4E8C']];
+      PINS.forEach(([t0, list, col], g) => list.forEach((ll, i) => { const k = pr(t, t0 - 0.2 + i * 0.08, t0 + 0.2 + i * 0.08, 'outBounce'); if (k <= 0) return; const p = prj(ll); const th = pr(t, t0 + 0.2 + i * 0.08, t0 + 0.9 + i * 0.08, 'inOutSine'); if (th > 0) { const mx = (p[0] + ap[0]) / 2 - 40, my = Math.min(p[1], ap[1]) - 60; const pts = []; for (let q = 0; q <= 24; q++) { const u = q / 24 * th; pts.push([(1 - u) * (1 - u) * p[0] + 2 * (1 - u) * u * mx + u * u * ap[0], (1 - u) * (1 - u) * p[1] + 2 * (1 - u) * u * my + u * u * ap[1]]); } S5.ink(ctx, pts, 2.5, col, t, { taper: [0, 0] }); } const dy = (1 - k) * -80; ctx.save(); ctx.translate(p[0], p[1] + dy); S5.ink(ctx, [[0, 0], [10, -46]], 3, '#8a8f99', t, { taper: [0, 0] }); ctx.fillStyle = col; ctx.beginPath(); ctx.arc(10, -50, 12, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 2; ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.arc(6, -54, 4, 0, MG.TAU); ctx.fill(); ctx.restore(); }));
+      const lb = (ll, s, t0) => { const p = prj(ll); MG.text.reveal(ctx, s, p[0], p[1], t, t0, { font: F.grotesk, weight: 800, size: 40, color: P.ink, align: 'center', tracking: 0.08, stroke: 'rgba(240,232,214,0.9)', strokeW: 8, style: 'rise', by: 'line' }); };
+      lb([-3.0, 39.2], 'SPAIN', tSp - 0.1); lb([-7.9, 39.6], 'PORTUGAL', tPt - 0.1); lb([-6.3, 32.6], 'MOROCCO', tMa - 0.1);
+      const hk = pr(t, tHalf - 0.1, tHalf + 0.4, 'outBack'); if (hk > 0) { ctx.save(); ctx.translate(1600, 260); ctx.scale(hk, hk); MG.kit.sun(ctx, 0, 0, 90, t, { corona: 0.3, halftone: 0.3 }); ctx.save(); ctx.beginPath(); ctx.rect(0, -100, 100, 200); ctx.clip(); ctx.fillStyle = A('#EDE4D0', 0.85); ctx.beginPath(); ctx.arc(0, 0, 92, 0, MG.TAU); ctx.fill(); ctx.restore(); ctx.strokeStyle = '#2a1a16'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, 90, 0, MG.TAU); ctx.moveTo(0, -90); ctx.lineTo(0, 90); ctx.stroke(); ctx.restore(); MG.text.reveal(ctx, 'HALF THE PRODUCTION', 1600, 410, t, tHalf + 0.1, { font: F.mono, weight: 700, size: 26, color: P.ink, align: 'center', tracking: 0.18, style: 'track', by: 'line' }); MG.text.reveal(ctx, 'stays close by', 1600, 460, t, TE('by,', 850.85) - 0.2, { font: F.serif, italic: true, size: 44, color: P.ink2, align: 'center', style: 'rise', by: 'word' }); }
+    }, post: { grade: 'warm', vignette: 0.3 } });
+  // ---------- 37 · everyone else copies the model: the dress form clones into an endless moving row ----------
+  add({ id: 's05_copy', start: 855.49,
+    transIn: { type: 'push', dir: 'left', dur: 0.6, ease: 'inOutCubic' },
+    draw(ctx, t) {
+      MG.fx.vgrad(ctx, [[0, '#F1ECE2'], [1, '#DED4C4']]); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = A(P.sombra, 0.1); ctx.fillRect(0, 860, W, 220); ctx.restore();
+      const n = Math.floor(lerp(1, 14, pr(t, tEvery2 - 0.1, tCopy + 0.6, 'in'))); const run = Math.max(0, t - (tCopy - 0.2)) * 900 * pr(t, tCopy - 0.2, tCopy + 0.6, 'in');
+      for (let i = n - 1; i >= 0; i--) { const x = 960 + i * 260 - run; if (x < -300 || x > W + 300) continue; const ghost = i > 0 ? 0.88 : 1; ctx.save(); ctx.globalAlpha = ghost; MG.fx.contact(ctx, x, 905, 120, 16, 0.35); S5.dressForm(ctx, x, 900, 0.95, i ? '#E1D4BC' : '#E9DCC4', i ? ['#E9B949', '#C8423B', '#1F4E8C', '#2FA7A0'][i % 4] : '#E9B949'); ctx.restore(); }
+      MG.text.reveal(ctx, 'COPY', 1700, 200, t, tCopy - 0.1, { font: F.wide, weight: 800, size: 72, color: A(P.ink, 0.85), align: 'right', tracking: 0.3, style: 'track', by: 'line' }); MG.text.reveal(ctx, 'that model', 1700, 260, t, T('model.', 857.65) - 0.2, { font: F.serif, italic: true, size: 48, color: P.ink2, align: 'right', style: 'rise', by: 'word' });
+    }, post: { grade: 'neutral', vignette: 0.3 } });
+
   /*@@SCENES@@*/
 
   // ---------- finalise scene tiling ----------
@@ -1587,5 +1815,19 @@
     for (let i = 0; i < 10; i++) A.sfx.tick(T('residents', 792.59) - 0.2 + i * 0.06, { gain: 0.45 });
     for (let i = 0; i < 16; i++) A.sfx.tick(T('Sixteen', 796.75) - 0.5 + i * 0.09, { gain: 0.4, pan: (i % 2 ? 0.4 : -0.4) });
     A.sfx.amb('city', 796.7, 4.7, { gain: 0.5 }); A.sfx.whoosh(T('Every', 799.71) + 0.3, { dur: 1.0, gain: 0.4 });
+    // F · fashion — warm piano for Ortega's past, then pulse with a sneaky rivalry layer
+    A.music('warm', 801.2, 816.4, { key: 'D3', bpm: 84, intensity: [[801.2, 0.35], [803.9, 0.5], [808.9, 0.55], [811.8, 0.5], [816, 0.4]], fadeIn: 0.8, fadeOut: 1.0 });
+    A.sfx.whoosh(801.4, { dur: 0.8, gain: 0.5, dir: -1 }); A.sfx.swish(T('fashion.', 802.35) - 0.2, { gain: 0.4 }); A.sfx.click(T('Meet', 803.54) - 0.45, { gain: 0.7 }); A.sfx.pop(T('Amancio', 803.95), { freq: 520, gain: 0.45 });
+    A.sfx.whoosh(805.6, { dur: 0.6, gain: 0.4 }); A.sfx.train(806.2, 2.2, { gain: 0.35, bpm: 140 }); A.sfx.ding(T('thirteen', 808.90), { note: 'C6', gain: 0.4 }); for (let i = 0; i < 4; i++) A.sfx.click(810.2 + i * 0.16, { gain: 0.35 });
+    A.sfx.whoosh(811.6, { dur: 0.6, gain: 0.4, dir: -1 }); A.sfx.stamp(T('1975,', 811.78) + 0.1, { gain: 0.45 }); A.sfx.pop(T('opens', 813.38), { freq: 400, gain: 0.5 }); A.sfx.chime(T('Coruña.', 814.94), { note: 'A6', gain: 0.45 });
+    A.music('pulse', 815.8, 859.6, { key: 'A2', bpm: 118, intensity: [[815.8, 0.4], [818.9, 0.6], [822.8, 0.7], [827.2, 0.45], [833.2, 0.55], [837, 0.7], [840.3, 0.65], [845.4, 0.75], [849.3, 0.6], [855.5, 0.7], [858.6, 0.4]], fadeIn: 0.6, fadeOut: 1.4 });
+    A.sfx.whoosh(816.0, { dur: 0.6, gain: 0.4 }); A.sfx.thud(T('Inditex,', 817.66), { gain: 0.35 }); for (const [w, a] of [['Zara,', 818.90], ['Bershka,', 819.62], ['Massimo', 820.46], ['Pull&Bear.', 821.54]]) { A.sfx.slide(T(w, a) - 0.35, { gain: 0.35 }); A.sfx.tock(T(w, a) + 0.15, { gain: 0.35 }); }
+    A.sfx.whoosh(822.8, { dur: 0.45, gain: 0.45 }); for (let i = 0; i < 18; i++) A.sfx.blip(822.9 + 0.4 + i * 0.13, { note: ['E6', 'G6', 'B6'][i % 3], gain: 0.12 }); A.sfx.chime(T('hundred', 825.70) + 0.3, { note: 'E6', gain: 0.4 });
+    A.music('sneaky', 827.1, 837.2, { key: 'A2', bpm: 108, intensity: [[827.1, 0.35], [831, 0.45], [834.6, 0.55], [836.9, 0.3]], fadeIn: 0.5, fadeOut: 0.6, gain: 0.7 }); A.sfx.click(827.25, { gain: 0.6 }); A.sfx.creak(828.5, { gain: 0.4 }); A.sfx.creak(830.2, { gain: 0.35 }); A.sfx.creak(835.4, { gain: 0.4 }); A.sfx.pop(T('Bernard', 834.66) - 0.3, { freq: 300, gain: 0.45 });
+    A.sfx.whoosh(836.95, { dur: 0.4, gain: 0.45 }); for (let i = 0; i < 12; i++) A.sfx.tick(837.0 + i * 0.12, { gain: 0.25 }); A.sfx.thud(T('Fast', 838.82) + 0.2, { gain: 0.45 }); A.sfx.chime(T('fashion.', 839.30) + 0.1, { note: 'A6', gain: 0.4 });
+    A.sfx.slide(840.4, { dur: 0.8, gain: 0.45 }); A.sfx.whoosh(T('two', 842.18) - 0.2, { dur: 0.35, gain: 0.45, pitch: 1.6 }); A.sfx.ding(T('two', 842.18) + 0.2, { note: 'E6', gain: 0.4 }); A.sfx.slide(842.6, { dur: 1.6, gain: 0.2 });
+    A.sfx.whoosh(845.4, { dur: 0.4, gain: 0.4 }); for (let i = 0; i < 5; i++) A.sfx.shutter(845.6 + i * 0.22, { gain: 0.35 }); A.sfx.whoosh(T('fourteen', 846.74) - 0.2, { dur: 0.5, gain: 0.35 }); for (let i = 0; i < 13; i++) A.sfx.paper(846.6 + i * 0.08, { dur: 0.07, gain: 0.25 }); A.sfx.whoosh(T('hanging', 848.18) - 0.2, { dur: 0.5, gain: 0.35 }); A.sfx.tock(T('hanging', 848.18) + 0.25, { gain: 0.4 });
+    A.sfx.whoosh(849.3, { dur: 0.6, gain: 0.35 }); for (const [w, a] of [['Spain,', 851.73], ['Portugal,', 852.37], ['Morocco,', 853.21]]) A.sfx.pop(T(w, a), { freq: 600, gain: 0.4 }); A.sfx.swish(854.0, { gain: 0.3 });
+    A.sfx.whoosh(855.5, { dur: 0.6, gain: 0.4 }); for (let i = 0; i < 6; i++) A.sfx.swish(T('copy', 857.01) - 0.4 + i * 0.18, { gain: 0.2 });
   };
 })();
