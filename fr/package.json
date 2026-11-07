@@ -1,0 +1,14 @@
+{
+  "name": "espagne-documentaire-fr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "French version (26 min) of the motion-design documentary about Spain, rendered in the browser (Canvas 2D + Three.js + Web Audio) and captured with Puppeteer.",
+  "scripts": {
+    "render": "node render.js",
+    "preview": "node render.js --preview",
+    "audio": "node render.js --audio-only"
+  },
+  "dependencies": {
+    "puppeteer": "^23.0.0"
+  }
+}

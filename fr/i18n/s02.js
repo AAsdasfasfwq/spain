@@ -1,0 +1,26 @@
+// S02 · Madrid, rock & water, land, people, history to 1492 — EN → FR
+MG.i18n({
+  'Africa': 'Africa', 'Gallia': 'Gallia', 'HISPANIA': 'HISPANIA', 'Lusitania': 'Lusitania', 'Mare Mediterraneum': 'Mare Mediterraneum', 'Oceanus Atlanticus': 'Oceanus Atlanticus',
+  '40.4°N  3.7°W': '40,4° N  3,7° O', 'MESETA': 'MESETA', 'no accident.': 'pas un hasard.', 'ANNO DOMINI': 'ANNO DOMINI', 'KING OF SPAIN · 1556–1598': 'ROI D’ESPAGNE · 1556–1598', 'Philip II': 'Philippe II',
+  'AN UNREMARKABLE TOWN · 1561': 'UNE PETITE VILLE SANS INTÉRÊT · 1561', 'Madrid': 'Madrid', 'GEOGRAPHIC CENTRE': 'CENTRE GÉOGRAPHIQUE', 'the most popular': 'l’explication', 'explanation?': 'la plus courante ?',
+  '100 KM': '100 KM', '200 KM': '200 KM', '300 KM': '300 KM', '400 KM': '400 KM', '500 KM': '500 KM', 'BARCELONA': 'BARCELONE', 'SEVILLA': 'SÉVILLE', 'VALENCIA': 'VALENCE', 'VALLADOLID': 'VALLADOLID',
+  'NORTH': 'NORD', 'SOUTH': 'SUD', 'WASHINGTON': 'WASHINGTON', 'CANBERRA': 'CANBERRA', 'MELBOURNE': 'MELBOURNE', 'SYDNEY': 'SYDNEY', '+229 YEARS': '+229 ANS',
+  'the first thing to understand': 'une première particularité', 'more': 'plus de', 'than': 'que d’', 'than ': 'que d’', 'water': 'eau', 'ROCK': 'PIERRE', 'FOR CENTURIES': 'DEPUIS TOUJOURS',
+  'Tagus': 'Tage', 'Ebro': 'Èbre', 'Guadalquivir': 'Guadalquivir', 'SUMMER': 'ÉTÉ', 'SEMIDESERT': 'SEMI-DÉSERTIQUE', 'olives': 'oliviers', 'grapes': 'vignes', 'sheep': 'moutons',
+  'OLIVE OIL': 'HUILE D’OLIVE', "WORLD'S LARGEST": 'PREMIER MONDIAL', 'producer': 'producteur', 'OF THE GLOBAL SUPPLY': 'DE LA PRODUCTION MONDIALE', 'almost half': 'près de la moitié',
+  'LAND PLANTED WITH VINEYARDS': 'SUPERFICIE DE VIGNOBLES', 'more than any other country': 'la plus grande au monde', 'ITALY': 'ITALIE',
+  "EUROPE'S LARGEST": 'PREMIER D’EUROPE', 'pork producer': 'producteur de porc', 'GERMANY': 'ALLEMAGNE', 'SPAIN  #1': 'ESPAGNE  N° 1', 'dry-cured ham': 'jambon sec', 'jamón': 'jamón',
+  'THE DRY SOUTH': 'LE SUD ARIDE', 'bellotas': 'bellotas', 'than cattle': 'que les vaches', 'ACORNS': 'GLANDS',
+  'OF SPANIARDS': 'DES ESPAGNOLS', 'OF THE LAND': 'DU TERRITOIRE', '7 MILLION': '7 MILLIONS', '5 MILLION': '5 MILLIONS', 'SEVILLE': 'SÉVILLE', 'BILBAO': 'BILBAO', 'INLAND, ON THE MESETA': 'À L’INTÉRIEUR, SUR LA MESETA',
+  '8.6/km²': '8,6 hab./km²', '9/km²': '9 hab./km²', 'PEOPLE PER KM²': 'HABITANTS PAR KM²', '11.5/km²': '11,5 hab./km²', '≈ Siberia': '≈ Sibérie',
+  'ESCUELA': 'ESCUELA', 'ESPAÑA VACÍA': 'ESPAÑA VACÍA', 'Empty Spain': 'l’Espagne vide', 'THEY CALL IT': 'ON L’APPELLE', 'RETIREES LEFT': 'RETRAITÉS', 'BUS': 'BUS',
+  'MON': 'LUN', 'TUE': 'MAR', 'WED': 'MER', 'THU': 'JEU', 'FRI': 'VEN', 'SAT': 'SAM', 'SUN': 'DIM', 'TIMETABLE': 'HORAIRES',
+  'OVER THE PAST 50 YEARS': 'EN 50 ANS', 'the interior': 'l’intérieur', 'MINISTERIO PARA LA TRANSICIÓN ECOLÓGICA': 'MINISTERIO PARA LA TRANSICIÓN ECOLÓGICA', 'Y EL RETO DEMOGRÁFICO': 'Y EL RETO DEMOGRÁFICO',
+  'THE GOVERNMENT CREATED A MINISTRY': 'LE GOUVERNEMENT A CRÉÉ UN MINISTÈRE', 'to do something': 'pour trouver une solution', 'AND THE JOBS': 'ET LES EMPLOIS', 'TOURISTS': 'LES TOURISTES', 'to the coast': 'vers les côtes',
+  'Historia': 'Historia', 'none of this makes sense without it': 'sans elle, impossible de comprendre la suite', 'Arabs & Berbers': 'Arabes et Berbères', 'AL-ANDALUS': 'AL-ANDALUS', 'by 718': 'dès 718',
+  'CENTURIES': 'SIÈCLES', 'part of the Islamic world': 'dans le monde musulman', 'Córdoba': 'Cordoue', "EUROPE'S LARGEST CITY · 10TH CENTURY": 'PLUS GRANDE VILLE D’EUROPE · Xe SIÈCLE', 'RESIDENTS': 'HABITANTS',
+  'meanwhile, in Paris': 'pendant ce temps, à Paris', 'x² + 10x': 'x² + 10x', 'into Europe': 'vers l’Europe', 'WORDS OF ARABIC ORIGIN': 'MOTS D’ORIGINE ARABE', 'aceite': 'aceite', 'SUGAR': 'SUCRE', 'azúcar': 'azúcar',
+  'GOD WILLING': 'SI DIEU LE VEUT', 'ojalá': 'ojalá', 'Alhambra': 'Alhambra', 'GRANADA': 'GRENADE', 'ACCORDING TO ONE THEORY': 'SELON UNE HYPOTHÈSE', '¡olé!': '¡olé!',
+  'Aragón': 'Aragon', 'Castilla': 'Castille', 'León': 'León', 'Navarra': 'Navarre', 'Portugal': 'Portugal', '800 YEARS': '800 ANS', 'La Reconquista': 'La Reconquista', 'THE FALL OF GRANADA': 'LA CHUTE DE GRENADE',
+}, 'S02');
+MG.i18n({ "WORLD'S LARGEST": 'PREMIER PRODUCTEUR MONDIAL', 'producer': '' }, 's02_olive');

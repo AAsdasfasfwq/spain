@@ -32,6 +32,11 @@ Measured cost: ≈0.22 s per frame per worker on average (heaviest scenes ≈0.7
 The music/SFX stems (11 segments, synthesised offline) render in parallel browsers first and take about 5–10 minutes;
 they are cached in `build/audio/`, so later video-only re-renders skip them.
 
+## French version
+
+`fr/` holds the complete French version of the film (French voice-over, re-timed animation, all on-screen text
+adapted, metric units). It renders the same way from inside that folder — see [`fr/README.md`](fr/README.md).
+
 ## Preview in a browser
 
 ```bash
