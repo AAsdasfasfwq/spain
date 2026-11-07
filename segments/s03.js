@@ -1267,15 +1267,183 @@
         if (t < 441.4) S3.mono(ctx, 'AT HOME', 140, 150, { alpha: pr01(t, 436.4, 436.8) * (1 - smooth(441.0, 441.3, t)), size: 22, color: C.ink });
       },
       post: { grade: 'warm', vignette: 0.38, grain: 0.05, sat: 0.9 } },
-    placeholder('s03_moriscos', 447.37, 458.71, '1609'),
-    placeholder('s03_huerta', 458.71, 464.87, 'huerta'),
-    placeholder('s03_wars', 464.87, 468.79, 'wars'),
-    placeholder('s03_armada', 468.79, 476.19, 'armada'),
-    placeholder('s03_desk', 476.19, 483.11, 'bankruptcies'),
-    placeholder('s03_1898', 483.11, 490.55, '1898'),
-    placeholder('s03_paper', 490.55, 494.71, 'Disaster'),
-    placeholder('s03_cafe', 494.71, 507.32, 'Generation 98'),
+    // ===================================================================== 447.37 → 507.32 (completed)
+    // ---- 1609 · the Moriscos: 300,000 of the south's most skilled farmers & craftspeople expelled
+    (() => { const t1609 = MG.T('1609,', 449.6, 2.5), tMor = MG.T('Moriscos,', 450.3, 2.5), t300 = MG.T('300,000', 454.0, 2.5), tSkill = MG.T('skilled', 455.6, 2.5), tFarm = MG.T('farmers', 456.0, 2.5);
+      const prS = () => S3._prMor || (S3._prMor = MG.geo.proj('spain', { center: [-1.6, 38.6], scale: 4600, translate: [900, 560] }));
+      const MAP = () => MG.cache('s3:morMap', W, H, (x) => { const pr = prS(); x.drawImage(MG.tex.paper(C.parch, { seed: 34, light: 0.28, blotch: 0.14 }), 0, 0); x.fillStyle = MG.col.a(C.seaL, 0.25); x.fillRect(0, 0, W, H); for (const f of MG.geo.iberia10.features) { const n = f.properties.name; if (!['Spain', 'Portugal', 'France', 'Morocco', 'Algeria', 'Andorra', 'Tunisia'].includes(n)) continue; MG.geo.draw(x, pr, f, { fill: n === 'Spain' ? C.parchL : '#E2D3AE', stroke: 'rgba(42,32,36,0.7)', width: 1.4 }); }
+        // Morisco lands hatched: Valencia, Aragon (Ebro valley), the old kingdom of Granada
+        x.save(); MG.geo.clip(x, pr, MG.geo.countries(['Spain'], '10')); x.strokeStyle = 'rgba(15,76,74,0.55)'; x.lineWidth = 2; for (const reg of ['Valencia', 'Aragon', 'Andalusia', 'Murcia']) { const f = MG.geo.region(reg); if (!f) continue; x.save(); MG.geo.clip(x, pr, f); for (let i = -60; i < 120; i++) { x.beginPath(); x.moveTo(i * 14, 0); x.lineTo(i * 14 + 700, H); x.stroke(); } x.restore(); } x.restore();
+        MG.geo.draw(x, pr, MG.geo.regionMesh, { stroke: 'rgba(42,32,36,0.25)', width: 0.8 }); MG.tex.over(x, 'fibers', { alpha: 0.5, color: '#4a2e14' }); });
+      return { id: 's03_moriscos', start: 447.37, end: 458.71, transIn: { type: 'zoom', dur: 0.6, amount: 1.6, from: 0.86 },
+        init() { const pr = prS(); const r = MG.rng(17); const src = [[-0.38, 39.47], [-0.7, 38.9], [-0.9, 41.65], [-1.4, 41.3], [-3.6, 37.18], [-2.46, 36.84], [-4.4, 36.72], [-1.13, 37.99]]; const ports = [[-0.33, 39.45], [-0.48, 38.34], [-0.98, 37.6], [-2.46, 36.84], [0.52, 40.81], [-6.3, 36.53]]; const dest = [[-0.64, 35.7], [3.06, 36.75], [10.18, 36.8], [-5.37, 35.59]];
+          this.dots = []; for (let i = 0; i < 300; i++) { const s = src[i % src.length]; const p = ports[Math.floor(r() * ports.length)]; const d = dest[Math.floor(r() * dest.length)]; this.dots.push({ a: pr([s[0] + (r() - 0.5) * 1.1, s[1] + (r() - 0.5) * 0.8]), b: pr(p), c: pr([d[0] + (r() - 0.5) * 0.6, d[1] + (r() - 0.5) * 0.3]), d: r() }); } },
+        draw(ctx, t) {
+          const z = MG.keys(t, [[447.37, 1.08], [452, 1.0, 'inOutSine'], [458.8, 0.97]]); ctx.save(); ctx.translate(900, 560); ctx.scale(z, z); ctx.translate(-900, -560); ctx.drawImage(MAP(), 0, 0);
+          const kd = MG.prog(t, t300 - 0.3, 458.4, 'inOutSine');
+          for (const d of this.dots) { const u = clamp((kd - d.d * 0.35) / 0.65); const p = u < 0.45 ? S3.lerpPt(d.a, d.b, ease.inOutSine(u / 0.45)) : S3.lerpPt(d.b, d.c, ease.inOutSine((u - 0.45) / 0.55)); const y = p[1] - (u > 0.45 ? Math.sin((u - 0.45) / 0.55 * Math.PI) * 40 : 0); ctx.fillStyle = u >= 1 ? 'rgba(42,32,36,0.45)' : C.ink; ctx.beginPath(); ctx.arc(p[0], y, 3.2, 0, MG.TAU); ctx.fill(); }
+          ctx.restore();
+          const kc = MG.prog(t, t1609 - 0.3, t1609 + 0.5, 'outBack'); if (kc > 0) S3.cartouche(ctx, 1560, 200, '1609', { s: kc, size: 62 });
+          if (t > tMor - 0.2) S3.fellR(ctx, 'the Moriscos', 1560, 330, t, tMor - 0.2, { size: 54, italic: true });
+          if (t > t300 - 0.2) { const k = MG.prog(t, t300 - 0.2, t300 + 0.5); MG.text.draw(ctx, MG.text.count(t, t300 - 0.2, t300 + 1.2, 0, 300000), 1560, 470, { font: F.cond, weight: 900, size: 130, color: C.red, align: 'center', alpha: k }); S3.mono(ctx, 'EACH DOT = 1,000 PEOPLE', 1560, 515, { align: 'center', alpha: k, color: C.ink }); }
+          if (t > tSkill - 0.2) S3.fellR(ctx, 'skilled farmers & craftspeople', 1560, 600, t, tSkill - 0.2, { size: 34, italic: true });
+        },
+        post: { grade: 'archival', vignette: 0.4, sat: 0.92 } }; })(),
+
+    // ---- 458.7 · "in the name of religious purity, Spain throws out the people who know how to make things" — the huerta stops
+    (() => { const tName = MG.T('name', 459.0, 2.5), tPur = MG.T('purity,', 460.3, 2.5), tOut = MG.T('throws', 461.3, 2.5), tMake = MG.T('make', 463.6, 2.5);
+      return { id: 's03_huerta', start: 458.71, end: 464.87, transIn: { type: 'blur', dur: 0.5 },
+        draw(ctx, t) {
+          const kd = MG.prog(t, tOut, 464.6, 'inOutSine'); // the farmers leave → the fields dry, the wheel stops
+          MG.fx.vgrad(ctx, [[0, MG.col.mix('#F4D9A6', '#E8D2AA', kd)], [1, '#E9D6B0']]); MG.kit.sun(ctx, 1600, 170, 70, t, { color: '#E8A050', corona: 0.4, halftone: 0.5 });
+          // irrigation channels and green plots in perspective that brown over
+          ctx.save(); for (let r = 0; r < 9; r++) { const y0 = 560 + Math.pow(r / 9, 1.6) * 520, y1 = 560 + Math.pow((r + 1) / 9, 1.6) * 520; for (let c = -6; c <= 6; c++) { const xa = 960 + c * (60 + r * 40), xb = 960 + (c + 1) * (60 + (r + 1) * 40); ctx.fillStyle = MG.col.mix((r + c) % 2 ? '#7E9A4A' : '#9AB05A', (r + c) % 2 ? '#B9A070' : '#C8AE7E', clamp(kd * 1.4 - (r * 0.05))); ctx.beginPath(); ctx.moveTo(960 + c * (60 + r * 40), y0); ctx.lineTo(960 + (c + 1) * (60 + r * 40), y0); ctx.lineTo(960 + (c + 1) * (60 + (r + 1) * 40), y1); ctx.lineTo(960 + c * (60 + (r + 1) * 40), y1); ctx.closePath(); ctx.fill(); } ctx.fillStyle = MG.col.mix('#5A8AB0', '#A08A6A', kd); ctx.fillRect(0, y1 - 3, W, 4 + r * 0.6); } ctx.restore();
+          // the noria (water wheel) on the left, turning until the people go
+          const ang = (t - 458.7) * 1.2 * (1 - kd * 0.95); ctx.save(); ctx.translate(360, 520); ctx.strokeStyle = '#4A3424'; ctx.lineWidth = 10; ctx.beginPath(); ctx.arc(0, 0, 170, 0, MG.TAU); ctx.stroke(); for (let i = 0; i < 12; i++) { const a = ang + i * MG.TAU / 12; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * 170, Math.sin(a) * 170); ctx.stroke(); ctx.fillStyle = '#B8743A'; ctx.save(); ctx.translate(Math.cos(a) * 176, Math.sin(a) * 176); ctx.rotate(a); ctx.fillRect(-14, -10, 28, 20); ctx.restore(); if (kd < 0.5 && Math.sin(a) > 0.6) { ctx.fillStyle = 'rgba(120,170,210,0.6)'; ctx.fillRect(Math.cos(a) * 176 - 3, Math.sin(a) * 176, 6, 40); } } ctx.fillStyle = '#4A3424'; ctx.beginPath(); ctx.arc(0, 0, 18, 0, MG.TAU); ctx.fill(); ctx.restore();
+          // the farmers walk away along the channel, out of frame
+          for (let i = 0; i < 6; i++) { const k = MG.prog(t, tOut - 0.4 + i * 0.12, tOut + 2.6 + i * 0.12, 'inSine'); const x = lerp(700 + i * 120, 2100 + i * 60, k), y = 700 + (i % 3) * 40; ctx.save(); ctx.translate(x, y); const s = 0.9 + (i % 3) * 0.12; ctx.scale(s, s); const step = Math.sin((t - 458) * 8 + i) * 8 * (k > 0 && k < 1 ? 1 : 0); ctx.fillStyle = '#3A2A20'; ctx.fillRect(-10 + step, -60, 8, 60); ctx.fillRect(2 - step, -60, 8, 60); ctx.fillStyle = ['#E9DBB9', '#C9B48A', '#B8743A'][i % 3]; ctx.beginPath(); ctx.moveTo(-22, -60); ctx.lineTo(22, -60); ctx.lineTo(16, -130); ctx.lineTo(-16, -130); ctx.fill(); ctx.fillStyle = '#E2B08A'; ctx.beginPath(); ctx.arc(0, -146, 14, 0, MG.TAU); ctx.fill(); ctx.fillStyle = '#F4EFE6'; ctx.beginPath(); ctx.ellipse(0, -154, 16, 9, 0, Math.PI, MG.TAU); ctx.fill(); if (i % 2) { ctx.strokeStyle = '#6A4A2A'; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(14, -120); ctx.lineTo(40, -40); ctx.stroke(); } ctx.restore(); }
+          S3.fellR(ctx, 'in the name of religious purity', 960, 150, t, tName - 0.1, { size: 54, italic: true });
+          if (t > tMake - 0.4) S3.mono(ctx, 'THE PEOPLE WHO KNEW HOW TO MAKE THINGS', 960, 220, { align: 'center', color: C.red, size: 24, alpha: MG.prog(t, tMake - 0.4, tMake + 0.1) });
+        },
+        post: { grade: 'warm', vignette: 0.36, sat: 0.95 } }; })(),
+
+    // ---- 464.9 · endless wars across Europe in defence of Catholicism — silver flows from Spain to the battlefields
+    (() => { const tWars = MG.T('wars', 465.6, 2.5), tCath = MG.T('Catholicism.', 467.4, 2.5);
+      return { id: 's03_wars', start: 464.87, end: 468.79, transIn: { type: 'blur', dur: 0.45 },
+        init() { this.pr = MG.geo.proj('conic', { center: [5, 46], scale: 1900, translate: [960, 560] }); const pr = this.pr; this.map = MG.cache('s3:warmap', W, H, (x) => { x.drawImage(MG.tex.paper(C.decline, { seed: 35, light: 0.25, blotch: 0.16 }), 0, 0); x.fillStyle = MG.col.a(C.storm, 0.3); x.fillRect(0, 0, W, H); for (const f of MG.geo.iberia10.features) MG.geo.draw(x, pr, f, { fill: f.properties.name === 'Spain' ? '#C9B48A' : '#DCCFB2', stroke: 'rgba(42,32,36,0.5)', width: 1 }); MG.tex.over(x, 'fibers', { alpha: 0.5, color: '#4a2e14' }); }); },
+        draw(ctx, t) {
+          const pr = this.pr; const z = 1 + 0.05 * MG.lin(t, 464.87, 468.8); ctx.save(); ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-960, -540); ctx.drawImage(this.map, 0, 0);
+          const md = pr(MG.geo.cities.Madrid); const fields = [[[4.4, 51.0], 'FLANDERS'], [[9.2, 45.4], 'ITALY'], [[10.5, 50.2], 'GERMANY'], [[2.4, 49.0], 'FRANCE'], [[-1.0, 52.0], 'ENGLAND']];
+          fields.forEach(([ll, n], i) => { const k = MG.prog(t, tWars - 0.4 + i * 0.22, tWars + 0.6 + i * 0.22, 'inOutSine'); if (k <= 0) return; const b = pr(ll); const pts = []; for (let u = 0; u <= 1.001; u += 0.05) pts.push([lerp(md[0], b[0], u), lerp(md[1], b[1], u) - Math.sin(u * Math.PI) * 100]); MG.fx.line(ctx, pts, { progress: k, color: C.silverD, width: 4, dash: [10, 8] }); const q = MG.path.along(pts, k); S3.drawCoin ? MG.kit.sun(ctx, q[0], q[1], 10, t, { variant: 'coin' }) : 0;
+            if (k >= 1) { MG.fx.smoke(ctx, b[0], b[1], t - tWars, { n: 6, seed: 50 + i, spread: 30, rise: 40, r: 34, alpha: 0.55, color: '#6B6460', life: 3 }); ctx.fillStyle = 'rgba(230,120,50,0.6)'; ctx.beginPath(); ctx.arc(b[0], b[1], 6 + Math.sin(t * 9 + i) * 2, 0, MG.TAU); ctx.fill(); S3.fell(ctx, n, b[0], b[1] + 34, { sc: true, size: 22 }); } });
+          ctx.restore();
+          S3.fellR(ctx, 'endless wars', 140, 170, t, tWars - 0.2, { align: 'left', size: 70 }); if (t > tCath - 0.3) S3.fellR(ctx, 'in defence of Catholicism', 146, 230, t, tCath - 0.3, { align: 'left', size: 36, italic: true });
+        },
+        post: { grade: 'archival', vignette: 0.42, sat: 0.8 } }; })(),
+
+    // ---- 468.8 · the "invincible" Armada, defeated by the English and battered by storms in 1588 — a 2.5D storm at sea
+    (() => { const tInv = MG.T('invincible', 470.4, 2.5), tDef = MG.T('defeated', 471.9, 2.5), tEng = MG.T('English', 472.9, 2.5), tStorm = MG.T('storms', 474.5, 2.5), t1588 = MG.T('1588.', 475.2, 2.5);
+      return { id: 's03_armada', start: 468.79, end: 476.19, transIn: { type: 'zoom', dur: 0.5, amount: 1.5, from: 0.9 },
+        draw(ctx, t) {
+          const ks = MG.prog(t, tStorm - 1.0, tStorm + 0.6, 'inOutSine'); const sh = MG.cam.add(MG.cam.handheld(t, 4 + ks * 8, 77), MG.cam.shake(t, tStorm + 0.2, 10, 3));
+          MG.fx.vgrad(ctx, [[0, MG.col.mix('#59606B', '#2A2E36', ks)], [0.55, MG.col.mix('#7A808A', '#3A3E46', ks)], [1, '#2A2E36']]);
+          // lightning
+          const lt = Math.max(0, 1 - Math.abs(t - (tStorm + 0.15)) * 6) + Math.max(0, 1 - Math.abs(t - (t1588 + 0.2)) * 7) * 0.7; if (lt > 0) { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.fillStyle = `rgba(220,230,255,${0.55 * lt})`; ctx.fillRect(0, 0, W, H); ctx.strokeStyle = `rgba(255,255,255,${lt})`; ctx.lineWidth = 4; ctx.beginPath(); let x = 1320, y = 0; ctx.moveTo(x, y); for (let i = 0; i < 9; i++) { x += (MG.rand(3, i) - 0.5) * 90; y += 70; ctx.lineTo(x, y); } ctx.stroke(); ctx.restore(); }
+          ctx.save(); ctx.translate(sh.dx, sh.dy); ctx.rotate(sh.rot);
+          // wave layers (far → near) with ships riding them
+          for (let L = 0; L < 4; L++) { const yb = 560 + L * 130, amp = 14 + L * 10 + ks * (10 + L * 8); const col = MG.col.mix('#4A5568', '#1E2430', L / 3); const ships = L === 1 ? [[300, 0.45, 0], [760, 0.5, 1], [1260, 0.42, 2]] : L === 2 ? [[540, 0.75, 1], [1500, 0.7, 2]] : [];
+            for (const [sx, s, v] of ships) { const wy = yb + Math.sin(sx * 0.01 + t * 1.6) * amp; const sunk = L === 2 && sx > 1400 ? MG.prog(t, tStorm, 476.2, 'inSine') * 160 : 0; S3.ship(ctx, sx + Math.sin(t * 0.5 + v) * 20, wy - 10 + sunk, s, { t, seed: v + L * 3, v, dark: true, heel: Math.sin(t * 1.9 + sx) * (0.05 + ks * 0.12) + sunk * 0.002, wake: false }); }
+            ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(0, H); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, yb + Math.sin(x * 0.01 + t * 1.6 + L) * amp + Math.sin(x * 0.033 - t * 2.2) * amp * 0.4); ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+            ctx.strokeStyle = 'rgba(230,235,240,0.35)'; ctx.lineWidth = 2; ctx.beginPath(); for (let x = 0; x <= W; x += 20) ctx.lineTo(x, yb + Math.sin(x * 0.01 + t * 1.6 + L) * amp + Math.sin(x * 0.033 - t * 2.2) * amp * 0.4 + 3); ctx.stroke(); }
+          ctx.restore();
+          MG.fx.particles(ctx, { n: 220, seed: 41, t, area: [-200, -100, W + 400, H], vel: [-260 - ks * 300, 1300], life: 0.45, size: [1, 2], shape: 'streak', streak: 0.03, color: '#DDE3EA', alpha: 0.35 + ks * 0.3 });
+          MG.fx.smoke(ctx, 900, 600, t, { n: 8, seed: 9, spread: 1200, rise: 6, r: 220, alpha: 0.25, color: '#9AA0A8', life: 9, wind: -30 });
+          // INVINCIBLE in the fog — struck through on "defeated"
+          const ki = MG.prog(t, tInv - 0.3, tInv + 0.5); if (ki > 0) { ctx.save(); ctx.globalAlpha = ki * (1 - MG.prog(t, t1588 - 0.2, t1588 + 0.4)) * 0.9; MG.text.draw(ctx, 'INVINCIBLE', 960, 330, { font: F.roman, weight: 900, size: 150, color: '#E8EAEE', align: 'center', tracking: 0.12, shadow: { blur: 30, color: 'rgba(0,0,0,0.5)', dy: 6 } }); const kx = MG.prog(t, tDef - 0.1, tDef + 0.4, 'inOutCubic'); if (kx > 0) { ctx.strokeStyle = C.red; ctx.lineWidth = 16; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(420, 300); ctx.lineTo(420 + 1080 * kx, 290); ctx.stroke(); } ctx.restore(); }
+          if (t > tEng - 0.2 && t < t1588 - 0.2) S3.mono(ctx, 'BY THE ENGLISH · AND THE STORMS', 960, 400, { align: 'center', size: 26, color: '#E8EAEE', alpha: MG.prog(t, tEng - 0.2, tEng + 0.3) });
+          const kc = MG.prog(t, t1588 - 0.3, t1588 + 0.4, 'outBack'); if (kc > 0) S3.cartouche(ctx, 960, 300, '1588', { s: kc * 1.1, size: 64 });
+        },
+        post: { grade: 'cool', vignette: 0.5, sat: 0.6, contrast: 1.12 } }; })(),
+
+    // ---- 476.2 · four state bankruptcies in a single century — four red seals on the royal ledger · the eternal empire deflates (a desk globe sags)
+    (() => { const tFour = MG.T('Four', 476.19, 2.5), tBank = MG.T('bankruptcies', 477.0, 2.5), tCent = MG.T('century.', 478.6, 2.5), tEmp = MG.T('empire', 480.0, 2.5), tDef = MG.T('deflate.', 481.8, 2.5);
+      return { id: 's03_desk', start: 476.19, end: 483.11, transIn: { type: 'flash', dur: 0.4, color: '#E8EEFF' },
+        draw(ctx, t) {
+          MG.fx.vgrad(ctx, [[0, '#2E2420'], [1, '#160F0C']]); MG.fx.glow(ctx, 380, 280, 900, '#FFB766', 0.32);
+          // desk + ledger
+          ctx.fillStyle = '#4A2E1E'; ctx.fillRect(0, 700, W, 380); ctx.fillStyle = 'rgba(255,200,140,0.06)'; for (let i = 0; i < 20; i++) ctx.fillRect(0, 710 + i * 18, W, 2);
+          const ledger = new Path2D('M300 520 L1180 500 L1240 900 L240 930 Z'); MG.fx.shadow(ctx, ledger, { dx: 20, dy: 28, blur: 30 }); ctx.fillStyle = C.parchL; ctx.fill(ledger); ctx.save(); ctx.clip(ledger); MG.tex.over(ctx, 'fibers', { alpha: 0.6, color: '#4a2e14' }); ctx.strokeStyle = 'rgba(42,32,36,0.35)'; ctx.lineWidth = 1.5; for (let i = 0; i < 16; i++) { ctx.beginPath(); ctx.moveTo(260, 560 + i * 24); ctx.lineTo(1230, 545 + i * 24); ctx.stroke(); } ctx.restore(); ctx.strokeStyle = 'rgba(42,32,36,0.6)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(740, 510); ctx.lineTo(740, 915); ctx.stroke();
+          // four seals slam with their years
+          ['1557', '1560', '1575', '1596'].forEach((yr, i) => { const t0 = tFour + 0.25 + i * 0.42; const k = MG.prog(t, t0 - 0.1, t0 + 0.12, 'inExpo'); if (k <= 0) return; const x = 420 + (i % 2) * 520 + (i > 1 ? 40 : 0), y = 640 + (i > 1 ? 160 : 0); const s = lerp(2.2, 1, k); ctx.save(); ctx.translate(x, y); ctx.rotate(-0.15 + i * 0.1); ctx.scale(s, s); ctx.globalAlpha = k; MG.fx.volume(ctx, MG.path.blob(0, 0, 62, { seed: i + 3, irr: 0.12 }), [-70, -70, 140, 140], { color: C.red, shade: 0.5, hi: 0.4, cel: true, outline: '#5a1410', outlineW: 2 }); MG.text.draw(ctx, yr, 0, 14, { font: F.roman, weight: 900, size: 34, color: '#F2D2C8', align: 'center' }); ctx.restore(); });
+          // the silver desk globe deflates
+          const kd = MG.prog(t, tEmp - 0.2, tDef + 0.8, 'inOutSine'); ctx.save(); ctx.translate(1520, 640); MG.fx.contact(ctx, 0, 220, 170 + kd * 60, 26, 0.45); ctx.fillStyle = C.brass; ctx.fillRect(-12, 120, 24, 100); ctx.fillRect(-90, 210, 180, 16); const sx = 1 + kd * 0.35, sy = 1 - kd * 0.62; ctx.translate(0, kd * 110); ctx.scale(sx, sy); const globe = MG.path.blob(0, 0, 170, { seed: 7, irr: 0.02 + kd * 0.18, t: kd * 3 }); MG.fx.volume(ctx, globe, [-170, -170, 340, 340], { color: MG.col.mix(C.silver, '#8A8E96', kd), shade: 0.45, hi: 0.55, rim: '#FFFFFF', rimW: 4 }); ctx.save(); ctx.clip(globe); ctx.strokeStyle = 'rgba(42,32,36,0.35)'; ctx.lineWidth = 2; for (let i = -4; i <= 4; i++) { ctx.beginPath(); ctx.ellipse(0, 0, 170, Math.abs(i) * 40 + 4, 0, 0, MG.TAU); ctx.stroke(); } ctx.restore(); ctx.restore();
+          S3.fellR(ctx, 'four bankruptcies', 140, 170, t, tBank - 0.4, { align: 'left', size: 74, color: '#F3E8CF' }); S3.mono(ctx, 'IN A SINGLE CENTURY', 146, 220, { size: 24, color: '#E8C9A0', alpha: MG.prog(t, tCent - 0.3, tCent + 0.2) });
+          if (t > tDef - 0.6) S3.fellR(ctx, 'the eternal empire deflates', 1520, 980, t, tDef - 0.6, { size: 40, italic: true, color: '#F3E8CF' });
+        },
+        post: { grade: 'warm', vignette: 0.5, sat: 0.85 } }; })(),
+
+    // ---- 483.1 · 1898: the United States takes Cuba, the Philippines and Puerto Rico in just three months
+    (() => { const t1898 = MG.T('1898,', 483.4, 2.5), tUS = MG.T('United', 484.6, 2.5), tCuba = MG.T('Cuba,', 486.0, 2.5), tPhil = MG.T('Philippines,', 486.7, 2.5), tPR = MG.T('Puerto', 487.8, 2.5), tThree = MG.T('three', 489.4, 2.5);
+      return { id: 's03_1898', start: 483.11, end: 490.55, transIn: { type: 'blur', dur: 0.5 },
+        init() { this.pr = MG.geo.proj('natural', { center: [0, 16], scale: 340, translate: [960, 560], rotate: [148, 0, 0] }); const pr = this.pr; this.map = MG.cache('s3:map1898', W, H, (x) => { x.drawImage(MG.tex.paper(C.decline, { seed: 36, light: 0.25, blotch: 0.14 }), 0, 0); const gp = window.d3.geoPath(pr, x); x.fillStyle = MG.col.a(C.seaL, 0.35); x.beginPath(); gp({ type: 'Sphere' }); x.fill(); for (const f of MG.geo.world50.features) { const n = f.properties.name; MG.geo.draw(x, pr, f, { fill: n === 'United States of America' ? '#8A8E96' : '#E2D6BA', stroke: 'rgba(42,32,36,0.45)', width: 0.8 }); } MG.tex.over(x, 'fibers', { alpha: 0.5, color: '#4a2e14' }); }); },
+        draw(ctx, t) {
+          const pr = this.pr; ctx.drawImage(this.map, 0, 0);
+          const us = pr([-98, 39]); const grab = [['Cuba', [-79.5, 21.8], tCuba], ['Philippines', [122, 12.5], tPhil], ['Puerto Rico', [-66.5, 18.2], tPR]];
+          grab.forEach(([n, ll, t0], i) => { const k = MG.prog(t, t0 - 0.35, t0 + 0.45, 'inOutCubic'); if (k <= 0) return; const f = MG.geo.country(n, '50'); MG.geo.draw(ctx, pr, f, { fill: MG.col.mix('#C9A04A', '#4A5060', k), stroke: '#1d1d1f', width: 1.2 }); const b = pr(ll); const pts = []; for (let u = 0; u <= 1.001; u += 0.05) pts.push([lerp(us[0], b[0], u), lerp(us[1], b[1], u) - Math.sin(u * Math.PI) * (i === 1 ? 140 : 50)]); if (i !== 1) { ctx.save(); const bb = MG.geo.bbox(pr, f); ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(bb[0] + bb[2] / 2, bb[1] + bb[3] / 2, Math.max(26, bb[2] * 0.8), Math.max(20, bb[3] * 1.2), 0, 0, MG.TAU * k); ctx.stroke(); ctx.restore(); } MG.fx.line(ctx, pts, { progress: k, color: '#2A3040', width: 5 }); if (k > 0.05) MG.fx.arrowHead(ctx, MG.path.trim(pts, 0, k), 22, '#2A3040'); MG.geo.pulse(ctx, pr, ll, t, { color: C.red, r: 30 }); S3.fell(ctx, n.toUpperCase(), b[0] + [-40, -10, 70][i], b[1] + [-34, 60, 56][i], { sc: true, size: 26, halo: 'rgba(243,232,207,0.85)', alpha: k }); });
+          S3.mono(ctx, 'UNITED STATES', us[0], us[1] + 8, { align: 'center', size: 22, color: '#1d1d1f', alpha: MG.prog(t, tUS - 0.2, tUS + 0.3) });
+          const kc = MG.prog(t, t1898 - 0.3, t1898 + 0.4, 'outBack'); if (kc > 0) S3.cartouche(ctx, 300, 180, '1898', { s: kc, size: 60 });
+          if (t > tThree - 0.2) { const k = MG.prog(t, tThree - 0.2, tThree + 0.4, 'outBack'); ctx.save(); ctx.translate(1600, 900); ctx.scale(k, k); MG.text.draw(ctx, '3 months', 0, 0, { font: F.cond, weight: 900, size: 110, color: C.red, align: 'center', stroke: C.parchL, strokeW: 8 }); ctx.restore(); }
+        },
+        post: { grade: 'archival', vignette: 0.42, sat: 0.85 } }; })(),
+
+    // ---- 490.6 · "In Spain, they have one word for it: 'the Disaster.'" — the map becomes a newspaper front page; EL DESASTRE slams
+    (() => { const tWord = MG.T('word', 491.9, 2.5), tDis = MG.T('“the', 493.23, 2.5);
+      return { id: 's03_paper', start: 490.55, end: 494.71, transIn: { type: 'zoom', dur: 0.5, amount: 0.7, from: 1.4 },
+        draw(ctx, t) {
+          MG.fx.vgrad(ctx, [[0, '#3A2E28'], [1, '#1E1814']]); const z = lerp(1.15, 1.0, MG.prog(t, 490.55, 492, 'inOutSine'));
+          ctx.save(); ctx.translate(960, 560); ctx.scale(z, z); ctx.rotate(-0.03); const pg2 = new Path2D('M-640 -420 L640 -430 L660 440 L-650 450 Z'); MG.fx.shadow(ctx, pg2, { dx: 24, dy: 30, blur: 40 }); ctx.fillStyle = '#E9E1CC'; ctx.fill(pg2); ctx.save(); ctx.clip(pg2); MG.tex.over(ctx, 'fibers', { alpha: 0.6 }); MG.tex.over(ctx, 'blotch', { alpha: 0.12, color: '#6a5a40', scale: 4 }); ctx.restore();
+            MG.text.draw(ctx, 'EL IMPARCIAL', 0, -340, { font: F.news, size: 80, color: '#1d1d1f', align: 'center' }); ctx.fillStyle = '#1d1d1f'; ctx.fillRect(-600, -320, 1200, 4); ctx.fillRect(-600, -312, 1200, 2); MG.text.draw(ctx, 'MADRID · 1898', 0, -285, { font: F.mono, size: 20, tracking: 0.3, color: '#2a2020', align: 'center' });
+            ctx.fillStyle = 'rgba(40,30,30,0.35)'; for (let c = 0; c < 4; c++) for (let r = 0; r < 18; r++) ctx.fillRect(-600 + c * 305, 60 + r * 20, 280 - (r % 5 === 4 ? 120 : 0), 6);
+            const k = MG.prog(t, tDis - 0.15, tDis + 0.12, 'inExpo'); if (k > 0) { ctx.save(); const s = lerp(2.6, 1, k); ctx.scale(s, s); ctx.globalAlpha = k; MG.text.draw(ctx, 'EL DESASTRE', 0, -60, { font: F.news, size: 190, color: '#7E1F1B', align: 'center' }); ctx.restore(); }
+          ctx.restore();
+          if (t < tDis) S3.fellR(ctx, 'one word for it', 960, 150, t, tWord - 0.3, { size: 48, italic: true, color: '#F3E8CF' });
+        },
+        post: { grade: 'archival', vignette: 0.45 } }; })(),
+
+    // ---- 494.7 · a generation of writers and philosophers asks: "how did we go from the world's leading power to being nobody?" · the 20th century starts even worse
+    (() => { const tGen = MG.T('generation', 495.7, 2.5), tWrit = MG.T('writers', 496.6, 2.5), tHow = MG.T('How', 499.99, 2.5), tLead = MG.T('leading', 502.0, 2.5), tNob = MG.T('nobody?', 503.6, 2.5), t20 = MG.T('20th', 505.1, 2.5), tWorse = MG.T('worse.', 506.6, 2.5);
+      const writer = (ctx, x, y, s, t, i) => { const seed = 70 + i; ctx.save(); ctx.translate(x, y + Math.sin(t * 1.3 + i) * 2); ctx.scale(s, s); // dark coat, head with beard/glasses — Unamuno, Valle-Inclán, Baroja-like silhouettes
+        const coat = new Path2D(MG.path.smooth([[-90, 0], [-80, -170], [-40, -220], [40, -220], [80, -170], [90, 0]], true)); MG.fx.volume(ctx, coat, [-90, -222, 180, 222], { color: ['#2A2A30', '#3A2E28', '#26303A'][i], shade: 0.5, hi: 0.2, cel: true, outline: '#0e0c0e', outlineW: 3 });
+        ctx.fillStyle = '#F4EFE6'; ctx.beginPath(); ctx.moveTo(-20, -220); ctx.lineTo(0, -180); ctx.lineTo(20, -220); ctx.fill(); const head = MG.path.blob(0, -270, 52, { seed, irr: 0.07, sy: 1.15 }); MG.fx.volume(ctx, head, [-52, -330, 104, 120], { color: '#E2B892', shade: 0.45, hi: 0.3, cel: true, outline: '#2a1a16', outlineW: 3 });
+        if (i === 0) { ctx.fillStyle = '#CFC8BA'; ctx.beginPath(); ctx.moveTo(-34, -250); ctx.quadraticCurveTo(0, -180, 34, -250); ctx.quadraticCurveTo(0, -230, -34, -250); ctx.fill(); ctx.strokeStyle = '#1a1414'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(-16, -280, 11, 0, MG.TAU); ctx.arc(16, -280, 11, 0, MG.TAU); ctx.stroke(); ctx.fillStyle = '#E8E0D0'; ctx.beginPath(); ctx.ellipse(0, -318, 40, 14, 0, Math.PI, MG.TAU); ctx.fill(); }
+        if (i === 1) { ctx.fillStyle = '#4A3A30'; ctx.beginPath(); ctx.moveTo(-36, -258); ctx.quadraticCurveTo(-10, -120, 0, -100); ctx.quadraticCurveTo(10, -120, 36, -258); ctx.quadraticCurveTo(0, -236, -36, -258); ctx.fill(); ctx.strokeStyle = '#1a1414'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(-15, -282, 10, 0, MG.TAU); ctx.arc(15, -282, 10, 0, MG.TAU); ctx.stroke(); ctx.fillStyle = '#2A2020'; ctx.beginPath(); ctx.ellipse(0, -322, 46, 18, 0, Math.PI, MG.TAU); ctx.fill(); }
+        if (i === 2) { ctx.fillStyle = '#2A2020'; ctx.beginPath(); ctx.ellipse(0, -330, 64, 14, 0, 0, MG.TAU); ctx.fill(); ctx.fillRect(-36, -360, 72, 30); ctx.fillStyle = '#3A2A22'; ctx.beginPath(); ctx.moveTo(-28, -252); ctx.quadraticCurveTo(0, -205, 28, -252); ctx.quadraticCurveTo(0, -240, -28, -252); ctx.fill(); MG.kit.eye(ctx, -14, -282, { r: 6, look: [0.3, 0.2], blink: MG.kit.blink(t, seed), skin: '#E2B892' }); MG.kit.eye(ctx, 14, -282, { r: 6, look: [0.3, 0.2], blink: MG.kit.blink(t, seed), skin: '#E2B892' }); }
+        ctx.restore(); };
+      return { id: 's03_cafe', start: 494.71, end: 507.32, transIn: { type: 'zoom', dur: 0.6, amount: 0.6, from: 1.5 },
+        draw(ctx, t) {
+          const kq = MG.prog(t, tHow - 0.4, tHow + 0.4, 'inOutCubic'); const dark = MG.prog(t, t20 - 0.3, 507.3, 'inOutSine');
+          // the café: mirrors, a gas lamp, smoke, the paper on the marble table
+          MG.fx.vgrad(ctx, [[0, MG.col.mix('#4A3A2E', '#1A1410', dark)], [1, MG.col.mix('#2A201A', '#0C0A08', dark)]]); const lamp = 1 - dark * 0.85 + Math.sin(t * 13) * 0.03 * dark; MG.fx.glow(ctx, 960, 200, 900, '#FFC27A', 0.38 * lamp);
+          ctx.fillStyle = MG.col.a('#C9A04A', 0.25 * lamp); for (let i = 0; i < 3; i++) { ctx.strokeStyle = MG.col.a('#C9A04A', 0.4 * lamp); ctx.lineWidth = 6; ctx.strokeRect(180 + i * 560, 120, 440, 380); ctx.fillStyle = MG.col.a('#7A6A5A', 0.18); ctx.fillRect(186 + i * 560, 126, 428, 368); }
+          for (let i = 0; i < 3; i++) writer(ctx, 520 + i * 440, 900, 1.25 - (i === 1 ? 0.1 : 0), t, i);
+          ctx.fillStyle = '#E6DFD0'; ctx.beginPath(); ctx.ellipse(960, 940, 760, 110, 0, 0, MG.TAU); ctx.fill(); ctx.fillStyle = 'rgba(40,30,30,0.2)'; ctx.beginPath(); ctx.ellipse(960, 980, 740, 80, 0, 0, Math.PI); ctx.fill();
+          ctx.save(); ctx.translate(960, 930); ctx.rotate(-0.06); ctx.fillStyle = '#E9E1CC'; ctx.fillRect(-170, -40, 340, 90); MG.text.draw(ctx, 'EL DESASTRE', 0, 10, { font: F.news, size: 46, color: '#7E1F1B', align: 'center' }); ctx.restore();
+          MG.fx.smoke(ctx, 520, 600, t, { n: 7, seed: 4, spread: 60, rise: 40, r: 70, alpha: 0.22, color: '#E8E0D0', life: 5 }); MG.fx.smoke(ctx, 1400, 600, t, { n: 7, seed: 8, spread: 60, rise: 40, r: 70, alpha: 0.22, color: '#E8E0D0', life: 5 });
+          if (t < tHow) S3.fellR(ctx, "the Generation of '98", 960, 120, t, tGen - 0.2, { size: 64, color: '#F3E8CF' });
+          // the question in perspective type: huge "the world's leading power" → tiny "nobody?"
+          if (kq > 0) { ctx.save(); ctx.globalAlpha = kq * (1 - MG.prog(t, t20 - 0.4, t20)); ctx.fillStyle = `rgba(10,8,6,${0.55 * kq})`; ctx.fillRect(0, 0, W, H); const kl = MG.prog(t, tLead - 0.6, tLead + 0.3); MG.text.draw(ctx, "the world's leading power", 960, 470, { font: F.roman, weight: 900, size: lerp(60, 112, kl), color: '#F3E8CF', align: 'center', tracking: 0.04 }); const kn = MG.prog(t, tNob - 0.2, tNob + 0.5); if (kn > 0) { MG.text.draw(ctx, 'to', 960, 560, { font: F.serif, italic: true, size: 40, color: '#C9B48A', align: 'center', alpha: kn }); MG.text.draw(ctx, 'nobody?', 960, 640, { font: F.serif, italic: true, size: lerp(80, 30, kn), color: '#C9B48A', align: 'center', alpha: kn }); } ctx.restore(); }
+          // 1899 → 1900 on the wall calendar as the lamp dies
+          if (t > t20 - 0.5) { const k = MG.prog(t, t20 - 0.5, t20); const kf = MG.prog(t, t20 + 0.2, t20 + 0.9, 'inOutCubic'); ctx.save(); ctx.globalAlpha = k; ctx.translate(1640, 300); ctx.fillStyle = '#E9E1CC'; ctx.fillRect(-110, -130, 220, 260); ctx.fillStyle = '#7E1F1B'; ctx.fillRect(-110, -130, 220, 56); MG.text.draw(ctx, kf < 0.5 ? '1899' : '1900', 0, 60, { font: F.cond, weight: 900, size: 100, color: '#1d1d1f', align: 'center' }); if (kf > 0 && kf < 1) { ctx.save(); ctx.rotate(-kf * 1.2); ctx.translate(kf * 140, -kf * 120); ctx.fillStyle = '#E9E1CC'; ctx.fillRect(-110, -74, 220, 200); ctx.restore(); } ctx.restore(); S3.fellR(ctx, 'the 20th century starts even worse', 960, 980, t, t20 - 0.2, { size: 46, italic: true, color: '#D8C9A8' }); }
+        },
+        post: (t) => ({ grade: 'archival', vignette: 0.5, sat: 0.7, fade: 0.15 * MG.lin(t, 505.5, 507.8) }) }; })(),
   ];
   MG.segment('S03', { start: 351.14, end: 507.32, scenes, audio(A) { S3.audio(A); } });
-  S3.audio = (A) => { /*@@AUDIO@@*/ };
+  S3.audio = (A) => {
+    // 1492: the edict (sober) → Columbus → the New World
+    A.music('lament', 351.14, 360.6, { key: 'D3', bpm: 60, intensity: [[351.14, 0.35], [354, 0.5], [360.4, 0.35]], fadeIn: 1.2, fadeOut: 1.2 });
+    A.sfx.creak(352.2, { gain: 0.5 }); A.sfx.paper(354.0, { dur: 0.8, gain: 0.8 }); A.sfx.stamp(355.4, { gain: 0.5 }); A.sfx.amb('wind', 355.9, 4.0, { gain: 0.5 });
+    A.music('epic', 359.6, 389.9, { key: 'D3', bpm: 96, intensity: [[359.6, 0.4], [364.6, 0.6], [368.3, 0.8], [373.3, 0.65], [377.5, 0.8], [384.7, 0.7], [389.6, 0.5]], fadeIn: 1.0, fadeOut: 1.2 });
+    A.sfx.amb('sea', 360.0, 8.0, { gain: 0.6 }); A.sfx.creak(361.5, { gain: 0.6 }); A.sfx.creak(364.0, { gain: 0.5 }); A.sfx.tonal(365.7, ['D2', 'A2', 'D3', 'F#3'], { gain: 0.5 }); A.sfx.coins(366.4, { n: 14, spread: 1.4, gain: 0.7 });
+    A.sfx.thud(373.4, { gain: 0.5 }); A.sfx.coins(377.5, { n: 20, spread: 2.5, gain: 0.6 }); A.sfx.coins(382.4, { n: 6, spread: 0.5, gain: 0.8 }); A.sfx.chime(383.0, { note: 'D6', gain: 0.6 }); for (let i = 0; i < 3; i++) A.sfx.whoosh(385.6 + i * 1.1, { dur: 0.6, gain: 0.4, dir: i % 2 ? 1 : -1 });
+    A.music('hopeful', 389.4, 404.0, { key: 'G3', bpm: 92, intensity: [[389.4, 0.5], [395.3, 0.65], [398.5, 0.75], [403.8, 0.4]], fadeIn: 0.8, fadeOut: 1.2 }); A.sfx.ding(390.2, { note: 'G5', gain: 0.6 }); A.sfx.whoosh(395.3, { dur: 0.8, gain: 0.6 });
+    // the "fever": Dutch disease · nobles (sneaky)
+    A.sfx.downlifter(403.4, { dur: 1.4, gain: 0.6 });
+    A.music('sneaky', 403.6, 447.6, { key: 'D3', bpm: 112, intensity: [[403.6, 0.45], [409, 0.6], [418, 0.7], [429.9, 0.75], [436.2, 0.6], [441, 0.7], [447.3, 0.45]], fadeIn: 0.8, fadeOut: 1.2 });
+    for (let i = 0; i < 10; i++) A.sfx.coins(410.7 + i * 1.6, { n: 3, spread: 0.3, gain: 0.35 }); A.sfx.amb('hum', 409.2, 8, { gain: 0.5 }); A.sfx.splash(429.9, { gain: 0.4 }); A.sfx.register(437.0, { gain: 0.5 }); A.sfx.amb('crowd', 436.3, 11, { gain: 0.35 });
+    // 1609: the Moriscos (tension + oud) · the dying huerta
+    A.music('tension', 447.0, 465.2, { key: 'D3', bpm: 92, intensity: [[447, 0.35], [452, 0.5], [458.7, 0.45], [464.8, 0.3]], fadeIn: 1.0, fadeOut: 1.0 });
+    for (let i = 0; i < 8; i++) A.oud(449.6 + i * 0.6, ['D4', 'Eb4', 'F#4', 'G4', 'A4', 'G4', 'F#4', 'Eb4'][i], { vel: 0.45, pan: -0.3 }); A.sfx.stamp(449.6, { gain: 0.5 }); A.sfx.amb('sea', 452.0, 6.5, { gain: 0.6 });
+    A.sfx.creak(459.0, { gain: 0.6 }); A.sfx.creak(460.8, { gain: 0.5 }); A.sfx.amb('wind', 461.3, 3.6, { gain: 0.6 });
+    // wars (drums) → the Armada storm (dread)
+    A.music('march', 464.8, 469.4, { key: 'C3', bpm: 104, intensity: 0.7, fadeIn: 0.4, fadeOut: 0.6 }); for (let i = 0; i < 5; i++) A.sfx.cannon(465.4 + i * 0.6, { gain: 0.35 });
+    A.music('dread', 468.6, 476.6, { key: 'C2', intensity: 0.7, fadeIn: 0.6, fadeOut: 0.8 }); A.sfx.amb('rain', 468.8, 7.4, { gain: 1.0 }); A.sfx.amb('wind', 468.8, 7.4, { gain: 0.9 }); A.sfx.amb('sea', 468.8, 7.4, { gain: 1.0 });
+    A.sfx.thunder(474.6, { gain: 0.8 }); A.sfx.thunder(475.4, { gain: 0.5 }); A.sfx.creak(471.0, { gain: 0.8 }); A.sfx.creak(473.0, { gain: 0.7 }); A.sfx.cannon(471.9, { gain: 0.4 }); A.sfx.cannon(472.9, { gain: 0.35 });
+    // bankruptcies · the deflating empire
+    A.music('tension', 476.2, 483.6, { key: 'C3', bpm: 84, intensity: [[476.2, 0.3], [480, 0.45], [483.4, 0.3]], fadeIn: 0.4, fadeOut: 0.8 });
+    for (let i = 0; i < 4; i++) A.sfx.stamp(476.19 + 0.25 + i * 0.42, { gain: 0.7 }); A.sfx.downlifter(480.1, { dur: 2.4, gain: 0.7 });
+    // 1898 · the Disaster · the Generation of '98 (lament)
+    A.music('lament', 483.0, 508.8, { key: 'D3', bpm: 60, intensity: [[483, 0.4], [490.5, 0.5], [494.7, 0.45], [500, 0.55], [505, 0.4], [507.3, 0.25]], fadeIn: 0.8, fadeOut: 2.2 });
+    A.sfx.sub(483.4, { gain: 0.4 }); [486.0, 486.7, 487.8].forEach((tt) => A.sfx.thud(tt, { gain: 0.5 })); A.sfx.impact(493.3, { size: 0.35, gain: 0.5 }); A.sfx.paper(493.3, { dur: 0.3, gain: 0.8 });
+    A.sfx.amb('room', 494.7, 12.6, { gain: 0.9 }); A.sfx.clock(494.8, { dur: 12, bpm: 60, gain: 0.35 }); A.sfx.paper(505.3, { dur: 0.6, gain: 0.6 });
+  };
 })();
