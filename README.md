@@ -27,7 +27,10 @@ Result: `build/spain_1080p30.mp4` (H.264 CRF 18 + AAC 320 k, loudness ≈ −15 
 * `--crf 20` — smaller file (≈2 GB); `--png` — lossless frame capture (slower); `--gpu` — try hardware GL in Chrome.
 * `--force` — ignore cached chunks / stems.
 
-Typical speed on a modern 8-core CPU with 7 workers: 15–30 frames/s → ~30–60 minutes for the full film.
+Measured cost: ≈0.22 s per frame per worker on average (heaviest scenes ≈0.7 s), plus JPEG capture. On a modern
+8-core CPU with 7 workers that is roughly 15–25 frames/s → about 40–60 minutes for the 52,500 frames of the full film.
+The music/SFX stems (11 segments, synthesised offline) render in parallel browsers first and take about 5–10 minutes;
+they are cached in `build/audio/`, so later video-only re-renders skip them.
 
 ## Preview in a browser
 
