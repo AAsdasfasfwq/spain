@@ -758,6 +758,64 @@
     ctx.restore();
   };
 
+
+  // ---------------------------------------------------------------- street backdrop (market stall + Castilian street), bodies of hidalgo & merchant
+  S3.streetBG = () => MG.cache('s3:street', 4200, 1080, (x, w, h) => {
+    MG.fx.vgrad(x, [[0, '#e8dcc0'], [1, '#cdbb98']], 0, 0, w, h);
+    // market wall + slate board
+    x.fillStyle = '#d6c4a0'; x.fillRect(0, 0, 1900, 760); x.globalAlpha = 0.5; x.drawImage(MG.tex.paper('#d6c4a0', { seed: 19, light: 0, blotch: 0.4, w: 1024, h: 512 }), 0, 0, 1900, 760); x.globalAlpha = 1;
+    const slate = MG.path.rr(980, 110, 760, 470, 10); MG.fx.shadow(x, slate, { dx: 12, dy: 16, blur: 20, color: 'rgba(30,20,10,0.4)' }); x.fillStyle = '#2f3633'; x.fill(slate); x.strokeStyle = '#6b4a2e'; x.lineWidth = 22; x.stroke(slate); x.strokeStyle = 'rgba(240,240,230,0.25)'; x.lineWidth = 2; x.beginPath(); x.moveTo(1060, 520); x.lineTo(1700, 520); x.moveTo(1060, 520); x.lineTo(1060, 170); x.stroke();
+    // awning
+    for (let i = 0; i < 10; i++) { x.fillStyle = i % 2 ? '#e9dfc8' : '#a8402c'; x.beginPath(); x.moveTo(i * 190, 0); x.lineTo(i * 190 + 190, 0); x.lineTo(i * 190 + 190, 70); x.quadraticCurveTo(i * 190 + 95, 110, i * 190, 70); x.closePath(); x.fill(); x.strokeStyle = C.ink; x.lineWidth = 2; x.stroke(); }
+    // street houses (whitewashed, balconies, tile eaves)
+    for (let i = 0; i < 6; i++) { const hx = 1900 + i * 400, hw = 400; x.fillStyle = MG.col.mix('#f1e9d6', '#e2d2b0', (i % 3) / 3); x.fillRect(hx, 40 + (i % 2) * 40, hw, 760); x.strokeStyle = 'rgba(42,32,36,0.6)'; x.lineWidth = 3; x.strokeRect(hx, 40 + (i % 2) * 40, hw, 760); x.fillStyle = '#9b4a32'; x.fillRect(hx - 10, 30 + (i % 2) * 40, hw + 20, 28);
+      for (const wy of [180, 420]) { x.fillStyle = '#3a2c26'; x.fillRect(hx + 120, wy, 160, 150); x.fillStyle = '#6b4a2e'; x.fillRect(hx + 100, wy + 150, 200, 14); x.strokeStyle = '#2a201c'; x.lineWidth = 4; for (let k = 0; k < 7; k++) { x.beginPath(); x.moveTo(hx + 108 + k * 30, wy + 150); x.lineTo(hx + 108 + k * 30, wy + 100); x.stroke(); } x.beginPath(); x.moveTo(hx + 100, wy + 100); x.lineTo(hx + 300, wy + 100); x.stroke(); } }
+    // cobbled street
+    const gr = x.createLinearGradient(0, 760, 0, h); gr.addColorStop(0, '#a99470'); gr.addColorStop(1, '#7d6a50'); x.fillStyle = gr; x.fillRect(0, 760, w, h - 760); x.strokeStyle = 'rgba(50,36,26,0.35)'; x.lineWidth = 2; for (let j = 0; j < 9; j++) for (let i = 0; i < 80; i++) { const cx = i * 52 + (j % 2) * 26, cy = 780 + j * 34 + j * j * 2; x.beginPath(); x.ellipse(cx, cy, 22 + j * 1.5, 10 + j, 0, 0, MG.TAU); x.stroke(); }
+    // stall counter
+    const ct = MG.path.poly([[60, 640], [1860, 640], [1900, 700], [20, 700]]); x.fillStyle = '#8b6440'; x.fill(ct); x.strokeStyle = C.ink; x.lineWidth = 3; x.stroke(ct); x.fillStyle = '#6b4a2e'; x.fillRect(20, 700, 1880, 260); x.strokeRect(20, 700, 1880, 260); x.strokeStyle = 'rgba(30,20,10,0.35)'; for (let i = 0; i < 9; i++) { x.beginPath(); x.moveTo(20, 720 + i * 28); x.lineTo(1900, 720 + i * 28); x.stroke(); }
+  });
+  S3.loaf = () => MG.cache('s3:loaf', 520, 320, (x) => { const p = S3.sm([[30, 230], [60, 120], [170, 60], [330, 56], [460, 110], [500, 220], [470, 270], [60, 272]]); S3.vol(x, p, [30, 56, 470, 216], '#c98a4a', { shade: 0.5, shadeColor: '#6a3a1e', hi: 0.45, hiColor: '#f6d090', ow: 3.5, tex: 'grain', texAlpha: 0.3 }); x.strokeStyle = '#7a4a24'; x.lineWidth = 9; x.lineCap = 'round'; for (let i = 0; i < 4; i++) { x.beginPath(); x.moveTo(130 + i * 80, 100 + Math.abs(i - 1.5) * 10); x.quadraticCurveTo(160 + i * 80, 160, 140 + i * 80, 220); x.stroke(); } x.strokeStyle = '#f0cc8a'; x.lineWidth = 3; for (let i = 0; i < 4; i++) { x.beginPath(); x.moveTo(126 + i * 80, 104 + Math.abs(i - 1.5) * 10); x.quadraticCurveTo(152 + i * 80, 160, 132 + i * 80, 220); x.stroke(); } x.fillStyle = 'rgba(255,250,235,0.5)'; for (let i = 0; i < 40; i++) { x.beginPath(); x.arc(80 + rnd(81, i) * 360, 90 + rnd(82, i) * 120, 2, 0, MG.TAU); x.fill(); } });
+  /** hidalgo full figure, feet at 0, facing right; st: {nose (0..1 chin up), palm (0..1 dismissive hand), purse (0..1), t} */
+  S3.hidalgo = (ctx, x, y, s, st = {}) => {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const blk = '#231b1e', blk2 = '#3a3034'; const tt = st.t || 0; const br = Math.sin(tt * 1.6) * 3;
+    // legs: thin hose, puffed trunk hose, worn shoes (one with a hole)
+    for (const [lx, a] of [[-26, -0.02], [26, 0.04]]) { S3.blob(ctx, [[lx - 13, -330], [lx + 13, -330], [lx + 10 + a * 100, -40], [lx - 9 + a * 100, -40]], blk2, { shade: 0.4, ow: 2.5 }); S3.blob(ctx, [[lx - 22 + a * 100, -40], [lx + 38 + a * 120, -30], [lx + 40 + a * 120, -4], [lx - 20 + a * 100, 0]], '#2a2020', { shade: 0.35, ow: 2.5 }); }
+    ctx.fillStyle = '#e6b994'; ctx.beginPath(); ctx.arc(52 + 4, -14, 5, 0, MG.TAU); ctx.fill();
+    S3.blob(ctx, [[-62, -440], [62, -440], [74, -360], [52, -318], [-52, -318], [-74, -360]], blk, { shade: 0.4, hi: 0.15, hiColor: '#7a6a70', ow: 3 }); ctx.strokeStyle = 'rgba(200,180,150,0.25)'; ctx.lineWidth = 2; for (let i = -3; i <= 3; i++) { ctx.beginPath(); ctx.moveTo(i * 16, -438); ctx.lineTo(i * 18, -322); ctx.stroke(); }
+    // doublet with peascod belly + patches
+    const dbl = S3.sm([[-70, -700 + br], [70, -700 + br], [84, -560], [66, -450], [8, -408], [-66, -450], [-84, -560]]); S3.vol(ctx, dbl, [-84, -700, 168, 292], blk, { shade: 0.45, hi: 0.18, hiColor: '#7a6a70', ow: 3.2 });
+    ctx.fillStyle = '#4a4046'; for (const [px, py, pw, ph2] of [[-46, -560, 34, 30], [24, -500, 28, 26]]) { ctx.fillRect(px, py, pw, ph2); ctx.strokeStyle = '#a8988a'; ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5; ctx.strokeRect(px, py, pw, ph2); ctx.setLineDash([]); }
+    ctx.fillStyle = '#b8a070'; for (let i = 0; i < 7; i++) { ctx.beginPath(); ctx.arc(4, -680 + i * 36, 4, 0, MG.TAU); ctx.fill(); }
+    // rapier at the hip
+    ctx.save(); ctx.translate(-56, -440); ctx.rotate(0.55); ctx.strokeStyle = INK; ctx.lineWidth = 9; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-320, 0); ctx.stroke(); ctx.strokeStyle = '#cfd3d8'; ctx.lineWidth = 5; ctx.stroke(); ctx.strokeStyle = C.gold; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(20, 0, 26, -1.8, 1.8); ctx.stroke(); ctx.fillStyle = '#3a2418'; ctx.fillRect(14, -6, 46, 12); ctx.restore();
+    // cape over the left shoulder
+    S3.blob(ctx, [[-76, -706], [-20, -716], [-30, -560], [-60, -420], [-112, -440], [-106, -600]], '#2c2226', { shade: 0.5, ow: 3 });
+    // arms: right hand on hilt; left (front) hand raised palm-out (dismissive)
+    S3.arm(ctx, 60, -680, 96, -580, 40, -470, 34, blk, { cuff: '#efe9dc' }); MG.kit.hand(ctx, 44, -462, { pose: 'fist', angle: 0.2, s: 1.0, skin: '#e6b994' });
+    const pm = st.palm || 0; const hx = lerp(-70, 120, pm), hy = lerp(-470, -760, pm); S3.arm(ctx, -60, -680, lerp(-96, 40, pm), lerp(-580, -650, pm), hx, hy, 34, blk, { cuff: '#efe9dc' }); MG.kit.hand(ctx, hx, hy, { pose: pm > 0.4 ? 'open' : 'fist', angle: lerp(0.3, -2.6, pm), s: 1.05, skin: '#e6b994' });
+    // empty purse turned out, with a moth (penniless)
+    const pu = st.purse || 0; if (pu > 0) { const px = -40, py = -440; ctx.save(); ctx.translate(px, py); ctx.rotate(-0.2); S3.blob(ctx, [[-14, 0], [14, 0], [18, 30], [0, 44], [-18, 30]], '#6b4a2e', { shade: 0.4, ow: 2 }); ctx.restore(); const mk = clamp((tt - st.purseT) / 1.6); if (mk > 0 && mk < 1) { const mx = px + mk * 90 + Math.sin(mk * 20) * 14, my = py - mk * 220; const fl = Math.abs(Math.sin(tt * 30)); ctx.fillStyle = '#b8ad9a'; ctx.strokeStyle = INK; ctx.lineWidth = 1.5; for (const sd of [-1, 1]) { ctx.beginPath(); ctx.ellipse(mx + sd * 9, my, 10, 6 * (0.3 + fl), sd * 0.4, 0, MG.TAU); ctx.fill(); ctx.stroke(); } } }
+    // millstone ruff
+    const rf = MG.path.ellipse(0, -712 + br, 110, 40); MG.fx.shadow(ctx, rf, { dx: 0, dy: 16, blur: 14, color: 'rgba(0,0,0,0.35)' }); S3.vol(ctx, rf, [-110, -752, 220, 80], '#f4f0e6', { shade: 0.35, shadeColor: '#9c968a', ow: 3 }); ctx.strokeStyle = 'rgba(90,84,74,0.6)'; ctx.lineWidth = 2; for (let i = 0; i < 22; i++) { const a = (i / 22) * MG.TAU; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 46, -712 + br + Math.sin(a) * 16); ctx.quadraticCurveTo(Math.cos(a + 0.12) * 90, -712 + br + Math.sin(a + 0.12) * 34, Math.cos(a) * 108, -712 + br + Math.sin(a) * 39); ctx.stroke(); }
+    S3.head(ctx, 8, -800 + br, 1.25, S3.CAST.hidalgo, { tilt: -0.28 * (st.nose || 0) - 0.04, turn: 0.2, lid: 0.35 + 0.4 * (st.nose || 0), look: [0.5, -0.4 * (st.nose || 0)], brow: 0.3 + 0.5 * (st.nose || 0), blink: MG.kit.blink(tt, 13), mood: 'flat' });
+    ctx.restore();
+  };
+  S3.merchant = (ctx, x, y, s, st = {}) => {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const tt = st.t || 0; const br = Math.sin(tt * 1.9) * 3; const coat = '#6a4428', fur = '#c9a678';
+    for (const lx of [-30, 30]) { S3.blob(ctx, [[lx - 16, -160], [lx + 16, -160], [lx + 14, -30], [lx - 14, -30]], '#5a2a28', { shade: 0.4, ow: 2.5 }); S3.blob(ctx, [[lx - 24, -32], [lx + 30, -28], [lx + 32, -2], [lx - 22, 0]], '#2a1e1a', { shade: 0.35, ow: 2.5 }); }
+    S3.blob(ctx, [[-90, -560 + br], [90, -560 + br], [140, -380], [130, -150], [-130, -150], [-140, -380]], coat, { shade: 0.45, hi: 0.2, ow: 3.2, tex: 'blotch', texAlpha: 0.2 });
+    S3.blob(ctx, [[-30, -560 + br], [30, -560 + br], [40, -150], [-40, -150]], '#8a2a24', { shade: 0.4, ow: 2.5 });
+    for (const sd of [-1, 1]) S3.blob(ctx, [[sd * 30, -566 + br], [sd * 100, -556 + br], [sd * 70, -150], [sd * 36, -150]], fur, { shade: 0.35, ow: 2.5, tex: 'fibers', texAlpha: 0.5 });
+    ctx.strokeStyle = C.gold; ctx.lineWidth = 7; ctx.beginPath(); ctx.moveTo(-60, -550 + br); ctx.quadraticCurveTo(0, -420, 60, -550 + br); ctx.stroke(); ctx.fillStyle = C.gold; ctx.beginPath(); ctx.arc(0, -440, 14, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.stroke();
+    // heavy purse, jingles
+    const jg = MG.jiggle(tt, st.jingle || 1e9, 0.25, 5, 6); ctx.save(); ctx.translate(-120, -300); ctx.rotate(jg); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, -30); ctx.lineTo(0, 0); ctx.stroke(); S3.blob(ctx, [[-30, 0], [30, 0], [48, 50], [30, 90], [-30, 90], [-48, 50]], '#7c5a3a', { shade: 0.45, hi: 0.2, ow: 2.6 }); ctx.restore();
+    S3.arm(ctx, -80, -520, -150, -420, -126, -330, 38, coat, { cuff: fur }); MG.kit.hand(ctx, -124, -326, { pose: 'fist', angle: 0, s: 1.0, skin: '#eab08e' });
+    S3.arm(ctx, 80, -520, 150, -420, 100, -330, 38, coat, { cuff: fur }); MG.kit.hand(ctx, 100, -330, { pose: 'open', angle: 0.4, s: 1.0, skin: '#eab08e' });
+    S3.head(ctx, 0, -630 + br, 1.2, S3.CAST.merchant, { turn: -0.15, look: [-0.5, 0.2], blink: MG.kit.blink(tt, 17), mood: 'grin', brow: 0.2 });
+    ctx.restore();
+  };
+
   /*@@HELPERS@@*/
 
   // ====================================================================================================
@@ -1178,7 +1236,37 @@
         ctx.restore(); ctx.restore();
       },
       post: { grade: 'warm', vignette: 0.36, grain: 0.05, sat: 0.92 } },
-    placeholder('s03_street', 436.25, 447.37, 'market · noble'),
+    // ------------------------------------------------------------------ AT HOME: prices ×5 · the nobleman and the merchant (sol vs sombra)
+    { id: 's03_street', start: 436.25, end: 447.37, transIn: TR.pushInto(960, 540, { dur: 0.6, amount: 5 }),
+      init() { S3.streetBG(); S3.loaf(); },
+      draw(ctx, t) {
+        const camX = MG.keys(t, [[436.25, 900], [441.1, 960, 'linear'], [442.1, 2640, 'cam'], [444.0, 2700, 'linear'], [444.9, 2960, 'cam'], [447.4, 2990, 'linear']]); const z = MG.keys(t, [[436.25, 1.04], [441.1, 1.0, 'linear'], [444.0, 1.02], [444.9, 0.97, 'cam'], [447.4, 0.96, 'linear']]); const hh = MG.cam.handheld(t, 2.5, 33);
+        ctx.save(); ctx.translate(W / 2 + hh.dx, H / 2 + hh.dy); ctx.scale(z, z); ctx.translate(-camX, -H / 2);
+        ctx.fillStyle = '#d9c9a6'; ctx.fillRect(-400, -300, 5000, 1100); ctx.fillStyle = '#7d6a50'; ctx.fillRect(-400, 1000, 5000, 500); ctx.drawImage(S3.streetBG(), 0, 0);
+        // chalk price line on the slate (×1 → ×5, 1500 → 1600)
+        const pk = MG.prog(t, 437.6, 440.3, 'inOutSine'); const yr = Math.round(lerp(1500, 1600, pk)); const cp = []; for (let i = 0; i <= 40; i++) { const u = i / 40; cp.push([1060 + u * 620, 520 - (Math.pow(u, 1.3) * 4) * 82 + MG.noise2(u * 9, 2) * 6]); }
+        ctx.save(); ctx.globalAlpha = 0.9; MG.fx.ink(ctx, MG.path.trim(cp, 0, pk), { width: 6, color: '#f0eee4', taper: [0, 0], wobble: 1.5, seed: 4, boil: t }); ctx.restore();
+        for (let k = 1; k <= 5; k++) MG.text.draw(ctx, `×${k}`, 1040, 520 - (k - 1) * 82 + 8, { font: F.brush, size: 34, color: 'rgba(240,238,228,0.65)', align: 'right' });
+        MG.text.draw(ctx, String(yr), 1700, 230, { font: F.brush, size: 74, color: '#f0eee4', align: 'right' });
+        // the same loaf: 1 coin in 1500 … 5 coins in 1600
+        MG.fx.contact(ctx, 520, 650, 260, 30, 0.5); MG.sprite(ctx, S3.loaf(), 520, 660, { scale: 1.0, ax: 0.5, ay: 272 / 320 });
+        const nc = 1 + Math.floor(pk * 4.999); for (let i = 0; i < nc; i++) { const pop = MG.prog(t, 437.6 + (i / 4) * 2.7, 437.6 + (i / 4) * 2.7 + 0.2, 'outBack'); if (i === 0 || pop > 0) MG.sprite(ctx, S3.coin(22), 860, 650 - i * 15 - (1 - (i ? pop : 1)) * 30, { scale: 1.25, sy: 0.5 }); }
+        const x5 = MG.prog(t, 439.3, 439.75, 'outBack'); if (x5 > 0) { MG.text.draw(ctx, '×5', 1385, 400, { font: F.cond, weight: 900, size: 240 * x5, color: '#e2a03a', align: 'center', shadow: { blur: 0, dx: 6, dy: 8, color: 'rgba(30,20,10,0.5)' } }); S3.mono(ctx, 'PRICES IN A CENTURY', 1385, 480, { align: 'center', color: '#f0eee4', alpha: pr01(t, 439.6, 440.0), size: 22 }); }
+        // street: the hidalgo refuses a hammer; sun picks him out, the wealthy merchant stands in shade
+        const nose = MG.prog(t, 441.6, 442.4, 'out'); const palm = MG.prog(t, 442.5, 442.95, 'outBack') * (1 - MG.prog(t, 444.2, 444.6));
+        const offer = MG.prog(t, 441.3, 441.9, 'out') * (1 - MG.prog(t, 443.0, 443.5, 'in')); if (offer > 0) { const ax = lerp(2300, 2470, offer); S3.arm(ctx, 2190, 820, 2290, 740, ax, 700, 40, '#b8a07a', { cuff: '#8b6a48' }); ctx.save(); ctx.translate(ax + 10, 700); ctx.rotate(-0.4); ctx.strokeStyle = INK; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, -120); ctx.stroke(); ctx.strokeStyle = '#8b6a48'; ctx.lineWidth = 8; ctx.stroke(); ctx.fillStyle = '#4c4e56'; ctx.fillRect(-36, -150, 72, 34); ctx.strokeStyle = INK; ctx.lineWidth = 3; ctx.strokeRect(-36, -150, 72, 34); ctx.restore(); MG.kit.hand(ctx, ax, 704, { pose: 'fist', angle: -1.6, s: 1.1, skin: '#d9a27a' }); }
+        const sunK = smooth(444.0, 444.8, t);
+        MG.fx.contact(ctx, 2660, 1005, 170, 24, 0.45); S3.hidalgo(ctx, 2660, 1000, 0.95, { nose, palm, t: tw(t), purse: smooth(444.4, 444.6, t), purseT: 444.6 });
+        MG.fx.contact(ctx, 3290, 1005, 200, 26, 0.45 * smooth(443.5, 444.5, t)); if (t > 443.4) S3.merchant(ctx, 3290, 1000, 0.95, { t: tw(t), jingle: 445.9 });
+        if (sunK > 0) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; const g = ctx.createLinearGradient(2960, 0, 3060, 0); g.addColorStop(0, 'rgba(58,43,58,0)'); g.addColorStop(1, `rgba(58,43,58,${0.55 * sunK})`); ctx.fillStyle = g; ctx.fillRect(2960, -100, 1200, 1400); ctx.restore(); MG.fx.rays(ctx, 2300, -300, { n: 6, len: 1600, spread: 0.25, dir: 1.25, alpha: 0.16 * sunK, t, color: '#fff0c0' }); MG.fx.glow(ctx, 2660, 420, 420, '#ffe6a8', 0.35 * sunK); }
+        ctx.restore();
+        // labels (on the words)
+        const lk1 = pr01(t, 444.55, 445.0), lk2 = pr01(t, 446.05, 446.5);
+        if (lk1 > 0) { MG.text.reveal(ctx, 'PENNILESS', 330, 560, t, 444.55, { font: F.grotesk, weight: 800, size: 58, color: C.ink, align: 'center', style: 'rise', by: 'char', stagger: 0.025, tracking: 0.08 }); S3.mono(ctx, 'NOBLEMAN', 330, 606, { align: 'center', alpha: lk1, size: 24, color: C.ink2 }); }
+        if (lk2 > 0) { MG.text.reveal(ctx, 'WEALTHY', 1640, 560, t, 446.05, { font: F.grotesk, weight: 800, size: 58, color: '#f3e8cf', align: 'center', style: 'rise', by: 'char', stagger: 0.025, tracking: 0.08 }); S3.mono(ctx, 'MERCHANT', 1640, 606, { align: 'center', alpha: lk2, size: 24, color: '#e6d8bc' }); }
+        if (t < 441.4) S3.mono(ctx, 'AT HOME', 140, 150, { alpha: pr01(t, 436.4, 436.8) * (1 - smooth(441.0, 441.3, t)), size: 22, color: C.ink });
+      },
+      post: { grade: 'warm', vignette: 0.38, grain: 0.05, sat: 0.9 } },
     placeholder('s03_moriscos', 447.37, 458.71, '1609'),
     placeholder('s03_huerta', 458.71, 464.87, 'huerta'),
     placeholder('s03_wars', 464.87, 468.79, 'wars'),

@@ -428,7 +428,7 @@
       const geo = U.mergeGeometries(parts); geo.computeVertexNormals();
       const mat = new T.MeshStandardMaterial({ color: 0x3b3934, roughness: 0.75, metalness: 0.15 });
       const prop = new T.MeshBasicMaterial({ color: 0x1a1816, transparent: true, opacity: 0.22, side: T.DoubleSide }); const pg2 = new T.CircleGeometry(1.7, 20);
-      this.planes = []; const form = [[0, 56, 0], [-19, 60, -14], [19, 60, -14], [-36, 84, -30], [32, 86, -32], [-8, 104, -52], [22, 108, -56]];
+      this.planes = []; const form = [[0, 56, 0], [-19, 60, -10], [19, 60, -10], [-36, 84, -22], [32, 86, -24], [-8, 104, -34], [22, 108, -38]];
       for (const f of form) { const g = new T.Group(); g.add(new T.Mesh(geo, mat)); for (const sx of [-4.1, 4.1]) { const pm = new T.Mesh(pg2, prop); pm.position.set(sx, -0.25, -6.6); g.add(pm); } g.userData.f = f; sc.add(g); this.planes.push(g); }
       this.sky = MG.cache('s4:bsky', W, H, (x, w, h) => { const g = x.createRadialGradient(1220, 330, 60, 960, 540, 1300); g.addColorStop(0, '#E9E1CF'); g.addColorStop(0.5, '#C6BCA6'); g.addColorStop(1, '#8F8674'); x.fillStyle = g; x.fillRect(0, 0, w, h); for (let i = 0; i < 7; i++) MG.sprite(x, MG.tex.puff(128, 30 + i, '#f3ecdc'), 200 + MG.rand(4, i) * 1500, 120 + MG.rand(5, i) * 800, { scale: 6 + MG.rand(6, i) * 4, alpha: 0.35, sy: 0.5 }); MG.tex.over(x, 'grain', { alpha: 0.1 }); });
     },
@@ -438,7 +438,7 @@
       MG.kit.sun(ctx, 1220, 330, 120, t, { color: '#E9DCC0', deep: '#BDAE90', corona: 0.5, halftone: 0.2 });
       const sh = MG.cam.shake(t, 530.3, 3, 0.5, 9, 3);
       this.cam.position.set(0, 0, 0); this.cam.up.set(0.12, 0, 1); this.cam.lookAt(0, 50, 12);
-      for (const g of this.planes) { const [fx, fy, fz] = g.userData.f; g.position.set(fx - 3, fy, fz - 26 + lt * 66); g.rotation.set(0, 0, Math.sin(lt * 2 + fx) * 0.05); }
+      for (const g of this.planes) { const [fx, fy, fz] = g.userData.f; g.position.set(fx - 3, fy, fz + 8 + lt * 55); g.rotation.set(0, Math.PI, Math.sin(lt * 2 + fx) * 0.05); }
       const c = MG.three.render(this.sc, this.cam, { slot: 0, clearAlpha: 0 });
       ctx.save(); ctx.translate(sh.dx, sh.dy); ctx.drawImage(c, 0, 0); ctx.restore();
       MG.tex.over(ctx, 'halftone', { alpha: 0.07, spacing: 7, radius: 2, color: '#000' });
@@ -646,12 +646,12 @@
       ctx.save(); ctx.translate(W / 2 + h.dx, H / 2 + h.dy); ctx.rotate(h.rot - 0.01 + lt * 0.002); ctx.scale(z, z); ctx.translate(-960 - lt * 6, -540); ctx.drawImage(this.base, 0, 0);
       const kw = E.outCubic(clamp((t - AUT.tBuild + 0.2) / 1.1)); const hg = 30 * kw;
       // ships & a lorry turned back at the walls
-      this.ships.forEach((q, i) => { const t0 = AUT.tDesign - 0.4 + i * 0.16; const tt = t - t0; if (tt < 0) return; const ang = Math.atan2(q[1][1] - q[0][1], q[1][0] - q[0][0]); let u, back = false; if (tt < 0.85) u = E.inOutSine(tt / 0.85); else { back = true; u = 1 - 0.55 * E.outCubic(clamp((tt - 0.85) / 1.3)); } const px = lerp(q[0][0], q[1][0], u * 0.9), py = lerp(q[0][1], q[1][1], u * 0.9); S4.ship(ctx, px, py, back ? ang + Math.PI : ang, 30, '#3E3A36', 1); if (tt > 0.85 && tt < 1.5) { const k = (tt - 0.85) / 0.65; ctx.strokeStyle = `rgba(255,255,255,${0.7 * (1 - k)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q[0][0] + (q[1][0] - q[0][0]) * 0.92, q[0][1] + (q[1][1] - q[0][1]) * 0.92, 6 + k * 22, 0, TAU); ctx.stroke(); } });
+      this.ships.forEach((q, i) => { const t0 = AUT.tDesign - 0.4 + i * 0.16; const tt = t - t0; if (tt < 0) return; const ang = Math.atan2(q[1][1] - q[0][1], q[1][0] - q[0][0]); let u, back = false; if (tt < 0.85) u = E.inOutSine(tt / 0.85); else { back = true; u = 1 - 0.55 * E.outCubic(clamp((tt - 0.85) / 1.3)); } const px = lerp(q[0][0], q[1][0], u * 0.9), py = lerp(q[0][1], q[1][1], u * 0.9); S4.ship(ctx, px, py, back ? ang + Math.PI : ang, 44, '#3E3A36', 1); if (tt > 0.85 && tt < 1.5) { const k = (tt - 0.85) / 0.65; ctx.strokeStyle = `rgba(255,255,255,${0.7 * (1 - k)})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(q[0][0] + (q[1][0] - q[0][0]) * 0.92, q[0][1] + (q[1][1] - q[0][1]) * 0.92, 6 + k * 22, 0, TAU); ctx.stroke(); } });
       { const tt = t - (AUT.tDesign + 0.3); if (tt > 0) { const u = tt < 0.8 ? E.inOutSine(tt / 0.8) : 1 - 0.5 * E.outCubic(clamp((tt - 0.8) / 1.2)); const px = lerp(this.truck[0][0], this.truck[1][0], u * 0.9), py = lerp(this.truck[0][1], this.truck[1][1], u * 0.9); ctx.save(); ctx.translate(px, py); ctx.rotate(Math.atan2(this.truck[1][1] - this.truck[0][1], this.truck[1][0] - this.truck[0][0])); ctx.fillStyle = 'rgba(20,14,10,0.3)'; ctx.fillRect(-12, -5, 28, 13); ctx.fillStyle = '#4A4038'; ctx.fillRect(-14, -7, 22, 14); ctx.fillStyle = '#6B5E50'; ctx.fillRect(8, -6, 8, 12); ctx.restore(); } }
       S4.walls(ctx, this.rings, hg, { lw: 8 });
       ctx.restore();
       // title on the map
-      const ka = clamp((t - AUT.tBuild) / 0.7); if (ka > 0) { const spr = S4.sten('AUTARKY', 120, '#1A1716', { wear: 0.3 }); S4.word(ctx, spr, 130, 170, ka * 1.05); mono(ctx, '1939 – 1959 · A CLOSED ECONOMY', 140, 252, { size: 22, weight: 700, color: '#2A2522', alpha: clamp((t - AUT.tBuild - 0.5) / 0.5) }); }
+      const ka = clamp((t - AUT.tBuild) / 0.7); if (ka > 0) { const spr = S4.sten('AUTARKY', 120, '#1A1716', { wear: 0.3 }); S4.word(ctx, spr, 1190, 880, ka * 1.05); mono(ctx, '1939 – 1959 · A CLOSED ECONOMY', 1200, 962, { size: 22, weight: 700, color: '#2A2522', alpha: clamp((t - AUT.tBuild - 0.5) / 0.5) }); }
     },
     post: { grade: 'archival', sat: 0.7, contrast: 1.1, vignette: 0.45, grain: 0.05 } });
 
@@ -660,7 +660,7 @@
   const RECIP = ['Austria', 'Belgium', 'Denmark', 'France', 'Greece', 'Iceland', 'Ireland', 'Italy', 'Luxembourg', 'Netherlands', 'Norway', 'Portugal', 'Sweden', 'Turkey', 'United Kingdom'];
   const BLOC = ['Russia', 'Ukraine', 'Belarus', 'Moldova', 'Lithuania', 'Latvia', 'Estonia', 'Georgia', 'Armenia', 'Azerbaijan', 'Kazakhstan', 'Poland', 'Czechia', 'Slovakia', 'Hungary', 'Romania', 'Bulgaria', 'Albania'];
   const WGER = [[5.5, 55.6], [10.95, 54.05], [10.75, 53.65], [10.6, 53.37], [11.45, 53.05], [11.0, 52.85], [10.95, 52.25], [10.6, 51.8], [10.15, 51.4], [10.0, 50.9], [10.05, 50.55], [10.8, 50.35], [11.95, 50.33], [12.2, 50.25], [13.5, 48.9], [14, 46.5], [5, 46.5]];
-  const TBL = { map: [0, 0, 3200, 2300], book: [200, 1440, 1000, 680], un: [3480, 480, 960, 1260] };
+  const TBL = { map: [0, 0, 3200, 2300], book: [1100, 2290, 1000, 680], un: [3480, 540, 960, 1260] };
   S4.tablePr = () => { if (S4._tpr) return S4._tpr; const pr = GEO.proj('conic', { center: [12, 52], scale: 1 }); pr.fitExtent([[60, 90], [3140, 2240]], { type: 'MultiPoint', coordinates: [[-24, 36], [44, 36], [-24, 66], [44, 68], [10, 71.5], [8, 33.5]] }); return (S4._tpr = pr); };
   const wgClip = (ctx, pr) => { ctx.beginPath(); WGER.forEach((q, i) => { const p = pr(q); i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); }); ctx.closePath(); ctx.clip(); };
   S4.tableMap = () => MG.cache('s4:tableMap', 3200, 2300, (x, w, h) => {
@@ -709,7 +709,7 @@
       const R = (pts) => MG.path.spline(pts.map((q) => pr(q)), 6); const MED = [[-30, 37.5], [-14, 36.2], [-6.0, 35.95], [-1, 36.4], [5, 37.6], [10.5, 38.0]];
       this.routes = [R([[-32, 50.6], [-12, 50.2], [-5, 49.9], [-1.3, 50.6]]), R([[-32, 48.2], [-10, 48.4], [-3, 49.7], [0.1, 49.5]]), R([[-32, 51.8], [-12, 51.1], [-3, 50.4], [2, 51.2], [4.2, 51.95]]), R([[-32, 54.2], [-14, 56.2], [0, 56.2], [6.5, 54.4], [8.6, 53.6]]), R([[-32, 57.5], [-12, 59.2], [3, 59.4], [10.6, 59.6]]), R([[-32, 61.5], [-24, 63.6], [-22.2, 64.1]]), R([[-32, 52.6], [-14, 51.6], [-8.3, 51.85]]), R([[-32, 39.4], [-14, 38.9], [-9.3, 38.65]]), R([...MED, [13, 40.0], [14.2, 40.75]]), R([...MED, [15.5, 36.6], [21, 36.5], [23.6, 37.9]]), R([...MED, [15.5, 36.4], [22, 36.2], [25.8, 38.8], [26.4, 40.15], [29, 41.0]]), R([...MED, [15.6, 36.6], [18.6, 39.8], [16, 42.6], [13.7, 45.6]])];
       this.recip = RECIP.map((n) => GEO.country(n, '50')).filter(Boolean); this.de = GEO.country('Germany', '50'); this.esF = GEO.country('Spain', '50'); },
-    cam(t) { const [ex, ey] = this.es || [0, 0]; return camKeys(t, [[552.85, { x: 960, y: 1700, z: 1.75 }], [TB.tHunger - 0.2, { x: 880, y: 1720, z: 1.5 }], [555.45, { x: 870, y: 1735, z: 1.42 }], [556.35, { x: 948, y: 1790, z: 1.55 }], [TB.tRest - 0.15, { x: 952, y: 1795, z: 1.6 }], [559.45, { x: 1600, y: 1150, z: 0.47 }, 'cam'], [561.75, { x: 1610, y: 1140, z: 0.5 }], [563.0, { x: ex + 40, y: ey - 20, z: 1.15 }, 'cam'], [564.6, { x: ex + 70, y: ey - 10, z: 1.22 }], [565.1, { x: 3960, y: 1110, z: 0.92 }, 'inOutQuart'], [568.1, { x: 3960, y: 1120, z: 1.0 }]]); },
+    cam(t) { const [ex, ey] = this.es || [0, 0]; return camKeys(t, [[552.85, { x: 1860, y: 2530, z: 1.75 }], [TB.tHunger - 0.2, { x: 1780, y: 2560, z: 1.5 }], [555.45, { x: 1770, y: 2575, z: 1.42 }], [556.35, { x: 1848, y: 2640, z: 1.55 }], [TB.tRest - 0.15, { x: 1852, y: 2645, z: 1.6 }], [559.45, { x: 1600, y: 1150, z: 0.47 }, 'cam'], [561.75, { x: 1610, y: 1140, z: 0.5 }], [563.0, { x: ex + 40, y: ey - 20, z: 1.15 }, 'cam'], [564.6, { x: ex + 70, y: ey - 10, z: 1.22 }], [565.1, { x: 3960, y: 1150, z: 0.9 }, 'inOutQuart'], [568.1, { x: 3960, y: 1160, z: 0.97 }]]); },
     draw(ctx, t) {
       const c = this.cam(t); const h = hh(t, 2.5, 16); c.dx = h.dx; c.dy = h.dy; c.r = h.rot; const lw = 1 / c.z; const pr = this.pr;
       const wb = Math.sin(clamp((t - 564.6) / 0.5) * Math.PI); if (wb > 0.05) ctx.filter = `blur(${(wb * 10).toFixed(1)}px)`;
@@ -736,8 +736,8 @@
       S4.gdpChart(ctx, 548, 200, 400, 380, clamp((t - TB.tGDP + 0.1) / 1.7), Math.max(0.6, lw)); ctx.restore();
       // plate (hunger) & ration book, coupons torn off; then both pushed away
       const away = E.inCubic(clamp((t - 555.45) / 0.75));
-      { const kin = E.outCubic(clamp((t - (TB.tHunger - 0.55)) / 0.6)); const px = lerp(-200, 560, kin) - away * 900, py = 1820 + away * 600; S4.plate(ctx, px, py, 150); }
-      { const rb = S4.ration(); const rx = 960 + away * 1300, ry = 1730 + away * 500; ctx.save(); ctx.translate(rx, ry); ctx.rotate(-0.04 + away * 0.3); ctx.shadowColor = 'rgba(10,5,2,0.55)'; ctx.shadowBlur = 20; ctx.shadowOffsetX = 10; ctx.shadowOffsetY = 16; ctx.drawImage(rb, -rb.width / 2, -rb.height / 2); ctx.shadowColor = 'transparent';
+      { const kin = E.outCubic(clamp((t - (TB.tHunger - 0.55)) / 0.6)); const px = lerp(700, 1460, kin) - away * 1100, py = 2670 + away * 700; S4.plate(ctx, px, py, 150); }
+      { const rb = S4.ration(); const rx = 1860 + away * 1500, ry = 2530 + away * 900; ctx.save(); ctx.translate(rx, ry); ctx.rotate(-0.04 + away * 0.3); ctx.shadowColor = 'rgba(10,5,2,0.55)'; ctx.shadowBlur = 20; ctx.shadowOffsetX = 10; ctx.shadowOffsetY = 16; ctx.drawImage(rb, -rb.width / 2, -rb.height / 2); ctx.shadowColor = 'transparent';
         for (let i = 0; i < 16; i++) { const cx2 = 20 + (i % 4) * 65 + 32.5, cy2 = -170 + Math.floor(i / 4) * 87 + 43; const tt = t - (TB.tRation - 0.05) - [0, 3, 6, 9, 12, 1, 4, 7, 10, 13, 2, 5, 8, 11, 14, 15][i] * 0.07; const cp = S4.coupon(i); if (tt <= 0) { ctx.drawImage(cp, cx2 - 32, cy2 - 43); continue; } if (tt > 1.4) continue; const e = E.inCubic(clamp(tt / 1.2)); ctx.save(); ctx.translate(cx2 + e * 900, cy2 - Math.sin(e * Math.PI) * 80 - e * 300); ctx.rotate(e * (MG.rand(4, i) - 0.3) * 2.5); const sc2 = 1 + Math.sin(clamp(tt / 0.25) * Math.PI / 2) * 0.12; ctx.scale(sc2, sc2); ctx.shadowColor = 'rgba(10,5,2,0.4)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 10; ctx.drawImage(cp, -32, -43); ctx.restore(); }
         ctx.restore(); }
       // UN seating plan
@@ -745,12 +745,12 @@
         const U = S4.unSeats(); const k55 = clamp((t - (TB.t55 - 0.05)) / 0.9);
         for (const st of U.seats) { if (st === U.spain) continue; if (!st.isNew) { ctx.fillStyle = '#1F2A36'; ctx.beginPath(); ctx.arc(st.x, st.y, 15, 0, TAU); ctx.fill(); } else { const kk = clamp((k55 * 16 - st.k) / 2.5); ctx.strokeStyle = 'rgba(31,42,54,0.5)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(st.x, st.y, 14, 0, TAU); ctx.stroke(); if (kk > 0) { ctx.fillStyle = '#4F6B88'; ctx.beginPath(); ctx.arc(st.x, st.y, 15 * E.outBack(kk), 0, TAU); ctx.fill(); } } }
         const sp = U.spain; const ks = E.inOutCubic(clamp((t - (TB.t55 - 0.15)) / 0.7)); const ox = ux + 820, oy = uy + 1060; const sx = lerp(ox, sp.x, ks), sy = lerp(oy, sp.y, ks) - Math.sin(ks * Math.PI) * 160;
-        ctx.strokeStyle = 'rgba(31,42,54,0.5)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(sp.x, sp.y, 14, 0, TAU); ctx.stroke(); ctx.fillStyle = C.red; ctx.beginPath(); ctx.arc(sx, sy, 17, 0, TAU); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); mono(ctx, 'SPAIN', sx, sy + 46, { size: 22, weight: 800, color: C.red, align: 'center' });
+        ctx.strokeStyle = 'rgba(31,42,54,0.5)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(sp.x, sp.y, 14, 0, TAU); ctx.stroke(); ctx.fillStyle = C.red; ctx.beginPath(); ctx.arc(sx, sy, 17, 0, TAU); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke(); mono(ctx, 'SPAIN', sx, sy + 46, { size: 22, weight: 800, color: C.red, align: 'center', alpha: 1 - ks }); if (ks > 0.95) { ctx.strokeStyle = C.red; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(sx, sy, 26 + Math.sin(t * 5) * 2, 0, TAU); ctx.stroke(); mono(ctx, 'SPAIN · 1955', sx + 40, sy - 34, { size: 22, weight: 800, color: C.red }); }
         if (ks < 0.05) { ctx.strokeStyle = 'rgba(184,50,42,0.6)'; ctx.lineWidth = 3; ctx.setLineDash([8, 8]); ctx.beginPath(); ctx.moveTo(ox - 60, oy - 60); ctx.lineTo(ox + 60, oy - 60); ctx.stroke(); ctx.setLineDash([]); }
-        const yr = Math.round(lerp(1946, 1955, clamp((t - TB.tUN + 0.4) / (TB.t55 - TB.tUN + 0.4)))); txt(ctx, String(yr), ux + 900, uy + 120, { font: F.cond, size: 120, weight: 900, color: yr === 1955 ? C.red : '#1F2A36', align: 'right' }); }
+        const yr = Math.round(lerp(1946, 1955, clamp((t - TB.tUN + 0.4) / (TB.t55 - TB.tUN + 0.4)))); txt(ctx, String(yr), ux + 900, uy + 250, { font: F.cond, size: 120, weight: 900, color: yr === 1955 ? C.red : '#1F2A36', align: 'right' }); }
       ctx.restore(); ctx.filter = 'none';
       // spoken key words, stencilled at the edge of frame
-      const words = [['HUNGER', TB.tHunger], ['RATIONING', TB.tRation]]; words.forEach(([wd, t0], i) => { const k = clamp((t - t0 + 0.05) / 0.45) * (1 - clamp((t - 555.5) / 0.4)); if (k <= 0) return; const spr = S4.sten(wd, 96, C.bone, { wear: 0.3 }); S4.word(ctx, spr, 120, 150 + i * 110, k * 1.05); });
+      const words = [['HUNGER', TB.tHunger], ['RATIONING', TB.tRation]]; words.forEach(([wd, t0], i) => { const k = clamp((t - t0 + 0.05) / 0.45) * (1 - clamp((t - 555.5) / 0.4)); if (k <= 0) return; const spr = S4.sten(wd, 96, '#1A1716', { wear: 0.25 }); S4.word(ctx, spr, 120, 150 + i * 110, k * 1.05); });
       // a single lamp, warm, from the upper-left
       ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(MG.cache('s4:lamp', W, H, (x, w, h2) => { const g = x.createRadialGradient(w * 0.35, h2 * 0.3, 100, w * 0.5, h2 * 0.5, w * 0.8); g.addColorStop(0, '#FFFFFF'); g.addColorStop(1, '#7A6A5A'); x.fillStyle = g; x.fillRect(0, 0, w, h2); }), 0, 0); ctx.restore();
     },
@@ -758,11 +758,11 @@
 
   // ---------------------------------------------------------------- 1959: back on the stamp sheet → dive into the first colourful stamp
   const S59 = { t59: tw('1959,', 568.99), tChanges: tw('everything', 570.51) };
-  S4.stampLive = (ctx, i, t, bloom) => { const [sx, sy] = S4.stampPos(i); const X = sx + 150, Y = sy + 60; ctx.save(); ctx.translate(X + 150, Y + 180); ctx.rotate(MG.range(5, i, -0.012, 0.012)); ctx.translate(-150, -180); ctx.fillStyle = '#F4EFE3'; ctx.fillRect(0, 0, 300, 360); ctx.save(); ctx.beginPath(); ctx.rect(22, 22, 256, 316); ctx.clip(); S4.tourArt(ctx, TOUR[i % 4], t, bloom); ctx.restore(); txt(ctx, 'ESPAÑA', 150, 62, { font: F.retro, size: 30, color: C.white, align: 'center', stroke: C.navy, strokeW: 5, alpha: 1 - bloom }); txt(ctx, String(1939 + i), 264, 324, { font: F.mono, size: 18, weight: 700, color: C.navy, align: 'right', alpha: 1 - bloom }); ctx.restore(); };
+  S4.stampLive = (ctx, i, t, bloom) => { const [sx, sy] = S4.stampPos(i); const X = sx + 150, Y = sy + 60; ctx.save(); ctx.translate(X + 150, Y + 180); ctx.rotate(MG.range(5, i, -0.012, 0.012)); ctx.translate(-150, -180); ctx.fillStyle = '#F4EFE3'; ctx.fillRect(0, 0, 300, 360); ctx.save(); const gr = bloom * 2600; ctx.beginPath(); ctx.rect(22 - gr, 22 - gr, 256 + gr * 2, 316 + gr * 2); ctx.clip(); S4.tourArt(ctx, TOUR[i % 4], t, bloom); ctx.restore(); txt(ctx, 'ESPAÑA', 150, 62, { font: F.retro, size: 30, color: C.white, align: 'center', stroke: C.navy, strokeW: 5, alpha: 1 - bloom }); txt(ctx, String(1939 + i), 264, 324, { font: F.mono, size: 18, weight: 700, color: C.navy, align: 'right', alpha: 1 - bloom }); ctx.restore(); };
   SC.push({ id: 's04_stamp59', start: 568.10, end: 571.95,
     draw(ctx, t) {
       const P18 = S4.stampPos(18), P19 = S4.stampPos(19), P20 = S4.stampPos(20); const c18 = [P18[0] - 150 + 150, P18[1] - 60 + 180], c19 = [P19[0] - 150 + 150, P19[1] - 60 + 180], c20 = [P20[0] + 150 + 150, P20[1] + 60 + 150];
-      const c = camKeys(t, [[568.1, { x: c18[0] - 40, y: c18[1], z: 1.45 }], [568.65, { x: c19[0], y: c19[1], z: 1.5 }, 'inOutSine'], [S59.t59 + 0.1, { x: c20[0], y: c20[1] + 20, z: 1.6 }, 'inOutCubic'], [S59.tChanges - 0.1, { x: c20[0], y: c20[1], z: 2.6 }, 'inOutSine'], [S59.tChanges + 0.55, { x: c20[0], y: c20[1], z: 9.5 }, 'inCubic'], [571.95, { x: c20[0], y: c20[1] - 6, z: 10.5 }]]);
+      const c = camKeys(t, [[568.1, { x: c18[0] - 40, y: c18[1], z: 1.45 }], [568.65, { x: c19[0], y: c19[1], z: 1.5 }, 'inOutSine'], [S59.t59 + 0.1, { x: c20[0], y: c20[1] + 20, z: 1.6 }, 'inOutCubic'], [S59.tChanges - 0.1, { x: c20[0], y: c20[1], z: 2.6 }, 'inOutSine'], [S59.tChanges + 0.7, { x: c20[0], y: c20[1], z: 4.0 }, 'inOutCubic'], [571.95, { x: c20[0], y: c20[1], z: 4.47 }]]);
       const h = hh(t, 2, 18); c.dx = h.dx * (1 - clamp((t - S59.tChanges) / 0.4)); c.dy = h.dy * (1 - clamp((t - S59.tChanges) / 0.4));
       S4.desk(ctx, '#2E2724'); ctx.save(); camT(ctx, c);
       S4.sheetDraw(ctx, t, { split: 1, flip: () => 1, dim: 1 });

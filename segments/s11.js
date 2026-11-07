@@ -872,6 +872,109 @@
   };
 
   // =====================================================================================================
+  // SCENE 8 — the night street. Match cut: the paella pan becomes the façade clock (Franco's clock returns) at 22:00.
+  // Hands sweep to midnight; the camera cranes back THROUGH the string lights (they switch on) to a terrace full of
+  // families — grandparents, parents, kids running with a ball. Push in on the abuela: "There's a saying:"
+  // =====================================================================================================
+  const tDinner = Tw('dinner', 1700.10), tTen = Tw('ten', 1700.58), tMid = Tw('midnight', 1701.54), tWhole = Tw('whole', 1702.34), tKids = Tw('kids', 1703.38), tIncl = Tw('included.', 1703.90), tSaying = Tw('saying:', 1705.14), tTheres = Tw("there's", 1704.82);
+  S11.football = (ctx, x, y, r, rot) => { const p = MG.path.circle(x, y, r); MG.fx.volume(ctx, p, [x - r, y - r, 2 * r, 2 * r], { color: '#F4EFE6', cel: true, outline: '#2a1a16', shade: 0.4 }); ctx.save(); ctx.clip(p); ctx.translate(x, y); ctx.rotate(rot); ctx.fillStyle = '#2a2426'; for (const [a, d] of [[0, 0], [0, 0.62], [1.26, 0.62], [2.51, 0.62], [3.77, 0.62], [5.03, 0.62]]) { ctx.beginPath(); for (let k = 0; k < 5; k++) { const aa = k / 5 * MG.TAU - Math.PI / 2; ctx.lineTo(Math.cos(a) * d * r + Math.cos(aa) * r * 0.26, Math.sin(a) * d * r + Math.sin(aa) * r * 0.26); } ctx.fill(); } ctx.restore(); };
+  /** running legs (side view, facing dir) */
+  S11.runLegs = (ctx, x, y, U, ph, dir, trou, shoe) => { for (const k of [0, Math.PI]) { const a = Math.sin(ph + k) * 0.75, kn = Math.max(0, Math.sin(ph + k + 1.2)) * 1.1 + 0.15; const hip = [x, y]; const knee = [x + Math.sin(a) * 0.5 * U * dir, y + Math.cos(a) * 0.5 * U]; const foot = [knee[0] + Math.sin(a - kn) * 0.48 * U * dir, knee[1] + Math.cos(a - kn) * 0.48 * U]; S11.limb(ctx, [hip, knee], U * 0.24, U * 0.2, trou); S11.limb(ctx, [knee, foot], U * 0.18, U * 0.15, k ? MG.col.shade(trou === '#F2C49A' ? '#E8B08C' : trou, 0.1) : (trou === '#F2C49A' ? '#E8B08C' : trou)); const sh = MG.path.ellipse(foot[0] + 0.08 * U * dir, foot[1], 0.14 * U, 0.07 * U); MG.fx.volume(ctx, sh, [foot[0] - 0.1 * U, foot[1] - 0.08 * U, 0.3 * U, 0.16 * U], { color: shoe, cel: true, outline: '#1a1010' }); } };
+  const streetScene = {
+    id: 's11_street', start: 1699.62, end: 1706.05,
+    transIn: { type: S11.matchDissolve, dur: 0.45, x: 960, y: 540, aTo: 1.08, bFrom: 0.95 },
+    post: (t) => ({ grade: 'warm', vignette: 0.42, bloom: 0.22 * pg(t, tMid - 0.2, tMid + 0.6) + 0.06, bloomThreshold: 0.72, temp: 0.04, lift: 0.01 }),
+    init() {
+      const L = [-0.5, -0.85];
+      this.skyA = MG.cache('s11:skydusk', W, H, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#2A2448'); g.addColorStop(0.55, '#6A3F62'); g.addColorStop(0.8, '#C77A6E'); g.addColorStop(1, '#E9A27F'); x.fillStyle = g; x.fillRect(0, 0, w, h); MG.tex.over(x, 'blotch', { alpha: 0.08, color: '#000', scale: 3 }); });
+      this.skyB = MG.cache('s11:skynight', W, H, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#120F26'); g.addColorStop(0.6, '#2B1E3E'); g.addColorStop(0.85, '#5A3550'); g.addColorStop(1, '#7A4A55'); x.fillStyle = g; x.fillRect(0, 0, w, h); const r = MG.rng(3); for (let i = 0; i < 160; i++) { x.fillStyle = `rgba(255,245,225,${0.3 + r() * 0.6})`; const s2 = r() * 1.8; x.fillRect(r() * w, r() * h * 0.55, s2, s2); } });
+      // façades (z = 1400). world origin: clock centre at (960, 0); street level y = 632
+      this.bx0 = -520; this.by0 = -230;
+      this.bld = MG.cache('s11:facades', 3000, 900, (x, w, h) => {
+        x.translate(-this.bx0, -this.by0); const r = MG.rng(31); const GY = 632;
+        const cols = ['#E7D6B6', '#D9B477', '#C98E6A', '#E3B9A6', '#E9DCC0', '#CFA36E'];
+        const blds = []; let px = this.bx0; let i = 0; while (px < this.bx0 + 3000) { const centre = px < 960 && px + 520 > 960; const bw = centre ? 0 : 300 + r() * 220; if (centre) { blds.push({ x: 960 - 330, w: 660, h: 610, c: '#E9DCC0', tower: true }); px = 960 + 330; i++; continue; } blds.push({ x: px, w: Math.min(bw, centre ? bw : bw), h: 430 + r() * 160, c: cols[i % cols.length] }); px += bw; i++; }
+        for (const b of blds) { if (b.x < 960 - 330 && b.x + b.w > 960 - 330) b.w = 960 - 330 - b.x; }
+        for (const b of blds) {
+          const top = GY - b.h; x.fillStyle = b.c; x.fillRect(b.x, top, b.w, b.h); x.save(); x.beginPath(); x.rect(b.x, top, b.w, b.h); x.clip(); MG.tex.over(x, 'blotch', { alpha: 0.18, color: '#6a4a3a', scale: 3, seed: Math.floor(b.x) }); MG.tex.over(x, 'fibers', { alpha: 0.5 }); x.restore();
+          x.fillStyle = 'rgba(60,30,40,0.25)'; x.fillRect(b.x, top - 14, b.w, 18); x.fillStyle = MG.col.shade(b.c, 0.25); x.fillRect(b.x - 6, top - 22, b.w + 12, 10); x.fillStyle = 'rgba(30,15,25,0.25)'; x.fillRect(b.x + b.w - 8, top, 8, b.h);
+          const floors = Math.floor((b.h - 150) / 120); const nw = Math.max(2, Math.floor(b.w / 120));
+          for (let f = 0; f < floors; f++) { const fy = GY - 170 - f * 120; for (let k = 0; k < nw; k++) { const wx = b.x + (k + 0.5) * (b.w / nw) - 28; const lit = r() < 0.62; const wg = x.createLinearGradient(0, fy - 70, 0, fy); wg.addColorStop(0, lit ? '#FFD58A' : '#3A2A3A'); wg.addColorStop(1, lit ? '#F0A050' : '#2A1E2A'); x.fillStyle = wg; x.fillRect(wx, fy - 76, 56, 76); if (lit && r() < 0.4) { x.fillStyle = 'rgba(60,30,30,0.5)'; x.beginPath(); x.ellipse(wx + 28, fy - 26, 12, 22, 0, 0, MG.TAU); x.fill(); x.beginPath(); x.arc(wx + 28, fy - 54, 9, 0, MG.TAU); x.fill(); }
+              x.fillStyle = r() < 0.5 ? '#3E6A52' : '#6A4A32'; x.fillRect(wx - 20, fy - 78, 18, 80); x.fillRect(wx + 58, fy - 78, 18, 80); x.fillStyle = 'rgba(0,0,0,0.25)'; for (let q = 0; q < 7; q++) { x.fillRect(wx - 20, fy - 74 + q * 11, 18, 2); x.fillRect(wx + 58, fy - 74 + q * 11, 18, 2); }
+              if (f < floors - 0) { x.fillStyle = '#2A1E24'; x.fillRect(wx - 24, fy, 104, 6); x.fillRect(wx - 24, fy - 34, 104, 3); for (let q = 0; q <= 9; q++) x.fillRect(wx - 24 + q * 11.5, fy - 34, 2, 36); if (r() < 0.45) { x.fillStyle = '#C8693F'; x.fillRect(wx - 16, fy - 18, 16, 14); x.fillStyle = '#D7303A'; x.beginPath(); x.arc(wx - 8, fy - 24, 8, 0, MG.TAU); x.fill(); x.fillStyle = '#3E6A3A'; x.beginPath(); x.arc(wx - 14, fy - 20, 6, 0, MG.TAU); x.fill(); } } } }
+          // ground floor: arched shopfronts with awnings
+          const na = Math.max(1, Math.floor(b.w / 160)); for (let k = 0; k < na; k++) { const ax = b.x + (k + 0.5) * (b.w / na); x.fillStyle = r() < 0.7 ? '#F3B565' : '#3A2A30'; x.beginPath(); x.moveTo(ax - 52, GY); x.lineTo(ax - 52, GY - 80); x.arc(ax, GY - 80, 52, Math.PI, 0); x.lineTo(ax + 52, GY); x.fill(); if (r() < 0.6) { const aw = [ax - 70, GY - 150]; for (let q = 0; q < 7; q++) { x.fillStyle = q % 2 ? '#F4EFE6' : '#B8322A'; x.beginPath(); x.moveTo(aw[0] + q * 20, aw[1]); x.lineTo(aw[0] + q * 20 + 20, aw[1]); x.lineTo(aw[0] + q * 20 + 26, aw[1] + 44); x.lineTo(aw[0] + q * 20 + 6, aw[1] + 44); x.fill(); } } }
+        }
+        // the clock tower (Puerta del Sol-like)
+        x.fillStyle = '#E9DCC0'; x.fillRect(960 - 130, -150, 260, 160); x.fillStyle = 'rgba(60,30,40,0.25)'; x.fillRect(960 - 140, -158, 280, 14); x.fillRect(960 - 130, 0, 260, 8); x.fillStyle = '#3B2A3A'; x.beginPath(); x.moveTo(960 - 60, -158); x.quadraticCurveTo(960, -230, 960 + 60, -158); x.fill(); x.fillRect(958, -260, 4, 50); x.fillStyle = '#B8322A'; x.beginPath(); x.moveTo(962, -258); x.lineTo(1000, -248); x.lineTo(962, -238); x.fill();
+        x.save(); x.beginPath(); x.rect(960 - 130, -150, 260, 160); x.clip(); MG.tex.over(x, 'fibers', { alpha: 0.5 }); x.restore();
+      });
+      this.cobble = MG.cache('s11:cobble', 256, 256, (x, w, h) => { x.fillStyle = '#5A4248'; x.fillRect(0, 0, w, h); const r = MG.rng(7); for (let j = 0; j < 8; j++) for (let i = 0; i < 6; i++) { x.fillStyle = `rgb(${110 + r() * 30},${86 + r() * 20},${84 + r() * 20})`; x.beginPath(); x.ellipse(i * 44 + (j % 2) * 22 + 20, j * 32 + 16, 19, 13, 0, 0, MG.TAU); x.fill(); } MG.tex.over(x, 'grain', { alpha: 0.2 }); });
+      this.fgChair = MG.blurred(MG.cache('s11:fgchair', 520, 900, (x, w, h) => { x.strokeStyle = '#1A1216'; x.lineWidth = 26; x.lineCap = 'round'; x.beginPath(); x.moveTo(110, 900); x.lineTo(130, 260); x.quadraticCurveTo(260, 140, 390, 260); x.lineTo(410, 900); x.stroke(); x.lineWidth = 14; for (let i = 0; i < 4; i++) { x.beginPath(); x.moveTo(140, 330 + i * 70); x.quadraticCurveTo(260, 300 + i * 70, 380, 330 + i * 70); x.stroke(); } x.fillStyle = '#C8693F'; x.fillRect(0, 700, 120, 200); x.fillStyle = '#3E6A3A'; x.beginPath(); x.arc(60, 660, 90, 0, MG.TAU); x.fill(); }), 12);
+      this.fan = S11.spr('fan', 240, 160, (x) => { for (let i = 0; i < 9; i++) { const a = -Math.PI * 0.95 + (i / 8) * Math.PI * 0.9; x.fillStyle = i % 2 ? '#B8322A' : '#D8463A'; x.beginPath(); x.moveTo(0, 60); x.arc(0, 60, 110, a, a + Math.PI * 0.9 / 8 + 0.01); x.closePath(); x.fill(); } x.strokeStyle = '#2a1a16'; x.lineWidth = 2; x.beginPath(); x.arc(0, 60, 110, -Math.PI * 0.95, -Math.PI * 0.05); x.stroke(); x.fillStyle = '#F4EFE6'; for (let i = 0; i < 6; i++) { const a = -Math.PI * 0.85 + i * 0.5; x.beginPath(); x.arc(Math.cos(a) * 80, 60 + Math.sin(a) * 80, 6, 0, MG.TAU); x.fill(); } });
+    },
+    draw(ctx, t) {
+      const L = [-0.5, -0.85];
+      const k = MG.keys(t, [[1699.62, [960, 0, 1204]], [tTen + 0.25, [960, 0, 1170], 'inOutSine'], [tMid - 0.05, [960, 30, 1080], 'inOutSine'], [tWhole + 0.1, [950, 520, 0], 'inOutCubic'], [tTheres - 0.05, [930, 600, 90], 'inOutSine'], [1706.05, [700, 640, 560], 'inOutCubic']]);
+      const hh = MG.cam.handheld(t, 2.5, 51, 0.3); const cam = { x: k[0], y: k[1], z: k[2], focal: 1000, dx: hh.dx, dy: hh.dy };
+      // sky (dusk → night as the hands sweep to midnight)
+      const nk = pg(t, tTen, tMid + 0.4, 'inOutSine'); ctx.drawImage(this.skyA, 0, 0); if (nk > 0) { ctx.save(); ctx.globalAlpha = nk; ctx.drawImage(this.skyB, 0, 0); ctx.restore(); }
+      // clock hours: 21:58 → 22:00 on "ten", then a sweep to midnight
+      const hour = t < tTen ? lerp(21.95, 22.0, pg(t, 1699.62, tTen, 'inOutSine')) : lerp(22.0, 24.0, MG.ease.inOutCubic(clamp((t - tTen - 0.2) / (tMid + 0.35 - tTen - 0.2))));
+      const bulbsOn = (i) => pg(t, tMid - 0.1 + (i % 23) * 0.025, tMid + 0.05 + (i % 23) * 0.025);
+      const layers = [
+        { z: 1400, draw: (c) => { MG.sprite(c, this.bld, this.bx0, this.by0, { ax: 0, ay: 0 }); MG.fx.contact(c, 960, 640, 1400, 30, 0.4); MG.kit.sun(c, 960, -60, 70, t, { variant: 'clock', hour, corona: 0, halftone: 0.4 }); c.strokeStyle = '#2B1D26'; c.lineWidth = 6; c.beginPath(); c.arc(960, -60, 74, 0, MG.TAU); c.stroke(); if (t > tMid) { MG.fx.glow(c, 960, -60, 140, '#FFD58A', 0.25 * pg(t, tMid, tMid + 0.5)); } } },
+        { z: 900, draw: (c, s) => { if (s > 7) return; c.save(); c.globalAlpha = clamp((7 - s) / 2); const strings = [[-300, 40, 2300, 120, 70], [-200, 160, 2200, 60, 90], [-400, 260, 2400, 220, 60]]; let bi = 0; strings.forEach(([x0, y0, x1, y1, sag], si) => { const pts = []; for (let i = 0; i <= 40; i++) { const u = i / 40; pts.push([lerp(x0, x1, u), lerp(y0, y1, u) + Math.sin(u * Math.PI) * (sag + Math.sin(t * 1.2 + si) * 6)]); } c.strokeStyle = '#1A1216'; c.lineWidth = 2.5; c.beginPath(); pts.forEach((p, i) => (i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]))); c.stroke(); for (let i = 1; i < 40; i += 1) { const p = pts[i]; const on = bulbsOn(bi++); const sw = Math.sin(t * 2 + i) * 1.5; if (on > 0) MG.fx.glow(c, p[0] + sw, p[1] + 14, 46, '#FFC46A', 0.5 * on); c.fillStyle = on > 0.5 ? '#FFE9B8' : '#6A5A50'; c.beginPath(); c.ellipse(p[0] + sw, p[1] + 12, 6, 8, 0, 0, MG.TAU); c.fill(); } }); c.restore(); } },
+        { z: 1000, draw: (c) => this.terrace(c, t) },
+        { z: 640, sprite: this.fgChair, x: 180, y: 980, ax: 0.5, ay: 1 },
+      ];
+      MG.depth.stage(ctx, cam, layers);
+      // warm light pools after midnight
+      if (t > tMid) { ctx.save(); ctx.globalCompositeOperation = 'soft-light'; ctx.globalAlpha = 0.45 * pg(t, tMid, tMid + 0.6); const g = ctx.createRadialGradient(960, 650, 50, 960, 700, 1100); g.addColorStop(0, '#FFC47A'); g.addColorStop(1, 'rgba(255,170,90,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); ctx.restore(); }
+      // time tags anchored to the clock
+      const cp = MG.depth.project(cam, 960, -60, 1400);
+      if (t < tMid + 0.7 && cp[2] > 0.5) { const a1 = S11.env(t, tDinner - 0.3, tMid - 0.1, 0.3, 0.25), a2 = S11.env(t, tMid - 0.1, tMid + 0.8, 0.2, 0.3);
+        if (a1 > 0) { ctx.save(); ctx.globalAlpha = a1; MG.text.draw(ctx, 'DINNER', cp[0] + 70 * cp[2] + 40, cp[1] - 40, { font: F.mono, weight: 700, size: 30, tracking: 0.25, color: '#FFE3A8' }); MG.text.draw(ctx, '22:00', cp[0] + 70 * cp[2] + 36, cp[1] + 80, { font: F.cond, weight: 900, size: 150, color: '#FFF1D6', stroke: 'rgba(36,18,28,0.6)', strokeW: 10 }); ctx.restore(); }
+        if (a2 > 0) { const cp2 = cp; ctx.save(); ctx.globalAlpha = a2; MG.text.draw(ctx, 'OUT AT', Math.min(1500, cp2[0] + 70 * cp2[2] + 40), Math.max(150, cp2[1] - 40), { font: F.mono, weight: 700, size: 30, tracking: 0.25, color: '#FFE3A8' }); MG.text.draw(ctx, '00:00', Math.min(1496, cp2[0] + 70 * cp2[2] + 36), Math.max(270, cp2[1] + 80), { font: F.cond, weight: 900, size: 150, color: '#FFF1D6', stroke: 'rgba(36,18,28,0.6)', strokeW: 10 }); ctx.restore(); } }
+      if (t > tIncl - 0.2) { ctx.save(); ctx.globalAlpha = S11.env(t, tIncl - 0.2, tTheres + 0.1, 0.3, 0.3); MG.text.reveal(ctx, 'kids included.', 1770, 980, t, tIncl - 0.15, { font: F.serif, italic: true, size: 64, color: '#FFF1D6', align: 'right', style: 'rise', by: 'word', stroke: 'rgba(36,18,28,0.6)', strokeW: 10 }); ctx.restore(); }
+    },
+    terrace(c, t) {
+      const L = [-0.5, -0.85]; const rim = '#FFD9A0';
+      // cobbled street + kerb
+      c.fillStyle = MG.tex.pattern(c, this.cobble); c.fillRect(-900, 632, 3800, 900); c.fillStyle = 'rgba(30,15,25,0.35)'; c.fillRect(-900, 632, 3800, 30);
+      const sit = (o) => S11.person(c, { rim, light: L, ...o }, t);
+      // background tables (dimmer)
+      const bgTable = (x, y, a, b) => { MG.fx.contact(c, x, y + 120, 200, 22, 0.4); sit(a); sit(b); const top = MG.path.ellipse(x, y, 150, 34); MG.fx.volume(c, top, [x - 150, y - 34, 300, 68], { color: '#EFE6D6', cel: true, outline: '#2a1a16', light: L }); c.fillStyle = '#E2D6C2'; c.fillRect(x - 150, y, 300, 70); c.fillStyle = 'rgba(0,0,0,0.15)'; c.fillRect(x - 150, y + 50, 300, 20); MG.fx.glow(c, x, y - 40, 70, '#FFC46A', 0.35); c.fillStyle = '#FFF1C8'; c.fillRect(x - 4, y - 46, 8, 22); };
+      bgTable(130, 770, { x: 40, y: 800, s: 0.8, skin: '#D9A07A', shirt: '#3E6A8A', hair: { style: 'short', color: '#2A1A16' }, turn: 0.5, seed: 21, mood: 'smile', open: 0.3 * Math.max(0, Math.sin(t * 5)), arms: [{ hand: [0.6, -0.55] }, { hand: [0.75, -0.75], front: true, pose: 'open' }] }, { x: 230, y: 800, s: 0.8, skin: '#E3B08C', shirt: '#E9C46A', hair: { style: 'long', color: '#5A3A1A' }, turn: -0.5, seed: 22, mood: 'grin', open: 0.4, arms: [{ hand: [-0.6, -0.6] }, { hand: [-0.5, -0.9], front: true, pose: 'open' }] });
+      bgTable(1720, 770, { x: 1630, y: 800, s: 0.8, skin: '#C98A64', shirt: '#B8322A', hair: { style: 'bald', color: '#3A2A20' }, beard: '#3A2A20', turn: 0.45, seed: 23, mood: 'smile', arms: [{ hand: [0.6, -0.5] }, { hand: [0.7, -0.9], front: true, pose: 'point' }] }, { x: 1815, y: 800, s: 0.8, skin: '#E8B892', shirt: '#7B4A7A', hair: { style: 'bun', color: '#2A1A16' }, turn: -0.45, seed: 24, earring: true, mood: 'smile', open: 0.25, arms: [{ hand: [-0.6, -0.5] }, { hand: [-0.6, -0.8], front: true }] });
+      // waiter crossing behind with a tray
+      { const u = clamp((t - (tMid + 0.6)) / 3.6); if (u > 0 && u < 1) { const wx = lerp(1500, 380, u), wy = 720; const ph = t * 9; S11.runLegs(c, wx, wy, 70, ph * 0.6, -1, '#1E1A1D', '#111'); S11.person(c, { x: wx, y: wy, s: 0.7, skin: '#D9A07A', shirt: '#F4EFE6', collar: '#FFFFFF', hair: { style: 'short', color: '#1A1210' }, mustache: '#1A1210', turn: -0.6, seed: 25, light: L, rim, arms: [{ hand: [-0.2, -0.3] }, { hand: [-0.7, -1.45], front: true, pose: 'open', prop: (cc, tg) => { cc.fillStyle = '#B9BCC2'; cc.beginPath(); cc.ellipse(tg[0], tg[1] - 6, 60, 10, 0, 0, MG.TAU); cc.fill(); cc.fillStyle = '#6a0a1c'; cc.fillRect(tg[0] - 30, tg[1] - 40, 12, 32); cc.fillStyle = '#E2B24A'; cc.fillRect(tg[0] + 6, tg[1] - 34, 14, 26); } }] }, t); } }
+      // the family table
+      const TX = 960, TY = 820;
+      const laugh = (ph, a = 1) => Math.max(0, Math.sin(t * 6 + ph)) * a;
+      const raise = pg(t, tTheres - 0.15, tTheres + 0.35, 'outBack');
+      // back row: mother & father
+      sit({ x: TX - 115, y: TY + 10, s: 0.95, skin: '#C98A64', shirt: '#B8322A', hair: { style: 'long', color: '#2A1A16' }, earring: true, turn: 0.2, seed: 31, mood: 'grin', open: 0.25 + laugh(0.5) * 0.4, headDy: -laugh(0.5) * 0.04, mouthW: 0.24, arms: [{ hand: [-0.35, -0.55] }, { hand: [0.25, -0.95], front: true, pose: 'open', prop: (cc, tg) => { cc.fillStyle = 'rgba(255,255,255,0.35)'; cc.fillRect(tg[0] - 10, tg[1] - 44, 20, 34); cc.fillStyle = '#6a0a1c'; cc.fillRect(tg[0] - 9, tg[1] - 30, 18, 18); } }] });
+      sit({ x: TX + 120, y: TY + 10, s: 0.98, skin: '#D9A07A', shirt: '#3A6EA5', collar: '#4A7EB5', hair: { style: 'short', color: '#2A1A16' }, beard: '#2A1A16', turn: -0.25, seed: 33, mood: 'smile', open: 0.3 + 0.3 * Math.abs(Math.sin(t * 7)), brows: 0.3 * Math.sin(t * 2), arms: [{ hand: [0.4, -0.5] }, { hand: [-0.55 + Math.sin(t * 3) * 0.12, -1.0 + Math.cos(t * 3) * 0.1], front: true, pose: 'open' }] });
+      // table + props
+      MG.fx.contact(c, TX, TY + 160, 330, 30, 0.45);
+      const top = MG.path.ellipse(TX, TY, 250, 58); c.save(); c.fillStyle = '#F1E7D6'; c.beginPath(); c.moveTo(TX - 250, TY); c.lineTo(TX - 262, TY + 120); c.quadraticCurveTo(TX, TY + 150, TX + 262, TY + 120); c.lineTo(TX + 250, TY); c.fill(); c.fillStyle = 'rgba(184,50,42,0.18)'; for (let i = -6; i <= 6; i++) c.fillRect(TX + i * 40 - 10, TY, 20, 130); c.fillStyle = 'rgba(40,20,30,0.18)'; c.fillRect(TX - 262, TY + 96, 524, 30); c.restore();
+      MG.fx.volume(c, top, [TX - 250, TY - 58, 500, 116], { color: '#F6EEE0', cel: true, outline: '#2a1a16', light: L });
+      c.fillStyle = '#2B2A2E'; c.beginPath(); c.ellipse(TX - 10, TY - 4, 120, 28, 0, 0, MG.TAU); c.fill(); c.fillStyle = '#D9861E'; c.beginPath(); c.ellipse(TX - 10, TY - 6, 108, 23, 0, 0, MG.TAU); c.fill(); for (let i = 0; i < 9; i++) { c.fillStyle = i % 3 ? '#C8402A' : '#2a2430'; c.beginPath(); c.ellipse(TX - 10 + Math.cos(i * 0.7) * 70, TY - 6 + Math.sin(i * 0.7) * 14, 9, 4, 0, 0, MG.TAU); c.fill(); }
+      c.fillStyle = '#2E4A2A'; c.fillRect(TX + 150, TY - 92, 22, 80); c.fillRect(TX + 156, TY - 116, 10, 26); c.fillStyle = '#E9C46A'; c.fillRect(TX + 150, TY - 62, 22, 22);
+      MG.fx.glow(c, TX - 170, TY - 50, 90, '#FFC46A', 0.5 + 0.1 * Math.sin(t * 9)); c.fillStyle = '#FFF1C8'; c.fillRect(TX - 175, TY - 60, 10, 30); c.fillStyle = '#FFB040'; c.beginPath(); c.ellipse(TX - 170, TY - 68, 4, 8, 0, 0, MG.TAU); c.fill();
+      // sides: abuela (left, fan → raised finger) & abuelo (right, toast)
+      const fanA = Math.sin(t * 7) * 0.35 * (1 - raise);
+      sit({ x: TX - 300, y: TY + 110, s: 1.05, skin: '#E3A988', shirt: '#2E2A3A', cardigan: '#3A3348', hair: { style: 'bun', color: '#C9C3BC' }, glasses: '#3a2a2a', age: 1, earring: true, turn: lerp(0.55, 0.15, raise), seed: 4, mood: raise > 0.5 ? 'smirk' : 'smile', open: raise > 0.5 ? 0.1 : 0.25 + laugh(1.3) * 0.3, brows: raise * 0.6, browR: raise * 0.4, look: raise > 0.5 ? [0.1, -0.1] : [0.6, 0], pattern: (cc, U) => { const r = MG.rng(3); for (let i = 0; i < 40; i++) { cc.fillStyle = r() < 0.5 ? '#E9C46A' : '#F4EFE6'; cc.beginPath(); cc.arc((r() - 0.5) * U, -r() * 1.3 * U, U * 0.03, 0, 7); cc.fill(); } }, arms: [{ hand: [0.55, -0.62] }, { hand: [lerp(0.62, 0.42, raise), lerp(-1.05, -1.85, raise)], front: true, pose: raise > 0.4 ? 'point' : 'fist', angle: raise > 0.4 ? -0.15 : -0.6 + fanA, prop: raise > 0.4 ? null : (cc, tg) => { MG.sprite(cc, this.fan, tg[0] + 10, tg[1] - 40, { rot: fanA + 0.2, scale: 0.55 }); } }] });
+      sit({ x: TX + 305, y: TY + 110, s: 1.05, skin: '#D9946E', shirt: '#F2EEE4', shortSleeve: true, hair: { style: 'bald', color: '#EDEAE4' }, mustache: '#EFEAE2', age: 1, nose: 1.4, jaw: 0.34, belly: true, turn: -0.5, seed: 7, mood: 'grin', open: 0.3 + laugh(2.1) * 0.5, headDy: -laugh(2.1) * 0.05, arms: [{ hand: [-0.6, -0.6] }, { hand: [-0.55, -1.3 - 0.25 * pg(t, tWhole, tWhole + 0.4, 'outBack')], front: true, pose: 'fist', prop: (cc, tg) => { cc.fillStyle = 'rgba(255,255,255,0.35)'; cc.fillRect(tg[0] - 12, tg[1] - 60, 24, 44); cc.fillStyle = '#6a0a1c'; cc.fillRect(tg[0] - 11, tg[1] - 42, 22, 22); } }] });
+      // kids run across in front (the ball is the sun disk turned football)
+      { const u = clamp((t - (tKids - 0.75)) / 1.9); if (u > 0 && u < 1) { const ph = t * 16;
+        const bx = lerp(2150, -380, u), by = 1010; S11.football(c, bx - 130 * 1, by + 40 - Math.abs(Math.sin(t * 8)) * 30, 26, -t * 9); MG.fx.contact(c, bx - 130, by + 70, 30, 8, 0.4);
+        for (const [dx, sk, sh, hr, pal] of [[0, '#E8B08C', '#2D7FC0', { style: 'short', color: '#4A2A1A' }, '#F2C49A'], [260, '#C98A64', '#E9C46A', { style: 'pigtails', color: '#2A1A16' }, '#F2C49A']]) { const x0 = bx + dx, y0 = by - 40 + Math.abs(Math.sin(ph + dx)) * -10; MG.fx.contact(c, x0, by + 72, 50, 10, 0.4); S11.runLegs(c, x0, y0, 62, ph + dx, -1, dx ? '#F2C49A' : '#3E4A5A', '#B8322A'); S11.person(c, { x: x0, y: y0, s: 0.62, head: 1.3, skin: sk, shirt: sh, hair: hr, turn: -0.6, seed: 40 + dx, mood: 'grin', open: 0.6, lean: -0.15, light: L, rim, arms: [{ hand: [0.35 + Math.sin(ph + dx) * 0.4, -0.45], pose: 'fist' }, { hand: [-0.35 - Math.sin(ph + dx) * 0.4, -0.55], front: true, pose: 'fist' }] }, t); } } }
+    },
+  };
+
+  // =====================================================================================================
   // placeholder scenes (filled in below)
   // =====================================================================================================
   const ph = (id, a, b, label) => ({ id, start: a, end: b, draw(ctx, t) { MG.kit.paper(ctx, '#E9CFA8'); MG.text.draw(ctx, label, 960, 540, { font: F.mono, size: 40, align: 'center', color: C.plum }); } });
@@ -886,7 +989,7 @@
       bullScene,
       alleyScene,
       paellaScene,
-      ph('s11_street', 1699.62, 1706.05, 'STREET'),
+      streetScene,
       ph('s11_saying', 1706.05, 1713.0, 'SAYING'),
       ph('s11_retire', 1713.0, 1716.55, 'RETIREES MAP'),
       ph('s11_beach', 1716.55, 1723.85, 'BEACH'),

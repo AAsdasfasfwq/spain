@@ -1073,14 +1073,14 @@
       // sky: sunset, deepening to violet, with a warm afterglow when "live better" rises
       const top = MG.col.mix(MG.col.mix('#F3B76E', '#5E4A7A', dusk), '#C9708A', glow2 * 0.35), low = MG.col.mix(MG.col.mix('#FFD58E', '#E58A5A', dusk), '#FFC07A', glow2 * 0.4);
       MG.fx.vgrad(ctx, [[0, top], [clamp(hz / H, 0.05, 0.98), low], [1, low]]);
-      const sp = far(-0.38, lerp(0.07, -0.03, dusk) + 0.02 * glow2); MG.fx.glow(ctx, sp[0], sp[1], 700, '#FFC36B', 0.55); MG.kit.sun(ctx, sp[0], sp[1], 120, t, { rays: 0.4, corona: 0.8 });
+      const sp = far(-0.36, lerp(0.15, 0.03, dusk) + 0.015 * glow2); MG.fx.glow(ctx, sp[0], sp[1], 700, '#FFC36B', 0.55); MG.kit.sun(ctx, sp[0], sp[1], 120, t, { rays: 0.4, corona: 0.8 });
       // the far stands & barrier (vertical layers at the arena edge), fading as the camera cranes up
       const wallA = 1 - pr01(t, 111.95, 112.25);
       const xdiv = K(t, [[103, -650], [tT.and, -560, 'soft'], [tT.price + 0.35, 250, 'inOutCubic'], [113, 280, 'soft']]); const divAt = (Z) => xdiv + 0.42 * (Z - 900);
       if (wallA > 0) { ctx.save(); ctx.globalAlpha = wallA; const zb = TW.cz + TW.R * 0.82; const quad = (x0, x1, y0, y1, z, col) => { const a = S1.pj(cam, x0, y0, z), b = S1.pj(cam, x1, y0, z), c = S1.pj(cam, x1, y1, z), d = S1.pj(cam, x0, y1, z); ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.closePath(); ctx.fill(); };
-        for (let k = 12; k >= 0; k--) quad(-6000, 6000, -150 - k * 70, -150 - (k + 1) * 70, zb + 150 + k * 60, k % 2 ? '#E2D2B6' : '#CDB898');
-        quad(-6000, 6000, -150 - 13 * 70, -150 - 13 * 70 - 140, zb + 150 + 13 * 60, '#B5643E');
-        for (let i = -30; i <= 30; i++) { const z = zb + 150 + 13 * 60; const a = S1.pj(cam, i * 200, -150 - 13 * 70 - 20, z), b = S1.pj(cam, i * 200, -150 - 13 * 70 - 110, z); ctx.fillStyle = '#3E2420'; const w2 = 60 * a[2]; ctx.beginPath(); ctx.moveTo(a[0] - w2, a[1]); ctx.lineTo(b[0] - w2, b[1] + w2); ctx.arc(b[0], b[1] + w2, w2, Math.PI, 0); ctx.lineTo(a[0] + w2, a[1]); ctx.closePath(); ctx.fill(); }
+        for (let k = 5; k >= 0; k--) quad(-6000, 6000, -150 - k * 55, -150 - (k + 1) * 55, zb + 150 + k * 60, k % 2 ? '#E2D2B6' : '#CDB898');
+        quad(-6000, 6000, -150 - 6 * 55, -150 - 6 * 55 - 120, zb + 150 + 6 * 60, '#B5643E');
+        for (let i = -30; i <= 30; i++) { const z = zb + 150 + 6 * 60; const a = S1.pj(cam, i * 200, -150 - 6 * 55 - 14, z), b = S1.pj(cam, i * 200, -150 - 6 * 55 - 90, z); ctx.fillStyle = '#3E2420'; const w2 = 60 * a[2]; ctx.beginPath(); ctx.moveTo(a[0] - w2, a[1]); ctx.lineTo(b[0] - w2, b[1] + w2); ctx.arc(b[0], b[1] + w2, w2, Math.PI, 0); ctx.lineTo(a[0] + w2, a[1]); ctx.closePath(); ctx.fill(); }
         quad(-6000, 6000, 0, -150, zb, '#A83A2C'); quad(-6000, 6000, -140, -150, zb - 1, '#F4EFE6');
         for (const [txt, X] of [['SOMBRA', -900], ['SOL', 900]]) { const p = S1.pj(cam, X, -55, zb - 2); MG.text.draw(ctx, txt, p[0], p[1] + 20 * p[2], { font: F.grotesk, weight: 800, size: 64 * p[2], color: '#F4EFE6', align: 'center', tracking: 0.3 }); }
         // the stands in shade left of the divide
@@ -1094,10 +1094,10 @@
       { const pts = []; for (let Z = -900; Z <= 3200; Z += 100) { const p = S1.pj(cam, divAt(Z), 0, Z); if (p[3] > 5) pts.push([p[0], p[1]]); } if (pts.length > 1) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(74,58,110,0.62)'; ctx.beginPath(); ctx.moveTo(-3000, pts[0][1]); pts.forEach((p) => ctx.lineTo(p[0], p[1])); ctx.lineTo(-3000, pts[pts.length - 1][1]); ctx.closePath(); if (cam.pitch > 0.6) { ctx.beginPath(); const a = S1.pj(cam, divAt(-900), 0, -900), b = S1.pj(cam, divAt(3200), 0, 3200), c = S1.pj(cam, -6000, 0, 3200), d = S1.pj(cam, -6000, 0, -900); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.lineTo(c[0], c[1]); ctx.lineTo(d[0], d[1]); ctx.closePath(); } ctx.fill(); ctx.restore(); } }
       ctx.restore();
       // ---- the words standing on the sand
-      const shadowDir = [0.35, -1.6]; const shadeTint = (X, Z) => X < divAt(Z);
+      const shadowDir = [1.0, -1.05]; const shadeTint = (X, Z) => X < divAt(Z);
       const word = (str, font, col, sideCol, X0, Z, h, gap, upAt, fallAt, fallDur, key, flatFrom) => { const sprs = str.split('').map((c) => (c === ' ' ? null : S1.letterStd(c, font, col, sideCol))); const ws = sprs.map((s2) => (s2 ? h * s2.width / s2.height * 0.78 : h * 0.35)); const total = ws.reduce((a, b) => a + b, 0) + gap * (str.length - 1); let x = X0 - total / 2; const items = [];
         str.split('').forEach((c, i) => { const w2 = ws[i]; const cx = x + w2 / 2; x += w2 + gap; if (!sprs[i]) return; const up = upAt === null ? 1 : pr01(t, upAt + i * 0.07, upAt + 0.5 + i * 0.07, 'outBack'); if (up <= 0) return; let th = (1 - up) * (Math.PI / 2); if (fallAt !== null) th = Math.max(th, (Math.PI / 2) * E.inCubic(clamp((t - fallAt - i * 0.09) / fallDur))); if (flatFrom !== null) th = Math.max(th, (Math.PI / 2) * pr01(t, flatFrom + i * 0.04, flatFrom + 0.5 + i * 0.04, 'inOutCubic')); items.push({ c, spr: sprs[i], X: cx, Z, th }); });
-        for (const it of items) { if (it.th < 1.4 && !shadeTint(it.X, it.Z)) S1.castShadow(ctx, cam, S1.tinted(it.spr, '#3A2B4A', key + it.c + col), it.X, it.Z, h * Math.cos(it.th), shadowDir, { alpha: 0.35 * (1 - dusk * 0.5) }); }
+        for (const it of items) { if (it.th < 0.9 && !shadeTint(it.X, it.Z)) S1.castShadow(ctx, cam, S1.tinted(it.spr, '#3A2B4A', key + it.c + col), it.X, it.Z, h * Math.cos(it.th), shadowDir, { alpha: 0.3 * (1 - dusk * 0.4) * (1 - it.th / 0.9) }); }
         for (const it of items) { S1.standTilt(ctx, cam, it.spr, it.X, it.Z, h, it.th); }
         return items; };
       // EMPIRE topples on "lost"
@@ -1105,14 +1105,14 @@
       // LIVE BETTER rises in the afterglow
       if (t > tT.learn - 0.2 && t < tT.price + 0.6) { ctx.save(); ctx.globalAlpha = 1 - pr01(t, tT.price, tT.price + 0.5); word('LIVE BETTER', F.grotesk, P.cal, '#B5946A', 40, 820, 210, 16, tT.live - 0.15, null, 0, 'lb', null); ctx.restore(); }
       // SPAIN — the title, split by the divide (SOMBRA | SOL)
-      let spainItems = []; if (t > tT.price - 0.1) spainItems = word('SPAIN', F.display, P.cal, '#A9875E', 60, 950, 360, 26, tT.price + 0.05, null, 0, 'sp', tT.lets + 0.15);
+      let spainItems = []; if (t > tT.price - 0.1) spainItems = word('SPAIN', F.display, P.cal, '#A9875E', 60, 950, 340, 26, tT.price + 0.3, null, 0, 'sp', tT.lets + 0.15);
       // tint the shaded part of the standing words (screen-space divide line, extended upward)
       { const a = S1.pj(cam, divAt(700), 0, 700), b = S1.pj(cam, divAt(1300), 0, 1300); const dx = b[0] - a[0], dy = b[1] - a[1]; const k = -2000 / (dy || -1); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(74,58,110,0.6)'; ctx.beginPath(); ctx.moveTo(-200, -200); ctx.lineTo(a[0] + dx * k, a[1] + dy * k); ctx.lineTo(a[0], a[1]); ctx.lineTo(a[0] - dx * 3, a[1] - dy * 3); ctx.lineTo(-200, H + 200); ctx.closePath(); ctx.clip(); ctx.beginPath(); ctx.rect(0, 0, W, Math.min(H, hz + 80 + (cam.pitch > 0.3 ? H : 0))); ctx.fill(); ctx.restore(); }
       // typography (VO-synced lead-ins, small)
       const L = (s2, y, t0, t1, o = {}) => { const a = 1 - pr01(t, t1, t1 + 0.35); if (t < t0 - 0.2 || a <= 0) return; ctx.save(); ctx.globalAlpha = a; S1.lead(ctx, s2, 960, y, t, t0, { size: 64, align: 'center', color: o.color || P.ink, ...o }); ctx.restore(); };
       L('so how did a country that lost', 170, tT.so, tT.learn - 0.3); L('the world’s greatest empire', 250, tT.greatest - 0.3, tT.learn - 0.3);
       L('learn to live better', 170, tT.learn, tT.and - 0.3); L('than those who defeated it?', 250, tT.than, tT.and - 0.3);
-      L('and what’s', 200, tT.and, tT.lets - 0.2, { color: P.cal }); if (t > tT.price - 0.1 && t < tT.lets) { ctx.save(); ctx.globalAlpha = 1 - pr01(t, tT.lets - 0.3, tT.lets); S1.key(ctx, 'THE PRICE?', 960, 310, t, tT.price - 0.05, { size: 110, align: 'center', color: P.cal, font: F.display, weight: 900 }); ctx.restore(); }
+      L('and what’s', 190, tT.and, tT.price + 0.3, { color: P.cal }); if (t > tT.price - 0.1 && t < tT.price + 0.9) { ctx.save(); ctx.globalAlpha = 1 - pr01(t, tT.price + 0.45, tT.price + 0.8); S1.key(ctx, 'THE PRICE?', 960, 300, t, tT.price - 0.05, { size: 96, align: 'center', color: P.cal, font: F.display, weight: 900 }); ctx.restore(); }
       if (t > tT.price + 0.5) { ctx.save(); ctx.globalAlpha = 1 - pr01(t, 112.0, 112.3); S1.lead(ctx, 'the empire the world comes to', 960, 990, t, tT.price + 0.6, { size: 54, align: 'center', color: P.cal }); ctx.restore(); }
     },
     post: (t) => ({ grade: 'golden', vignette: 0.4, grain: 0.05, bloom: 0.15, contrast: 1.05 }),

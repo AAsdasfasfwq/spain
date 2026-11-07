@@ -347,6 +347,42 @@
     ctx.restore();
   };
 
+  /** small tourist (front 3/4, ~150 px tall at s=1): sunhat, sunglasses, loud shirt, shorts, sunburn. v = variant 0..7 */
+  S5.tourist = (ctx, x, y, s, t, v, o = {}) => {
+    const shirts = ['#E8644A', '#49A6E0', '#F2C14E', '#6FBF8A', '#E86FA8', '#F08A3C', '#7A6FD8', '#F4F0E6']; const shorts = ['#2E4A7A', '#C8A36A', '#3A3A44', '#E9E0CC', '#4E7A4A'];
+    const sk = mix('#F1B79A', '#E8836A', (v % 3) / 2); const sh = shirts[v % 8], so = shorts[(v * 3) % 5]; const walk = o.walk || 0; const ph = tw(t) * 9 + v * 1.7;
+    ctx.save(); ctx.translate(x, y); ctx.scale(s * (o.flip ? -1 : 1), s);
+    MG.fx.contact(ctx, 0, 0, 40, 9, 0.35);
+    const lg = walk ? Math.sin(ph) * 14 : 0; for (const sgn of [-1, 1]) { MG.fx.ink(ctx, [[sgn * 10, -62], [sgn * 12 + lg * sgn, -4]], { width: 13, color: sk, taper: [0, 0] }); ctx.fillStyle = '#2a2226'; ctx.beginPath(); ctx.ellipse(sgn * 12 + lg * sgn + 4, -2, 10, 5, 0, 0, MG.TAU); ctx.fill(); }
+    S5.form(ctx, [[-24, -86], [24, -86], [26, -52], [-26, -52]], { poly: true, color: so, shade: 0.35, ow: 2.5 });
+    S5.form(ctx, [[-28, -138], [28, -138], [34, -118], [26, -84], [-26, -84], [-34, -118]], { color: sh, shade: 0.4, hi: 0.3, ow: 2.5 });
+    if (v % 2) { ctx.fillStyle = A('#ffffff', 0.55); for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.arc(-16 + (i % 3) * 16, -128 + Math.floor(i / 3) * 18, 4, 0, MG.TAU); ctx.fill(); } }
+    const sw = walk ? Math.sin(ph + Math.PI) * 0.35 : 0.1; for (const sgn of [-1, 1]) MG.fx.ink(ctx, [[sgn * 28, -132], [sgn * (38 + 6), -100 + sw * 20 * sgn]], { width: 10, color: sk, taper: [0, 0.2] });
+    if (v % 3 === 0) { ctx.fillStyle = '#1E1A1D'; ctx.fillRect(-12, -116, 22, 14); ctx.fillStyle = '#8a8a99'; ctx.beginPath(); ctx.arc(-1, -109, 4, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#1E1A1D'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-22, -136); ctx.lineTo(-12, -112); ctx.moveTo(20, -136); ctx.lineTo(10, -112); ctx.stroke(); }
+    S5.form(ctx, [[-20, -176], [20, -176], [24, -152], [12, -138], [-12, -138], [-24, -152]], { color: sk, shadeColor: '#B9665A', shade: 0.4, ow: 2.5 });
+    ctx.fillStyle = '#1E1A1D'; ctx.fillRect(-17, -162, 14, 7); ctx.fillRect(3, -162, 14, 7); ctx.fillRect(-3, -160, 6, 2);
+    S5.mouth(ctx, 0, -146, { w: 14, mood: v % 4 === 1 ? 'o' : 'smile', open: v % 4 === 1 ? 0.4 : 0 });
+    const hat = v % 4 === 3 ? '#F2E3B0' : v % 4 === 2 ? '#E8644A' : '#EBD9A8'; S5.form(ctx, [[-40, -172], [-20, -190], [0, -194], [20, -190], [40, -172], [0, -166]], { color: hat, shade: 0.3, hi: 0.3, ow: 2.5 }); S5.form(ctx, [[-18, -178], [-14, -198], [14, -198], [18, -178]], { color: hat, shade: 0.35, ow: 2.5 });
+    if (o.suitcase) { const sx2 = 34; S5.form(ctx, [[sx2, -60], [sx2 + 34, -60], [sx2 + 34, -4], [sx2, -4]], { poly: true, color: ['#E86F5A', '#49A6E0', '#2E2A30'][v % 3], shade: 0.35, hi: 0.3, ow: 2.5 }); ctx.strokeStyle = '#2a2226'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(sx2 + 17, -60); ctx.lineTo(sx2 + 17, -84); ctx.stroke(); }
+    ctx.restore();
+  };
+  /** the local: elderly Mallorcan on his chair, flat cap, arms crossed, unimpressed */
+  S5.local = (ctx, x, y, s, t, o = {}) => {
+    const tt = tw(t); ctx.save(); ctx.translate(x, y); ctx.scale(s, s); MG.fx.contact(ctx, 0, 4, 90, 16, 0.4);
+    ctx.strokeStyle = '#5a3a22'; ctx.lineWidth = 8; ctx.beginPath(); ctx.moveTo(-44, 0); ctx.lineTo(-40, -96); ctx.moveTo(44, 0); ctx.lineTo(40, -96); ctx.moveTo(-36, 0); ctx.lineTo(-30, -96); ctx.stroke(); ctx.fillStyle = '#C8A36A'; ctx.fillRect(-50, -104, 100, 14); // chair
+    S5.form(ctx, [[-48, -230], [-44, -280], [-30, -300], [-40, -300]], { color: '#5a3a22', ow: 2 });
+    for (const sgn of [-1, 1]) { MG.fx.ink(ctx, [[sgn * 18, -110], [sgn * 30, -60], [sgn * 26, -6]], { width: 24, color: '#3a3438', taper: [0, 0] }); ctx.fillStyle = '#1a1416'; ctx.beginPath(); ctx.ellipse(sgn * 30, -4, 18, 8, 0, 0, MG.TAU); ctx.fill(); }
+    S5.form(ctx, [[-46, -230], [46, -230], [52, -120], [-52, -120]], { color: '#F1ECE2', shade: 0.35, hi: 0.2, ow: 3 });
+    MG.fx.ink(ctx, [[-44, -200], [20, -170], [44, -196]], { width: 26, color: '#F1ECE2', taper: [0.1, 0.1] }); MG.fx.ink(ctx, [[44, -200], [-20, -168], [-44, -192]], { width: 26, color: '#E6E0D4', taper: [0.1, 0.1] }); ctx.strokeStyle = OL; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-40, -186); ctx.quadraticCurveTo(0, -164, 40, -186); ctx.stroke(); // crossed arms
+    S5.form(ctx, [[-30, -300], [30, -300], [36, -262], [20, -232], [-20, -232], [-36, -262]], { color: '#C98C6A', shadeColor: '#8a5a44', shade: 0.45, ow: 3, rim: '#FFE2B0' });
+    MG.kit.brow(ctx, -14, -276, { w: 18, angle: 0.3, thick: 5, color: '#E8E0D8' }); MG.kit.brow(ctx, 14, -276, { w: 18, angle: -0.3, thick: 5, color: '#E8E0D8', flip: true });
+    MG.kit.eye(ctx, -12, -266, { r: 6, look: o.look || [0.6, 0], blink: MG.kit.blink(tt, 61), skin: '#C98C6A', lid: 0.55 }); MG.kit.eye(ctx, 12, -266, { r: 6, look: o.look || [0.6, 0], blink: MG.kit.blink(tt, 61), skin: '#C98C6A', lid: 0.55 });
+    S5.form(ctx, [[-4, -266], [-12, -248], [0, -244], [10, -250]], { color: '#C98C6A', shade: 0.5, ow: 2 }); ctx.fillStyle = '#E8E0D8'; ctx.beginPath(); ctx.ellipse(0, -238, 16, 5, 0, 0, MG.TAU); ctx.fill();
+    S5.mouth(ctx, 0, -232, { w: 18, mood: 'frown' });
+    S5.form(ctx, [[-38, -292], [-30, -314], [10, -318], [40, -304], [44, -292]], { color: '#4a4044', shade: 0.4, hi: 0.2, ow: 3 }); ctx.fillStyle = '#3a3034'; ctx.fillRect(18, -298, 32, 8); // flat cap
+    ctx.restore();
+  };
+
   /* =====================================================================
      MAP HELPERS
      ===================================================================== */
@@ -1294,15 +1330,15 @@
   add({
     id: 's05_gdp', start: 765.51,
     init() {
-      const T3 = THREE; MG.geo.init(); const sc = new T3.Scene(); this.sc = sc; this.cam = new T3.PerspectiveCamera(30, 16 / 9, 5, 6000);
+      const T3 = THREE; MG.geo.init(); const sc = new T3.Scene(); this.sc = sc; this.cam = new T3.PerspectiveCamera(17, 16 / 9, 20, 12000);
       sc.add(new T3.HemisphereLight(0xFFF2E0, 0x5a4a5a, 1.0)); const sun = new T3.DirectionalLight(0xFFE2B8, 2.0); sun.position.set(-600, 900, 500); sc.add(sun);
       const pr2 = MG.geo.proj('conic', { center: [8, 47], scale: 1500, translate: [0, 0] }); this.pr2 = pr2; const d3p = window.d3.geoPath(pr2);
       const shapesOf = (f) => { const g = f.geometry; const polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates]; const out = []; for (const pl of polys) { const ring = pl[0].map((c) => pr2(c)).filter(Boolean); if (ring.length < 4) continue; let area = 0; for (let i = 0; i < ring.length; i++) { const a = ring[i], b = ring[(i + 1) % ring.length]; area += a[0] * b[1] - b[0] * a[1]; } if (Math.abs(area) < 40) continue; const sh = new T3.Shape(ring.map((q) => new T3.Vector2(q[0], -q[1]))); out.push(sh); } return out; };
       const land = ['France', 'Spain', 'Portugal', 'Italy', 'Germany', 'Belgium', 'Netherlands', 'Luxembourg', 'Switzerland', 'Austria', 'Denmark', 'United Kingdom', 'Ireland', 'Poland', 'Czechia', 'Slovakia', 'Hungary', 'Slovenia', 'Croatia', 'Bosnia and Herz.', 'Serbia', 'Montenegro', 'Albania', 'Macedonia', 'Kosovo', 'Greece', 'Bulgaria', 'Romania', 'Moldova', 'Ukraine', 'Belarus', 'Lithuania', 'Latvia', 'Estonia', 'Sweden', 'Norway', 'Finland', 'Morocco', 'Algeria', 'Tunisia', 'Turkey', 'Cyprus', 'Malta', 'Libya', 'Russia'];
       this.prisms = {}; this.tops = {};
-      for (const n of land) { const f = MG.geo.country(n, '50'); if (!f) continue; const shp = shapesOf(f); if (!shp.length) continue; const ez = GDP[n] !== undefined; const hgt = ez ? Math.max(4, GDP[n] * 72) : 2;
+      for (const n of land) { const f = n === 'Spain' ? S5.spainMain() : MG.geo.country(n, '50'); if (!f) continue; const shp = shapesOf(f); if (!shp.length) continue; const ez = GDP[n] !== undefined; const hgt = ez ? Math.max(4, GDP[n] * 72) : 2;
         const col = n === 'Spain' ? 0xF2A33A : ['Germany', 'France', 'Italy'].includes(n) ? 0x3A5FA8 : ez ? 0x9FB3D8 : 0xD9CFBC;
-        const geo = new T3.ExtrudeGeometry(shp, { depth: hgt, bevelEnabled: false, curveSegments: 1 }); geo.rotateX(-Math.PI / 2); const m = new T3.Mesh(geo, new T3.MeshLambertMaterial({ color: col })); m.userData = { n, hgt }; sc.add(m); this.prisms[n] = m;
+        const geo = new T3.ExtrudeGeometry(shp, { depth: hgt, bevelEnabled: false, curveSegments: 1 }); geo.rotateX(-Math.PI / 2); const cTop = new T3.Color(col).lerp(new T3.Color(0xFFF4DC), 0.08), cSide = new T3.Color(col).multiplyScalar(0.72); const m = new T3.Mesh(geo, [new T3.MeshLambertMaterial({ color: cTop }), new T3.MeshLambertMaterial({ color: cSide })]); m.userData = { n, hgt }; sc.add(m); this.prisms[n] = m;
         if (ez) { const c = window.d3.geoCentroid(n === 'France' ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[ -4.5, 42.5], [8, 42.5], [8, 51], [-4.5, 51], [-4.5, 42.5]]] } } : n === 'Spain' ? S5.spainMain() : f); this.tops[n] = { ll: c, h: hgt }; } }
       // sea + edge lines
       const sea = new T3.Mesh(new T3.PlaneGeometry(6000, 6000), new T3.MeshBasicMaterial({ color: 0xA9C6DE })); sea.rotation.x = -Math.PI / 2; sea.position.y = -1; sc.add(sea);
@@ -1313,8 +1349,8 @@
       // prisms rise (staggered by size) as the camera cranes in
       const kG = pr(t, t0 - 0.1, t0 + 1.2, 'out');
       for (const [n, m] of Object.entries(this.prisms)) { const ez = GDP[n] !== undefined; let k = ez ? clamp(kG * 1.3 - (1 - GDP[n] / 4.66) * 0.3) : 1; if (n === 'Spain') k = Math.max(k * 0.98, 0); m.scale.y = Math.max(0.02, E.out(k)); }
-      const cp = MG.keys(t, [[t0, [-760, 1180, 1500]], [tFour, [-640, 980, 1240], 'inOutSine'], [tIT + 0.3, [-420, 860, 1120], 'inOutSine'], [773.3, [-560, 620, 900], 'inOutSine']]);
-      const lk = MG.keys(t, [[t0, [80, 80, -60]], [tIT + 0.3, [60, 120, -40], 'inOutSine'], [773.3, [-300, 80, 260], 'inOutSine']]);
+      const cp = MG.keys(t, [[t0, [-900, 2900, 3300]], [tFour, [-700, 2500, 2900], 'inOutSine'], [tIT + 0.3, [-420, 2300, 2700], 'inOutSine'], [773.3, [-760, 1900, 2300], 'inOutSine']]);
+      const lk = MG.keys(t, [[t0, [-160, 40, 60]], [tIT + 0.3, [-120, 60, 40], 'inOutSine'], [773.3, [-360, 40, 220], 'inOutSine']]);
       const hh = MG.cam.handheld(t, 2, 87); this.cam.position.set(cp[0] + hh.dx * 2, cp[1] + hh.dy * 2, cp[2]); this.cam.lookAt(lk[0], lk[1], lk[2]);
       MG.kit.seaBg(ctx, '#A9C6DE');
       const c = MG.three.render(this.sc, this.cam, { slot: 2, w: 1440, h: 810, clearAlpha: 0 }); ctx.drawImage(c, 0, 0, W, H);
@@ -1322,7 +1358,8 @@
       const v = new THREE.Vector3(); const pin = (n, num, name, t1, o = {}) => { const tp = this.tops[n]; if (!tp) return; const q = this.pr2(tp.ll); const m = this.prisms[n]; v.set(q[0], tp.h * m.scale.y + 18, q[1]); v.project(this.cam); const sx = (v.x * 0.5 + 0.5) * W, sy = (-v.y * 0.5 + 0.5) * H; const k = pr(t, t1 - 0.1, t1 + 0.35); if (k <= 0) return;
         ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = o.c || P.ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx, sy - 70 * k); ctx.stroke(); ctx.fillStyle = o.c || P.ink; ctx.beginPath(); ctx.arc(sx, sy, 6, 0, MG.TAU); ctx.fill(); ctx.restore();
         MG.text.draw(ctx, num, sx - 8, sy - 84, { font: F.cond, weight: 900, size: o.big ? 120 : 96, color: o.c || P.ink, align: 'right', alpha: k, stroke: 'rgba(250,244,232,0.8)', strokeW: 8 }); MG.text.draw(ctx, name, sx + 4, sy - 90, { font: F.grotesk, weight: 800, size: o.big ? 44 : 34, color: P.ink, alpha: k, tracking: 0.06, stroke: 'rgba(250,244,232,0.85)', strokeW: 8 }); if (o.sub) MG.text.draw(ctx, o.sub, sx + 6, sy - 46, { font: F.cond, weight: 900, size: 64, color: P.solDeep, alpha: pr(t, tT - 0.1, tT + 0.3), stroke: 'rgba(250,244,232,0.9)', strokeW: 8 }); };
-      pin('Germany', '1', 'GERMANY', tDE); pin('France', '2', 'FRANCE', tFR); pin('Italy', '3', 'ITALY', tIT); pin('Spain', '4', 'SPAIN', tFour - 0.2, { big: true, c: P.solDeep, sub: '$1.7 TRILLION' });
+      pin('Germany', '1', 'GERMANY', tDE); pin('France', '2', 'FRANCE', tFR); pin('Italy', '3', 'ITALY', tIT); pin('Spain', '4', 'SPAIN', tFour - 0.2, { big: true, c: P.solDeep });
+      { const k = pr(t, tT - 0.15, tT + 0.35); if (k > 0) { MG.text.draw(ctx, '$1.7', 1500, 860, { font: F.cond, weight: 900, size: 190, color: P.solDeep, align: 'right', alpha: k, stroke: 'rgba(250,244,232,0.85)', strokeW: 10 }); MG.text.draw(ctx, 'TRILLION', 1520, 800, { font: F.grotesk, weight: 800, size: 54, color: P.ink, alpha: k, tracking: 0.08 }); MG.text.draw(ctx, 'GDP · 2024', 1524, 850, { font: F.mono, weight: 600, size: 22, color: P.ink2, alpha: k, tracking: 0.16 }); } }
       S5.kick(ctx, 'eurozone · GDP (height)', 150, 150, t, t0 + 0.2, { size: 24, color: P.ink2 });
       S5.lead(ctx, "the eurozone's", 150, 230, t, T('eurozone', 765.83) - 0.1, { size: 56 });
       S5.key(ctx, 'fourth-largest economy', 146, 320, t, tFour - 0.1, { size: 76 });
@@ -1340,28 +1377,145 @@
     draw(ctx, t, S) {
       const t0 = S.t0; const tYrs = T('years', 774.19), tGrow = T('growing', 775.03), tGer = T('Germany', 778.99), tStill = T('still', 780.27);
       MG.kit.paper(ctx, '#FAF4E8', { light: 0.25 });
-      const hh = MG.cam.handheld(t, 2, 89); ctx.save(); ctx.translate(hh.dx, hh.dy);
+      const hh = MG.cam.handheld(t, 2, 89);
+      const kc2 = E.inOutSine(li(t, T('growing', 775.03) - 0.4, 781.3)); const fx = lerp(820, 1240, kc2), fy = lerp(700, 520, kc2), z = lerp(1.0, 1.12, Math.sin(kc2 * Math.PI) * 0.6 + kc2 * 0.4);
+      ctx.save(); MG.cam.apply(ctx, { x: fx, y: fy, zoom: z, dx: hh.dx, dy: hh.dy, rot: hh.rot });
       // grid + years (2022 → 2025)
       ctx.strokeStyle = 'rgba(30,26,29,0.12)'; ctx.lineWidth = 1.5; for (let v = 98; v <= 110; v += 2) { const y = S5.growXY(0, v)[1]; ctx.beginPath(); ctx.moveTo(260, y); ctx.lineTo(1620, y); ctx.stroke(); }
       [2022, 2023, 2024, 2025].forEach((yv, i) => { const [x] = S5.growXY(i, 100); MG.text.draw(ctx, String(yv), x, 950, { font: F.mono, size: 26, weight: 600, color: P.ink2, align: 'center', tracking: 0.06, alpha: pr(t, t0 + i * 0.1, t0 + 0.4 + i * 0.1) }); });
       const kL = pr(t, tGrow - 0.4, tStill - 0.3, 'inOutSine');
       const drawLine = (name, col, w, kk, o = {}) => { const pts = []; const vals = GROW[name]; for (let i = 0; i <= 30; i++) { const u = (i / 30) * 3; const a = Math.floor(Math.min(2.999, u)); const f = u - a; const v = lerp(vals[a], vals[a + 1], f); pts.push(S5.growXY(u, v)); }
         const sub = MG.path.trim(pts, 0, kk); if (sub.length < 2) return null; ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.translate(6, 10); ctx.strokeStyle = 'rgba(60,40,50,0.18)'; ctx.lineWidth = w + 2; ctx.beginPath(); sub.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.stroke(); ctx.translate(-6, -10); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke(); ctx.restore(); return sub[sub.length - 1]; };
+      // sun-warmed area under Spain's line
+      { const vals = GROW.Spain; const pts = []; for (let i = 0; i <= 30; i++) { const u = (i / 30) * 3 * kL; const a = Math.floor(Math.min(2.999, u)); const f = u - a; pts.push(S5.growXY(u, lerp(vals[a], vals[a + 1], f))); } if (kL > 0.02) { const base = S5.growXY(0, 100)[1]; const ar = MG.path.poly([...pts, [pts[pts.length - 1][0], base], [pts[0][0], base]]); const g = ctx.createLinearGradient(0, 280, 0, base); g.addColorStop(0, A(P.sol, 0.45)); g.addColorStop(1, A(P.sol, 0.05)); ctx.fillStyle = g; ctx.fill(ar); MG.fx.halftone(ctx, ar, [260, 260, 1400, base - 260], { spacing: 12, color: A(P.solDeep, 0.25), cut: 0.3 }); } }
       const hF = drawLine('France', '#9FB3D8', 6, kL), hI = drawLine('Italy', '#B7C49A', 6, kL);
       const hG = drawLine('Germany', '#5A5658', 9, kL); const hS = drawLine('Spain', P.sol, 14, kL);
-      const tag = (h, name, col, dy = 0) => { if (!h) return; MG.text.draw(ctx, name, h[0] + 34, h[1] + 10 + dy, { font: F.grotesk, weight: 800, size: 30, color: col, tracking: 0.06 }); };
+      const tag = (h, name, col, dy = 0) => { if (!h) return; MG.text.draw(ctx, name, h[0] + 30, h[1] + 10 + dy, { font: F.grotesk, weight: 800, size: 28, color: col, tracking: 0.06 }); };
       if (kL > 0.05) { tag(hF, 'FRANCE', '#6E86B8', -8); tag(hI, 'ITALY', '#7E8C5E', 14); tag(hG, 'GERMANY', '#3B3638', 30); }
       // Spain's line-head is the sun disk (it becomes the beach umbrella in the next shot)
       if (hS) { MG.kit.sun(ctx, hS[0], hS[1], 30, t, { corona: 0.5, halftone: 0.4 }); MG.text.draw(ctx, 'SPAIN', hS[0] + 48, hS[1] - 10, { font: F.grotesk, weight: 800, size: 40, color: P.solDeep, tracking: 0.06 }); }
       // Germany standing still: a flat ruler line + label
       const kGs = pr(t, tGer - 0.2, tStill + 0.2); if (kGs > 0 && hG) { ctx.save(); ctx.globalAlpha = kGs; ctx.setLineDash([8, 8]); ctx.strokeStyle = '#3B3638'; ctx.lineWidth = 2; const y = S5.growXY(0, 100)[1]; ctx.beginPath(); ctx.moveTo(260, y); ctx.lineTo(1620, y); ctx.stroke(); ctx.restore(); S5.lead(ctx, 'standing still', hG[0] + 34, hG[1] + 82, t, tStill - 0.4, { size: 44, color: '#3B3638' }); }
       ctx.restore();
-      S5.kick(ctx, 'real GDP · 2022 = 100', 150, 130, t, t0 + 0.2, { size: 22, color: P.ink2 });
-      S5.lead(ctx, 'for the past', 150, 210, t, T('past', 773.55) - 0.1, { size: 56 });
-      S5.key(ctx, '3 years', 146, 300, t, T('three', 773.87) - 0.1, { size: 86 });
-      S5.key(ctx, 'faster than any other big EU economy', 150, 380, t, T('faster', 775.43) - 0.1, { size: 40, weight: 700, color: P.ink2 });
+      S5.kick(ctx, 'real GDP · 2022 = 100 · big EU economies', 150, 130, t, t0 + 0.2, { size: 22, color: P.ink2 });
+      S5.lead(ctx, 'for the past 3 years', 150, 210, t, T('past', 773.55) - 0.1, { size: 56 });
+      S5.key(ctx, 'growing faster', 146, 310, t, T('growing', 775.03) - 0.1, { size: 92 });
     },
     post: { grade: 'neutral', vignette: 0.3 },
+  });
+
+  /* ---------- 23 · PILLAR 1 · TOURISM — the beach umbrella is the pie ---- */
+  S5.sand = () => MG.cache('s5sand', W + 400, H + 400, (x, w, h) => { x.fillStyle = '#EED3A2'; x.fillRect(0, 0, w, h); const r = MG.rng(41); for (let i = 0; i < 9000; i++) { x.fillStyle = A(r() < 0.5 ? '#D9B47A' : '#FFF0D0', 0.35); x.fillRect(r() * w, r() * h, 1.5, 1.5); } x.strokeStyle = 'rgba(170,120,70,0.16)'; x.lineWidth = 3; for (let j = 0; j < 40; j++) { x.beginPath(); for (let i = 0; i <= w; i += 30) x.lineTo(i, j * 40 + Math.sin(i * 0.01 + j) * 8); x.stroke(); }
+    for (let i = 0; i < 26; i++) { const fx = 200 + i * 70, fy = 1200 - i * 44 + Math.sin(i) * 20; x.fillStyle = 'rgba(150,100,60,0.22)'; x.beginPath(); x.ellipse(fx + (i % 2) * 22, fy, 9, 16, 0.6, 0, MG.TAU); x.fill(); } MG.tex.over(x, 'blotch', { alpha: 0.15, color: '#8a5a2a', scale: 3 }); });
+  S5.umbrella = (ctx, x, y, r, open, t, o = {}) => {
+    const n = 8; const rot = o.rot || 0; const R = r * open; if (R < 2) return;
+    ctx.save(); ctx.translate(x + R * 0.28, y + R * 0.34); ctx.globalAlpha = 0.28; ctx.fillStyle = '#5a2f2a'; ctx.filter = 'blur(10px)'; ctx.beginPath(); for (let i = 0; i < n; i++) { const a = rot + (i / n) * MG.TAU; ctx.lineTo(Math.cos(a) * R, Math.sin(a) * R); } ctx.closePath(); ctx.fill(); ctx.restore();
+    for (let i = 0; i < n; i++) { const a0 = rot + (i / n) * MG.TAU, a1 = rot + ((i + 1) / n) * MG.TAU; const p = new Path2D(); p.moveTo(x, y); p.lineTo(x + Math.cos(a0) * R, y + Math.sin(a0) * R); p.quadraticCurveTo(x + Math.cos((a0 + a1) / 2) * R * 1.06, y + Math.sin((a0 + a1) / 2) * R * 1.06, x + Math.cos(a1) * R, y + Math.sin(a1) * R); p.closePath();
+      const hl = o.hl === i ? o.hlK || 0 : 0; const base = i % 2 ? '#FBF6EA' : P.azulejo; const col = mix(base, P.sol, hl); const lit = clamp(0.5 + 0.5 * Math.cos((a0 + a1) / 2 + 2.2));
+      ctx.fillStyle = mix(col, MG.col.shade(col, 0.35), 1 - lit); ctx.fill(p); ctx.strokeStyle = 'rgba(30,20,30,0.45)'; ctx.lineWidth = 2; ctx.stroke(p); if (hl > 0) { ctx.save(); ctx.clip(p); MG.tex.over(ctx, 'blotch', { alpha: 0.2 * hl, color: P.solDeep }); ctx.restore(); } }
+    ctx.strokeStyle = 'rgba(30,20,30,0.25)'; ctx.lineWidth = 1.5; for (let i = 0; i < n; i++) { const a = rot + (i / n) * MG.TAU; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + Math.cos(a) * R, y + Math.sin(a) * R); ctx.stroke(); }
+    MG.fx.volume(ctx, MG.path.circle(x, y, R * 0.06 + 4), [x - R * 0.06 - 4, y - R * 0.06 - 4, R * 0.12 + 8, R * 0.12 + 8], { color: '#D8B15A', shade: 0.4, hi: 0.6, cel: true });
+  };
+  add({
+    id: 's05_beach', start: 781.31,
+    transIn: { type: S5.trPush(1295, 297, 2.4, 0.4), dur: 0.7 },
+    draw(ctx, t, S) {
+      const t0 = S.t0; const tTour = T('tourism', 782.03), tObv = T('Obviously', 782.91), t12 = T('12', 784.91), tEcon = T('economy', 786.51), tAuto = T('auto', 788.51), tGer = T('Germany', 789.99), tBig = T('bigger', 787.66);
+      const hh = MG.cam.handheld(t, 2, 101); const rot = lerp(-0.04, 0.03, li(t, t0, 790.6)); const z = lerp(1.08, 0.94, E.inOutSine(li(t, t0, 790.6)));
+      ctx.save(); MG.cam.apply(ctx, { x: lerp(900, 1010, E.inOutSine(li(t, tBig - 0.6, tAuto + 0.4))), y: 560, zoom: z, rot: rot + hh.rot, dx: hh.dx, dy: hh.dy });
+      MG.sprite(ctx, S5.sand(), -200, -200, { ax: 0, ay: 0 });
+      // sea + foam at the top (waves washing in)
+      const sw = (xx) => 120 + Math.sin(xx * 0.004 + t * 0.9) * 26 + Math.sin(xx * 0.011 - t * 1.4) * 10 + Math.sin(t * 0.8) * 14;
+      ctx.save(); const sea = new Path2D(); sea.moveTo(-300, -300); sea.lineTo(W + 300, -300); for (let xx = W + 300; xx >= -300; xx -= 30) sea.lineTo(xx, sw(xx)); sea.closePath(); const g = ctx.createLinearGradient(0, -300, 0, 160); g.addColorStop(0, '#2C7FA8'); g.addColorStop(1, '#6FC4C8'); ctx.fillStyle = g; ctx.fill(sea); ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = 9; ctx.beginPath(); for (let xx = -300; xx <= W + 300; xx += 30) ctx.lineTo(xx, sw(xx)); ctx.stroke(); ctx.strokeStyle = 'rgba(255,255,255,0.35)'; ctx.lineWidth = 3; ctx.beginPath(); for (let xx = -300; xx <= W + 300; xx += 30) ctx.lineTo(xx, sw(xx) - 30 - Math.sin(xx * 0.02 + t) * 6); ctx.stroke(); ctx.restore();
+      // loungers: one painted "01" (the integrated numeral of pillar 1)
+      const lounger = (lx, ly, num, ang) => { ctx.save(); ctx.translate(lx, ly); ctx.rotate(ang); ctx.save(); ctx.translate(18, 22); ctx.fillStyle = 'rgba(90,50,40,0.25)'; ctx.fillRect(-60, -150, 120, 300); ctx.restore(); S5.form(ctx, [[-60, -150], [60, -150], [60, 150], [-60, 150]], { poly: true, color: '#F4F0E6', shade: 0.15, hi: 0.2, ow: 2.5, cel: false }); ctx.strokeStyle = 'rgba(31,78,140,0.55)'; ctx.lineWidth = 8; for (let i = -130; i < 150; i += 26) { ctx.beginPath(); ctx.moveTo(-52, i); ctx.lineTo(52, i); ctx.stroke(); } MG.text.draw(ctx, num, 0, 120, { font: F.stencil2 || F.cond, weight: 900, size: 64, color: P.rojo, align: 'center' }); ctx.fillStyle = '#E8644A'; ctx.fillRect(-46, -140, 92, 60); ctx.restore(); };
+      lounger(1340, 640, '01', -0.12); lounger(1500, 660, '02', -0.12);
+      // the umbrella: opens on "Obviously"; one of 8 panels (12.5 %) turns saffron = tourism's share
+      const open = 0.25 + 0.75 * MG.ease.outBack(pr(t, tObv - 0.25, tObv + 0.4, 'linear')); const kH = pr(t, t12 - 0.2, t12 + 0.5);
+      S5.umbrella(ctx, 820, 600, 300, open, t, { rot: -Math.PI / 2 - 0.0, hl: 0, hlK: kH });
+      // pie ring + label
+      if (kH > 0) { ctx.save(); ctx.globalAlpha = kH; ctx.strokeStyle = P.ink; ctx.lineWidth = 2.5; ctx.setLineDash([3, 7]); ctx.beginPath(); ctx.arc(820, 600, 340, 0, MG.TAU); ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth = 6; ctx.strokeStyle = P.solDeep; ctx.beginPath(); ctx.arc(820, 600, 340, -Math.PI / 2, -Math.PI / 2 + MG.TAU / 8); ctx.stroke(); ctx.restore(); }
+      // German cars: a tyre rolls in and falls flat; its rim carries a thinner slice (≈5 %)
+      const kT = pr(t, tAuto - 0.9, tAuto + 0.1, 'out'); if (kT > 0) { const tx = lerp(2300, 1500, kT), ty = 330; const spin = (1 - kT) * 14; ctx.save(); ctx.translate(tx, ty); ctx.rotate(spin); ctx.save(); ctx.translate(16, 20); ctx.fillStyle = 'rgba(70,40,30,0.3)'; ctx.filter = 'blur(8px)'; ctx.beginPath(); ctx.arc(0, 0, 150, 0, MG.TAU); ctx.fill(); ctx.restore();
+        ctx.fillStyle = '#1F1D22'; ctx.beginPath(); ctx.arc(0, 0, 150, 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#3a383e'; ctx.lineWidth = 3; for (let i = 0; i < 48; i++) { const a = (i / 48) * MG.TAU; ctx.beginPath(); ctx.moveTo(Math.cos(a) * 128, Math.sin(a) * 128); ctx.lineTo(Math.cos(a + 0.05) * 148, Math.sin(a + 0.05) * 148); ctx.stroke(); }
+        MG.fx.volume(ctx, MG.path.circle(0, 0, 100), [-100, -100, 200, 200], { color: '#C9CDD4', shade: 0.45, hi: 0.6, cel: true }); ctx.fillStyle = '#7d828c'; for (let i = 0; i < 5; i++) { ctx.save(); ctx.rotate((i / 5) * MG.TAU); ctx.beginPath(); ctx.moveTo(-14, -20); ctx.lineTo(14, -20); ctx.lineTo(26, -92); ctx.lineTo(-26, -92); ctx.closePath(); ctx.fill(); ctx.restore(); }
+        const kw = pr(t, tAuto + 0.15, tAuto + 0.6); if (kw > 0) { ctx.fillStyle = A('#5A7FB8', 0.9 * kw); ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 100, -Math.PI / 2 - spin, -Math.PI / 2 - spin + MG.TAU * 0.05); ctx.closePath(); ctx.fill(); } ctx.restore(); }
+      ctx.restore();
+      // type
+      S5.lead(ctx, 'First,', 150, 150, t, T('First', 781.31) - 0.05, { size: 60, color: '#F6FBFF', shadow: { blur: 8, dy: 3, color: 'rgba(10,40,60,0.35)' } });
+      S5.key(ctx, 'tourism.', 146, 250, t, tTour - 0.05, { size: 110, color: '#FFFFFF', font: F.display, weight: 900, shadow: { blur: 10, dy: 4, color: 'rgba(10,40,60,0.35)' } });
+      S5.lead(ctx, 'Obviously.', 560, 250, t, tObv - 0.05, { size: 56, color: '#FFF3DE', out: { at: t12 - 0.4, dur: 0.3 } });
+      const kN = pr(t, t12 - 0.1, t12 + 0.4); if (kN > 0) { MG.text.draw(ctx, '12–13%', 1240, 900, { font: F.cond, weight: 900, size: 180, color: P.solDeep, alpha: kN, stroke: 'rgba(255,248,232,0.8)', strokeW: 10 }); MG.text.draw(ctx, 'OF THE ECONOMY · TOURISM', 1248, 950, { font: F.mono, size: 24, weight: 700, color: P.ink, alpha: pr(t, tEcon - 0.2, tEcon + 0.3), tracking: 0.14 }); }
+      if (kT > 0.6) { MG.text.draw(ctx, 'GERMANY · CAR INDUSTRY', 1700, 540, { font: F.mono, size: 22, weight: 700, color: P.ink, align: 'right', alpha: pr(t, tGer - 0.4, tGer), tracking: 0.12 }); MG.text.draw(ctx, 'a smaller slice', 1700, 590, { font: F.serif, italic: true, size: 44, color: P.ink2, align: 'right', alpha: pr(t, tGer - 0.2, tGer + 0.3) }); }
+    },
+    post: { grade: 'warm', vignette: 0.3, temp: 0.05 },
+  });
+
+  /* ---------- 25 · THE BALEARICS: 1 M RESIDENTS · 16 M VISITORS --------- */
+  add({
+    id: 's05_balearics', start: 790.55,
+    transIn: { type: S5.trPull(960, 560, 0.08), dur: 0.8 },
+    draw(ctx, t, S) {
+      MG.geo.init(); const t0 = S.t0; const tIsl = T('Islands', 791.30), tMil = T('million', 792.18), tRes = T('residents', 792.59), t16 = T('16', 793.95), tVis = T('visitors', 795.14), tYear = T('year', 795.71);
+      const hh = MG.cam.handheld(t, 2, 103); const sc2 = lerp(30000, 33000, E.inOutSine(li(t, t0, 796.8)));
+      const pr2 = MG.geo.proj('spain', { center: [2.75, 39.35], scale: sc2, translate: [1000 + hh.dx, 560 + hh.dy] });
+      MG.kit.seaBg(ctx, '#7FB6D2'); ctx.save(); ctx.globalAlpha = 0.25; MG.geo.graticule(ctx, pr2, { color: '#FFFFFF', step: [0.5, 0.5] }); ctx.restore();
+      const bal = MG.geo.region('Balearic Islands'); MG.geo.slab(ctx, pr2, bal, { depth: 14, top: '#F2B65A', side: '#B8752E', shadowDy: 18, stroke: 'rgba(30,26,29,0.6)', width: 1.4 });
+      ctx.save(); MG.geo.clip(ctx, pr2, bal); ctx.globalAlpha = 0.5; ctx.globalCompositeOperation = 'multiply'; MG.geo.relief(ctx, pr2, { alpha: 1 }); ctx.restore();
+      // 1 M residents = 10 dots (100,000 each), mostly Mallorca/Palma
+      const res = [[2.65, 39.58], [2.70, 39.60], [2.62, 39.62], [2.92, 39.70], [3.10, 39.57], [2.88, 39.45], [3.25, 39.75], [1.43, 38.92], [1.30, 38.98], [4.12, 39.92]];
+      const kR = pr(t, tRes - 0.3, tRes + 0.6); res.forEach((c, i) => { const k = clamp(kR * 1.6 - i * 0.06); if (k <= 0) return; const q = pr2(c); ctx.fillStyle = P.ink; ctx.beginPath(); ctx.arc(q[0], q[1], 11 * E.outBack(k), 0, MG.TAU); ctx.fill(); ctx.strokeStyle = '#FBF6EE'; ctx.lineWidth = 2.5; ctx.stroke(); });
+      // 16 M visitors: planes stream in from the north; 160 saffron dots (16 per resident dot) settle along the coasts
+      const air = [[2.74, 39.55], [1.37, 38.87], [4.22, 39.86]]; const kV = pr(t, t16 - 0.4, tYear + 0.8, 'linear');
+      if (kV > 0) { for (let i = 0; i < 18; i++) { const u = MG.fract(MG.rand(111, i) + (t - t16) * 0.45); if (t < t16 - 0.4 + MG.rand(112, i) * 0.8) continue; const a = air[i % 3]; const from = [a[0] + (MG.rand(113, i) - 0.5) * 3, a[1] + 1.6]; const pa = pr2(from), pb = pr2(a); const x2 = lerp(pa[0], pb[0], u), y2 = lerp(pa[1], pb[1], u) - Math.sin(u * Math.PI) * 40; S5.plane(ctx, x2, y2, 1.4 - u * 0.4, Math.atan2(pb[1] - pa[1], pb[0] - pa[0]), A('#FFFFFF', Math.min(1, (1 - u) * 4))); }
+        for (let i = 0; i < 160; i++) { const k = clamp(kV * 1.4 - (i / 160) * 0.9); if (k <= 0) continue; const a = res[i % 10]; const ang = MG.rand(114, i) * MG.TAU, rr = 0.04 + MG.rand(115, i) * 0.13; const q = pr2([a[0] + Math.cos(ang) * rr * 1.3, a[1] + Math.sin(ang) * rr]); ctx.fillStyle = A(P.solDeep, k); ctx.beginPath(); ctx.arc(q[0], q[1], 4.2, 0, MG.TAU); ctx.fill(); } }
+      MG.geo.label(ctx, pr2, [2.65, 39.57], { text: 'PALMA', t, t0: tIsl, size: 22, weight: 700, color: P.ink, dot: 0, dx: -100, dy: 34, halo: 'rgba(250,244,232,0.85)', haloW: 6 });
+      S5.kick(ctx, 'Balearic Islands', 150, 140, t, T('Balearic', 790.75) - 0.1, { size: 26, color: P.ink });
+      const kM = pr(t, tMil - 0.2, tMil + 0.3); if (kM > 0) { MG.text.draw(ctx, '1 M', 150, 330, { font: F.cond, weight: 900, size: 150, color: P.ink, alpha: kM }); MG.text.draw(ctx, 'RESIDENTS', 156, 380, { font: F.mono, weight: 700, size: 26, color: P.ink, alpha: pr(t, tRes - 0.1, tRes + 0.3), tracking: 0.16 }); }
+      const kS = pr(t, t16 - 0.2, t16 + 0.3); if (kS > 0) { MG.text.draw(ctx, '16 M', 150, 590, { font: F.cond, weight: 900, size: 150, color: P.solDeep, alpha: kS }); MG.text.draw(ctx, 'VISITORS · A YEAR', 156, 640, { font: F.mono, weight: 700, size: 26, color: P.ink, alpha: pr(t, tVis - 0.1, tVis + 0.3), tracking: 0.16 }); }
+      ctx.save(); ctx.globalAlpha = kR; ctx.fillStyle = P.ink; ctx.beginPath(); ctx.arc(170, 720, 10, 0, MG.TAU); ctx.fill(); MG.text.draw(ctx, '= 100,000 PEOPLE', 196, 728, { font: F.mono, size: 20, weight: 600, color: P.ink2, tracking: 0.1 }); ctx.restore();
+    },
+    post: { grade: 'warm', vignette: 0.32 },
+  });
+
+  /* ---------- 26 · SIXTEEN TOURISTS FOR EVERY LOCAL · EVERY YEAR -------- */
+  add({
+    id: 's05_sixteen', start: 796.70,
+    transIn: { type: S5.trPush(960, 520, 2.2, 0.5), dur: 0.7 },
+    init() {
+      this.street = MG.cache('s5street', W + 240, H + 200, (x, w, h) => {
+        x.fillStyle = '#EFE6D6'; x.fillRect(0, 0, w, 640); MG.tex.over(x, 'blotch', { alpha: 0.2, color: '#8a6a4a', scale: 3 }); MG.tex.over(x, 'fibers', { alpha: 0.8 });
+        const door = (dx) => { x.fillStyle = '#3E6B4A'; x.fillRect(dx, 250, 190, 390); x.strokeStyle = '#2a4a32'; x.lineWidth = 4; for (let i = 0; i < 14; i++) { x.beginPath(); x.moveTo(dx + 10, 270 + i * 26); x.lineTo(dx + 180, 270 + i * 26); x.stroke(); } x.fillStyle = '#C8A36A'; x.fillRect(dx - 16, 236, 222, 16); };
+        door(300); door(1500); x.fillStyle = '#3E6B4A'; x.fillRect(880, 260, 260, 220); x.strokeStyle = '#2a4a32'; x.lineWidth = 4; for (let i = 0; i < 8; i++) { x.beginPath(); x.moveTo(890, 276 + i * 24); x.lineTo(1130, 276 + i * 24); x.stroke(); } x.fillStyle = '#C8A36A'; x.fillRect(864, 480, 292, 14);
+        for (let i = 0; i < 5; i++) { const px = 900 + i * 56; x.fillStyle = '#B5583A'; x.fillRect(px, 458, 36, 26); x.fillStyle = '#5E8A48'; x.beginPath(); x.arc(px + 18, 448, 22, 0, MG.TAU); x.fill(); x.fillStyle = '#E8644A'; x.beginPath(); x.arc(px + 10, 440, 6, 0, MG.TAU); x.arc(px + 26, 446, 6, 0, MG.TAU); x.fill(); }
+        x.fillStyle = '#C9B89A'; x.fillRect(0, 640, w, h - 640); for (let j = 0; j < 14; j++) for (let i = 0; i < 40; i++) { const yy = 650 + j * 34 + j * j * 1.5, xx = i * 70 + (j % 2) * 35; x.fillStyle = MG.rand(j, i) > 0.5 ? '#BBA888' : '#D2C2A2'; x.beginPath(); x.ellipse(xx, yy, 32 + j, 14 + j * 0.6, 0, 0, MG.TAU); x.fill(); }
+        const g = x.createLinearGradient(0, 600, 0, 720); g.addColorStop(0, 'rgba(60,40,40,0.35)'); g.addColorStop(1, 'rgba(60,40,40,0)'); x.fillStyle = g; x.fillRect(0, 600, w, 120);
+      });
+    },
+    draw(ctx, t, S) {
+      const t0 = S.t0; const tSix = T('Sixteen', 796.75), tLoc = T('local', 798.66), tEvery = T('Every', 799.71), tYear = T('year', 800.11);
+      const hh = MG.cam.handheld(t, 2.5, 105); const z = lerp(1.0, 1.05, li(t, t0, 801.4));
+      ctx.save(); MG.cam.apply(ctx, { x: 960, y: 560, zoom: z, dx: hh.dx, dy: hh.dy, rot: hh.rot });
+      MG.sprite(ctx, this.street, -120, -100, { ax: 0, ay: 0 });
+      // "every year": the sun sweeps across, shadows swing, a new wave of tourists replaces the last
+      const yk = pr(t, tEvery - 0.1, tYear + 0.7, 'inOutSine'); const shA = lerp(-0.9, 0.9, yk);
+      if (yk > 0 && yk < 1) { ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = A('#3A2B4A', 0.25 * Math.sin(yk * Math.PI)); ctx.fillRect(0, 0, W, H); ctx.restore(); }
+      // the local in front of his door
+      S5.local(ctx, 960, 900, 1.25, t, { look: [Math.sin(t * 1.3) * 0.8, 0.1] });
+      // 16 tourists arrive and crowd around him
+      const spots = []; for (let i = 0; i < 16; i++) { const ring = i < 7 ? 0 : 1; const k = ring ? (i - 7) / 8 : i / 6; const a = Math.PI * (0.05 + 0.9 * k); const R = ring ? 560 : 360; spots.push([960 - Math.cos(a) * R * 1.25, 880 - Math.sin(a) * R * 0.22 + (ring ? -40 : 30)]); }
+      spots.sort((a, b) => a[1] - b[1]);
+      const wave = Math.floor(clamp(yk * 2.999)); // 0..2
+      spots.forEach((sp, i) => { const st = tSix - 0.6 + i * 0.09; const k = pr(t, st, st + 0.9, 'out'); if (k <= 0) return; const fromX = sp[0] < 960 ? -200 : W + 200; const xx = lerp(fromX, sp[0], k), yy = sp[1]; const walking = k < 0.98; S5.tourist(ctx, xx, yy, 0.95 + (yy - 700) / 900, t, (i + wave * 5) % 8, { walk: walking, flip: sp[0] > 960, suitcase: i % 3 === 0 }); });
+      ctx.restore();
+      // ratio type
+      const kN = pr(t, tSix - 0.1, tSix + 0.4); if (kN > 0) { MG.text.draw(ctx, '16', 150, 300, { font: F.cond, weight: 900, size: 230, color: P.solDeep, alpha: kN, stroke: 'rgba(250,244,232,0.8)', strokeW: 10 }); MG.text.draw(ctx, 'TOURISTS', 156, 352, { font: F.mono, weight: 700, size: 26, color: P.ink, alpha: kN, tracking: 0.18 }); }
+      const kL = pr(t, tLoc - 0.15, tLoc + 0.3); if (kL > 0) { MG.text.draw(ctx, ':1', 360, 300, { font: F.cond, weight: 900, size: 230, color: P.ink, alpha: kL, stroke: 'rgba(250,244,232,0.8)', strokeW: 10 }); MG.text.draw(ctx, 'LOCAL', 380, 352, { font: F.mono, weight: 700, size: 26, color: P.ink, alpha: kL, tracking: 0.18 }); }
+      const kE = pr(t, tEvery - 0.1, tEvery + 0.3); if (kE > 0) { const yr = 2023 + Math.min(2, Math.floor(yk * 3)); MG.text.draw(ctx, 'every year', 1770, 220, { font: F.serif, italic: true, size: 64, color: P.ink, align: 'right', alpha: kE }); MG.text.draw(ctx, String(yr), 1770, 300, { font: F.mono, weight: 700, size: 44, color: P.solDeep, align: 'right', alpha: kE, tracking: 0.1 }); }
+      // sun disk crossing the sky strip on "every year"
+      if (yk > 0 && yk < 1) MG.kit.sun(ctx, lerp(260, 1660, yk), 130 - Math.sin(yk * Math.PI) * 60, 40, t, { corona: 0.5 });
+    },
+    post: { grade: 'warm', vignette: 0.34, temp: 0.05 },
   });
 
   /*@@SCENES@@*/
@@ -1425,5 +1579,13 @@
     A.sfx.thud(765.55, { gain: 0.5 }); A.sfx.swell(766.6, { dur: 1.2, gain: 0.4 });
     [['Germany', 768.67], ['France', 769.07], ['Italy', 769.71]].forEach(([w, a]) => A.sfx.pop(T(w, a), { freq: 400, gain: 0.6 })); A.sfx.chime(T('$1.7', 770.83), { note: 'C#6', gain: 0.6 });
     A.sfx.slide(773.2, { dur: 0.5, gain: 0.8 });
+    // E · tourism — retro bossa, beach and sea
+    A.music('retro60s', 780.9, 801.9, { key: 'F3', bpm: 124, intensity: [[780.9, 0.45], [783, 0.7], [796.5, 0.75], [801.5, 0.4]], fadeIn: 1.0, fadeOut: 1.0 });
+    A.sfx.amb('sea', 781.4, 9.2, { gain: 0.8 }); A.sfx.pop(T('Obviously', 782.91), { freq: 300, gain: 0.8 }); A.sfx.swish(T('Obviously', 782.91) + 0.05, { gain: 0.6 });
+    A.sfx.chime(T('12', 784.91), { note: 'F6', gain: 0.6 }); A.sfx.slide(T('auto', 788.51) - 0.8, { dur: 0.7, gain: 0.9 }); A.sfx.thud(T('auto', 788.51) + 0.1, { gain: 0.5 });
+    A.sfx.whoosh(790.6, { dur: 0.8, gain: 0.5, dir: 1, pitch: 1.2 }); A.sfx.plane(793.6, 3.2, { gain: 0.8 });
+    for (let i = 0; i < 10; i++) A.sfx.tick(T('residents', 792.59) - 0.2 + i * 0.06, { gain: 0.45 });
+    for (let i = 0; i < 16; i++) A.sfx.tick(T('Sixteen', 796.75) - 0.5 + i * 0.09, { gain: 0.4, pan: (i % 2 ? 0.4 : -0.4) });
+    A.sfx.amb('city', 796.7, 4.7, { gain: 0.5 }); A.sfx.whoosh(T('Every', 799.71) + 0.3, { dur: 1.0, gain: 0.4 });
   };
 })();

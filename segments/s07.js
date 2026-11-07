@@ -1318,6 +1318,165 @@ SC.push({
 });
 
 // =====================================================================================================
+// CHAPTER E — GHOSTS
+// =====================================================================================================
+S7.CR = [-3.927, 38.985]; S7.CRAP = [-3.97, 38.856];
+// ---------- E1 · dusk map → Ciudad Real (75,000) → a blueprint → the terminal stands up ----------
+SC.push({
+  id: 's07_e1_ciudadreal', start: 1100.65, end: 1108.0,
+  transIn: { type: 'blur', dur: 0.8, amount: 20 },
+  init() {
+    this.pr0 = MG.geo.proj('spain', { center: [-3.75, 39.7], scale: 6900 });
+    this.base = S7.cacheMap('e1', this.pr0, { sea: '#5F7E9B', land: '#B9A98F', portugal: '#C2B196', spain: '#D6A469', relief: 0.65, provinces: true, after: (x) => { x.globalCompositeOperation = 'multiply'; MG.fx.rgrad(x, 1500, 200, 1700, [[0, 'rgba(255,214,170,1)'], [1, 'rgba(120,96,140,1)']]); x.globalCompositeOperation = 'source-over'; } });
+    const r = MG.rng(75); this.dots = []; for (let i = 0; i < 75; i++) { const a = i * 2.39996, d = Math.sqrt(i + 0.5) * 9.5; this.dots.push([Math.cos(a) * d, Math.sin(a) * d * 0.9, r()]); }
+    this.bp = MG.cache('s7e1bp', W, H, (x) => { x.fillStyle = C.blueprint; x.fillRect(0, 0, W, H); x.strokeStyle = 'rgba(216,230,245,0.12)'; x.lineWidth = 1; for (let i = 0; i < W; i += 40) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H); x.stroke(); } for (let j = 0; j < H; j += 40) { x.beginPath(); x.moveTo(0, j); x.lineTo(W, j); x.stroke(); } x.strokeStyle = 'rgba(216,230,245,0.22)'; for (let i = 0; i < W; i += 200) { x.beginPath(); x.moveTo(i, 0); x.lineTo(i, H); x.stroke(); } MG.tex.over(x, 'blotch', { alpha: 0.15, color: '#000', scale: 3 }); MG.tex.over(x, 'fibers', { alpha: 0.35, color: '#9bb8d8', blend: 'screen' }); });
+  },
+  draw(ctx, t) {
+    const cam = S7.mapKeys(this.pr0, t, [[1100.75, { c: [-3.75, 39.7], z: 1 }], [1102.4, { c: [-3.93, 38.95], z: 4.4 }, 'cam'], [1104.8, { c: [-3.94, 38.93], z: 4.9 }, 'linear']]);
+    ctx.save(); cam.apply(ctx); ctx.drawImage(this.base, 0, 0); ctx.restore();
+    S7.mapLabel(ctx, cam.pt, MG.geo.cities.Madrid, t, 1100.9, 'MADRID', { dot: 7, dotColor: P.ink, size: 26, dx: 14, dy: -12, style: 'fade', alpha: 1 - MG.smoothstep(1101.6, 1102.2, t) });
+    const tc = TW('Ciudad', 1101.0); S7.mapLabel(ctx, cam.pt, S7.CR, t, tc - 0.1, 'CIUDAD REAL', { dot: 9, size: 40, dx: 26, dy: -24, weight: 800 });
+    const t75 = TW('75,000', 1102.8); const c = cam.pt(S7.CR);
+    this.dots.forEach(([dx, dy, rr], i) => { const k = MG.ease.outBack(clamp((t - t75 + 0.05 - i * 0.008) / 0.3)); if (k <= 0) return; ctx.fillStyle = rr < 0.5 ? '#FFF1D6' : '#F7D39A'; ctx.beginPath(); ctx.arc(c[0] + dx * 1.6, c[1] + 40 + dy * 1.6, 5.5 * k, 0, TAU); ctx.fill(); });
+    if (t > t75 - 0.1) { MG.text.reveal(ctx, '75,000', c[0] + 28, c[1] + 26, t, t75 - 0.05, { font: MG.F.cond, weight: 900, size: 64, color: P.cal, stroke: 'rgba(40,30,50,0.6)', strokeW: 6, style: 'rise', by: 'char', stagger: 0.03 }); S7.mono(ctx, 'people · ● = 1,000', c[0] + 32, c[1] + 62, t, t75 + 0.3, { size: 20, color: P.cal, stroke: 'rgba(40,30,50,0.6)', strokeW: 5 }); }
+    // the blueprint unrolls over the map
+    const tb = TW('build', 1104.9); const un = MG.ease.inOutCubic(lin(t, tb - 0.35, tb + 0.45)); if (un > 0) {
+      const ex = lerp(-40, W + 60, un); ctx.save(); ctx.beginPath(); ctx.rect(0, 0, ex, H); ctx.clip(); ctx.drawImage(this.bp, 0, 0);
+      const draw = (k0, k1, fn) => { const p = MG.ease.inOutSine(lin(t, k0, k1)); if (p > 0) fn(p); };
+      const L = (pts, p, w = 3, dash) => MG.fx.line(ctx, pts, { color: C.blueprintLine, width: w, progress: p, dash });
+      const ang = -0.17; const R = (x, y) => { const cx = 1000, cy = 560; const ca = Math.cos(ang), sa = Math.sin(ang); return [cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca]; };
+      draw(tb, tb + 1.0, (p) => { L([R(260, 560), R(1740, 560), R(1740, 610), R(260, 610), R(260, 560)], p, 4); L([R(280, 585), R(1720, 585)], p, 2, [22, 18]); });
+      draw(tb + 0.5, tb + 1.4, (p) => { L([R(380, 690), R(1620, 690)], p, 3); for (let k = 0; k < 6; k++) L([R(500 + k * 200, 610), R(540 + k * 200, 690)], p, 2); });
+      draw(tb + 0.9, tb + 1.8, (p) => { L([R(760, 760), R(1260, 760), R(1260, 880), R(760, 880), R(760, 760)], p, 3); L([R(1360, 780)], 1); });
+      draw(tb + 1.1, tb + 1.9, (p) => { ctx.save(); ctx.strokeStyle = C.blueprintLine; ctx.lineWidth = 3; const q = R(1380, 800); ctx.beginPath(); ctx.arc(q[0], q[1], 36, 0, TAU * p); ctx.stroke(); ctx.restore(); });
+      MG.text.reveal(ctx, 'RUNWAY · 4,000 M', R(300, 540)[0], R(300, 540)[1], t, tb + 0.6, { font: MG.F.mono, weight: 700, size: 24, color: C.blueprintLine, tracking: 0.18, style: 'type', by: 'char', stagger: 0.02 });
+      // title block
+      const tbX = 1300, tbY = 860; const kb = MG.prog(t, tb + 0.2, tb + 0.6); if (kb > 0) { ctx.save(); ctx.globalAlpha = kb; ctx.strokeStyle = C.blueprintLine; ctx.lineWidth = 2; ctx.strokeRect(tbX, tbY, 520, 170); ctx.beginPath(); ctx.moveTo(tbX, tbY + 50); ctx.lineTo(tbX + 520, tbY + 50); ctx.stroke(); MG.text.draw(ctx, 'CIUDAD REAL · CENTRAL AIRPORT', tbX + 16, tbY + 34, { font: MG.F.mono, weight: 700, size: 20, color: C.blueprintLine, tracking: 0.08 }); ctx.restore(); }
+      MG.text.reveal(ctx, '€1 BILLION', tbX + 16, tbY + 148, t, TW('billion-euro', 1105.5) - 0.05, { font: MG.F.cond, weight: 900, size: 100, color: '#FFFFFF', style: 'rise', by: 'word' });
+      ctx.restore();
+      // paper roll edge
+      if (un < 1) { ctx.save(); const g = ctx.createLinearGradient(ex - 40, 0, ex + 30, 0); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(0.6, 'rgba(10,20,40,0.45)'); g.addColorStop(1, 'rgba(10,20,40,0)'); ctx.fillStyle = g; ctx.fillRect(ex - 40, 0, 70, H); ctx.fillStyle = '#2A5490'; ctx.fillRect(ex - 6, 0, 22, H); ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(ex - 2, 0, 5, H); ctx.restore(); }
+      // the terminal stands up out of the plan
+      const ta = TW('airport', 1107.0); const st = MG.ease.out(lin(t, ta - 0.25, ta + 0.6)); if (st > 0) { const ang2 = -0.17; const R2 = (x, y) => { const cx = 1000, cy = 560; const ca = Math.cos(ang2), sa = Math.sin(ang2); return [cx + (x - cx) * ca - (y - cy) * sa, cy + (x - cx) * sa + (y - cy) * ca]; }; const hgt = 150 * st; const fp = [R2(760, 760), R2(1260, 760), R2(1260, 880), R2(760, 880)];
+        ctx.save(); ctx.fillStyle = 'rgba(10,20,40,0.35)'; ctx.beginPath(); fp.forEach((q, i) => (i ? ctx.lineTo(q[0] + hgt * 0.5, q[1] + hgt * 0.2) : ctx.moveTo(q[0] + hgt * 0.5, q[1] + hgt * 0.2))); ctx.closePath(); ctx.fill();
+        const top = fp.map((q) => [q[0], q[1] - hgt]); ctx.fillStyle = '#C9D8EA'; ctx.beginPath(); ctx.moveTo(fp[3][0], fp[3][1]); ctx.lineTo(fp[2][0], fp[2][1]); ctx.lineTo(top[2][0], top[2][1]); ctx.lineTo(top[3][0], top[3][1]); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#9FB6D2'; ctx.beginPath(); ctx.moveTo(fp[2][0], fp[2][1]); ctx.lineTo(fp[1][0], fp[1][1]); ctx.lineTo(top[1][0], top[1][1]); ctx.lineTo(top[2][0], top[2][1]); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#EEF3F9'; ctx.beginPath(); top.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.closePath(); ctx.fill(); ctx.strokeStyle = C.blueprint; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = 'rgba(30,60,100,0.55)'; for (let k = 0; k < 12; k++) { const u = (k + 0.5) / 12; const a = [lerp(fp[3][0], fp[2][0], u), lerp(fp[3][1], fp[2][1], u)]; ctx.fillRect(a[0] - 10, a[1] - hgt * 0.75, 20, hgt * 0.55); }
+        const tw = R2(1380, 800); ctx.fillStyle = '#DCE6F2'; ctx.fillRect(tw[0] - 14, tw[1] - 260 * st, 28, 260 * st); ctx.fillStyle = '#9FB6D2'; ctx.beginPath(); ctx.ellipse(tw[0], tw[1] - 260 * st, 46, 22, 0, 0, TAU); ctx.fill(); ctx.restore(); }
+    }
+  },
+  post: (t) => ({ grade: t < 1104.6 ? 'golden' : 'cool', vignette: 0.38, sat: 0.92 }),
+});
+
+// ---------- E2 · split-flap board counts three years → CLOSED; the empty terminal ----------
+S7.flapState = (t) => { const a = TW('operates', 1108.2), th = TW('three', 1109.0), y = TW('years', 1109.2), cl = TW('closes', 1110.2); if (t < a + 0.1) return 'OPEN'; if (t < th) return 'YEAR 1'; if (t < y + 0.35) return 'YEAR 2'; if (t < cl - 0.05) return 'YEAR 3'; return 'CLOSED'; };
+S7.flapTimes = () => { const a = TW('operates', 1108.2), th = TW('three', 1109.0), y = TW('years', 1109.2), cl = TW('closes', 1110.2); return [[0, 'OPEN'], [a + 0.1, 'YEAR 1'], [th, 'YEAR 2'], [y + 0.35, 'YEAR 3'], [cl - 0.05, 'CLOSED']]; };
+S7.drawBoard = (x, t) => {
+  const w = x.canvas.width, h = x.canvas.height; x.fillStyle = '#16181C'; x.fillRect(0, 0, w, h); x.strokeStyle = '#3a3f46'; x.lineWidth = 8; x.strokeRect(4, 4, w - 8, h - 8);
+  MG.text.draw(x, 'AEROPUERTO CENTRAL · CIUDAD REAL', 40, 62, { font: MG.F.mono, weight: 700, size: 34, color: '#E8C25A', tracking: 0.08 }); MG.text.draw(x, 'DEPARTURES', w - 40, 62, { font: MG.F.mono, weight: 700, size: 30, color: '#8E959E', align: 'right', tracking: 0.2 });
+  const T = S7.flapTimes(); let cur = T[0], prev = T[0]; for (const k of T) if (t >= k[0]) { prev = cur; cur = k; } const N = 7; const cw = 120, chh = 190, x0 = (w - N * (cw + 12)) / 2, y0 = 100;
+  for (let i = 0; i < N; i++) { const a = (prev[1].padEnd(N))[i], b = (cur[1].padEnd(N))[i]; const p = clamp((t - cur[0] - i * 0.04) / 0.22); const cx = x0 + i * (cw + 12); const red = cur[1] === 'CLOSED' && p > 0.5;
+    const cell = (ch, half, col) => { x.save(); x.beginPath(); x.rect(cx, half === 0 ? y0 : y0 + chh / 2, cw, chh / 2); x.clip(); x.fillStyle = '#25282E'; x.fillRect(cx, y0, cw, chh); MG.text.draw(x, ch, cx + cw / 2, y0 + chh * 0.78, { font: MG.F.cond, weight: 800, size: 170, color: col, align: 'center' }); x.restore(); };
+    const colA = prev[1] === 'CLOSED' ? '#E0503F' : '#F3EFE6', colB = cur[1] === 'CLOSED' ? '#E0503F' : '#F3EFE6';
+    if (p >= 1 || a === b) { cell(b, 0, colB); cell(b, 1, colB); }
+    else { cell(b, 0, colB); cell(a, 1, colA); const f = p < 0.5 ? 1 - p * 2 : (p - 0.5) * 2; x.save(); if (p < 0.5) { x.translate(cx, y0 + chh / 2); x.scale(1, f); x.translate(-cx, -(y0 + chh / 2)); cell(a, 0, colA); } else { x.translate(cx, y0 + chh / 2); x.scale(1, f); x.translate(-cx, -(y0 + chh / 2)); cell(b, 1, colB); } x.restore(); }
+    x.fillStyle = '#0c0d10'; x.fillRect(cx, y0 + chh / 2 - 2, cw, 4); }
+};
+SC.push({
+  id: 's07_e2_terminal', start: 1108.0, end: 1113.85,
+  transIn: { type: 'zoom', dur: 0.6, x: 1064, y: 814, amount: 3.0, from: 0.75 },
+  init() {
+    const T = THREE; const sc = new T.Scene(); this.sc = sc; sc.background = new T.Color(0x2a2430); sc.fog = new T.Fog(0x3a3240, 14, 46); sc.environment = MG.three.env();
+    this.cam = new T.PerspectiveCamera(46, 16 / 9, 0.1, 100);
+    const floor = new T.Mesh(new T.PlaneGeometry(16, 70), new T.MeshStandardMaterial({ color: 0xcfc6ba, roughness: 0.18, metalness: 0.15 })); floor.rotation.x = -Math.PI / 2; floor.position.set(0, 0, 20); sc.add(floor);
+    const wall = new T.Mesh(new T.PlaneGeometry(70, 7), new T.MeshStandardMaterial({ color: 0xe9e1d3, roughness: 0.8 })); wall.rotation.y = -Math.PI / 2; wall.position.set(6.5, 3.5, 20); sc.add(wall);
+    // outside: dusk sky seen through the glass wall
+    const sky = MG.canvas(1024, 256); { const x = sky.getContext('2d'); const g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, '#4b3a66'); g.addColorStop(0.55, '#E58A4E'); g.addColorStop(0.62, '#F6C27A'); g.addColorStop(0.63, '#3a3036'); g.addColorStop(1, '#2a2226'); x.fillStyle = g; x.fillRect(0, 0, 1024, 256); for (let i = 0; i < 40; i++) { x.fillStyle = 'rgba(255,220,150,0.8)'; x.fillRect(i * 26, 168, 4, 3); } }
+    const skyM = new T.Mesh(new T.PlaneGeometry(80, 14), new T.MeshBasicMaterial({ map: MG.three.canvasTexture(sky) })); skyM.rotation.y = Math.PI / 2; skyM.position.set(-12, 4, 20); sc.add(skyM);
+    const mulM = new T.MeshStandardMaterial({ color: 0x3b3f47, roughness: 0.4, metalness: 0.7 }); const mul = new T.InstancedMesh(new T.BoxGeometry(0.12, 7, 0.12), mulM, 24); const m = new T.Matrix4(); for (let k = 0; k < 24; k++) { m.makeTranslation(-6.5, 3.5, -4 + k * 2.8); mul.setMatrixAt(k, m); } sc.add(mul); const tr = new T.InstancedMesh(new T.BoxGeometry(0.1, 0.1, 70), mulM, 3); [0.05, 3.2, 6.9].forEach((y, i) => { m.makeTranslation(-6.5, y, 20); tr.setMatrixAt(i, m); }); sc.add(tr);
+    const slat = new T.InstancedMesh(new T.BoxGeometry(13, 0.08, 0.35), new T.MeshStandardMaterial({ color: 0xd8d0c2, roughness: 0.6 }), 60); for (let k = 0; k < 60; k++) { m.makeTranslation(0, 7 + Math.sin(k * 0.3) * 0.25, -4 + k * 0.9); slat.setMatrixAt(k, m); } sc.add(slat);
+    // rows of empty seats
+    const seatM = new T.MeshStandardMaterial({ color: 0x2b5c95, roughness: 0.45, metalness: 0.1 }); const legM = new T.MeshStandardMaterial({ color: 0x9aa0a8, roughness: 0.3, metalness: 0.8 }); const nS = 2 * 7 * 9; const pan = new T.InstancedMesh(new T.BoxGeometry(0.52, 0.08, 0.5), seatM, nS), back = new T.InstancedMesh(new T.BoxGeometry(0.52, 0.55, 0.07), seatM, nS), beam = new T.InstancedMesh(new T.BoxGeometry(5.0, 0.06, 0.1), legM, 2 * 7);
+    let i = 0, b = 0; for (const sx of [-2.9, 2.6]) for (let r = 0; r < 7; r++) { const z = 3 + r * 2.4; m.makeTranslation(sx, 0.42, z); beam.setMatrixAt(b++, m); for (let c = 0; c < 9; c++) { const x = sx - 2.2 + c * 0.55; m.makeTranslation(x, 0.46, z); pan.setMatrixAt(i, m); m.makeTranslation(x, 0.74, z + 0.26); back.setMatrixAt(i, m); i++; } } sc.add(pan, back, beam);
+    // split-flap board
+    this.bc = MG.canvas(1024, 320); this.bt = MG.three.canvasTexture(this.bc); S7.drawBoard(this.bc.getContext('2d'), 1108); const bm = [new T.MeshStandardMaterial({ color: 0x111215 }), new T.MeshStandardMaterial({ color: 0x111215 }), new T.MeshStandardMaterial({ color: 0x111215 }), new T.MeshStandardMaterial({ color: 0x111215 }), new T.MeshBasicMaterial({ map: this.bt }), new T.MeshStandardMaterial({ color: 0x111215 })];
+    const board = new T.Mesh(new T.BoxGeometry(6.4, 2.0, 0.25), bm); board.position.set(0, 4.6, 18); board.rotation.y = Math.PI; sc.add(board);
+    for (const sx of [-2.6, 2.6]) { const rod = new T.Mesh(new T.CylinderGeometry(0.03, 0.03, 1.6), legM); rod.position.set(sx, 6.4, 18); sc.add(rod); }
+    // ghost passengers (dotted silhouettes)
+    const gc = MG.canvas(128, 256); { const x = gc.getContext('2d'); x.fillStyle = 'rgba(240,235,255,0.9)'; const sil = new Path2D(); sil.arc(64, 40, 22, 0, TAU); sil.moveTo(30, 250); sil.lineTo(34, 120); sil.quadraticCurveTo(36, 72, 64, 70); sil.quadraticCurveTo(92, 72, 94, 120); sil.lineTo(98, 250); sil.closePath(); x.save(); x.clip(sil); for (let yy = 0; yy < 256; yy += 7) for (let xx = (yy / 7) % 2 * 3.5; xx < 128; xx += 7) { x.beginPath(); x.arc(xx, yy, 1.8, 0, TAU); x.fill(); } x.restore(); x.strokeStyle = 'rgba(240,235,255,0.6)'; x.setLineDash([4, 6]); x.lineWidth = 2; x.stroke(sil); }
+    const gt = MG.three.canvasTexture(gc); this.ghosts = []; const r = MG.rng(31); for (let k = 0; k < 11; k++) { const sp = new T.Sprite(new T.SpriteMaterial({ map: gt, transparent: true, opacity: 0, depthWrite: false })); sp.scale.set(0.85, 1.7, 1); sp.position.set(-4 + r() * 8, 0.85, 2 + r() * 14); this.ghosts.push({ sp, t0: 1111.4 + r() * 0.9, seed: k }); sc.add(sp); }
+    sc.add(new T.HemisphereLight(0xffd9b0, 0x302838, 0.75)); const dl = new T.DirectionalLight(0xffb070, 2.2); dl.position.set(-10, 3.5, 6); sc.add(dl); const dl2 = new T.DirectionalLight(0x8090c0, 0.5); dl2.position.set(5, 6, -6); sc.add(dl2);
+  },
+  draw(ctx, t) {
+    const k = MG.ease.inOutCubic(lin(t, 1110.4, 1113.0)); const d = MG.ease.inOutSine(lin(t, 1113.0, 1114.0));
+    this.cam.position.set(lerp(0.2, -2.2, k), lerp(3.6, 1.65, k), lerp(12.6, 0.5, k) - d * 0.4); this.cam.lookAt(lerp(0, 1.0, k), lerp(4.4, 2.6, k), lerp(18, 16, k));
+    S7.drawBoard(this.bc.getContext('2d'), t); this.bt.needsUpdate = true;
+    for (const G of this.ghosts) { const u = t - G.t0; const fl = 0.55 + 0.45 * Math.sin(t * 23 + G.seed * 3) * Math.sin(t * 7 + G.seed); G.sp.material.opacity = u < 0 ? 0 : Math.max(0, Math.min(0.5, u * 2) * (1 - MG.smoothstep(0.6, 1.6, u)) * fl); }
+    const c = MG.three.render(this.sc, this.cam, { slot: 1, w: 1440, h: 810, exposure: 1.0 }); ctx.drawImage(c, 0, 0, W, H);
+    // sunset shafts through the glass wall
+    ctx.save(); ctx.globalCompositeOperation = 'screen'; MG.fx.rays(ctx, -200, 380, { n: 8, len: 2200, spread: 0.5, dir: 0.18, alpha: 0.12 * k + 0.04, width: 0.05, seed: 8, t, color: '#FFC27A' }); ctx.restore();
+    MG.text.spoken(ctx, MG.phrase('The passengers never materialize', 1111.4).words, 960, 1000, t, { font: MG.F.serif, italic: true, size: 60, color: '#F3E9DA', align: 'center', style: 'blur', shadow: { blur: 12, dy: 3, color: 'rgba(0,0,0,0.6)' } });
+  },
+  post: { grade: 'golden', vignette: 0.45, sat: 0.9, contrast: 1.04 },
+});
+
+// ---------- E3 · lights out → night map of ghost airports ----------
+S7.GHOSTAP = [['CIUDAD REAL', S7.CRAP, 1.75, [22, 34]], ['CASTELLÓN', [-0.0736, 40.214], 1.4, [24, -18]], ['HUESCA', [-0.3163, 42.0761], 1.2, [-22, -20]], ['LLEIDA', [0.5354, 41.7282], 0.5, [24, 30]]];
+SC.push({
+  id: 's07_e3_ghostmap', start: 1113.85, end: 1116.7,
+  transIn: { type: 'dip', dur: 0.8, color: '#07090f' },
+  init() { this.pr0 = MG.kit.view('iberia'); this.base = S7.cacheMap('e3', this.pr0, { sea: '#0C1422', land: '#141B29', portugal: '#161D2B', spain: '#1C2436', coast: 'rgba(140,170,215,0.45)', border: 'rgba(120,140,180,0.25)', provinces: true }); },
+  draw(ctx, t) {
+    const z = lerp(1.0, 1.05, MG.ease.inOutSine(lin(t, 1113.85, 1116.8))); ctx.save(); ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-960, -540); ctx.drawImage(this.base, 0, 0);
+    // city lights
+    const cities = [['Madrid', 1], ['Barcelona', 0.9], ['Valencia', 0.7], ['Seville', 0.6], ['Bilbao', 0.5], ['Malaga', 0.5], ['Zaragoza', 0.45], ['Murcia', 0.4], ['Palma', 0.35], ['Valladolid', 0.3], ['Alicante', 0.4], ['Granada', 0.3], ['ACoruna', 0.3], ['Vigo', 0.3], ['Cordoba', 0.3], ['Oviedo', 0.25]];
+    for (const [n, s] of cities) { const p = this.pr0(MG.geo.cities[n]); MG.fx.glow(ctx, p[0], p[1], 50 * s + 14, '#F5B85A', 0.5 + 0.1 * Math.sin(t * 3 + s * 9)); ctx.fillStyle = '#FFE2A8'; ctx.beginPath(); ctx.arc(p[0], p[1], 2 + 3 * s, 0, TAU); ctx.fill(); }
+    // ghost airports: pale runway + a dotted plane that flickers
+    S7.GHOSTAP.forEach(([n, ll, rot, off], i) => { const p = this.pr0(ll); const t0 = 1114.1 + i * 0.32; const k = MG.prog(t, t0, t0 + 0.4); if (k <= 0) return; const fl = 0.55 + 0.45 * Math.abs(Math.sin(t * (9 + i * 2) + i)) * (Math.sin(t * 3 + i) > -0.3 ? 1 : 0.3);
+      ctx.save(); ctx.globalAlpha = k; ctx.translate(p[0], p[1]); ctx.rotate(rot); ctx.fillStyle = 'rgba(200,215,240,0.35)'; ctx.fillRect(-34, -5, 68, 10); ctx.strokeStyle = 'rgba(230,240,255,0.7)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(-30, 0); ctx.lineTo(30, 0); ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+      ctx.save(); ctx.globalAlpha = k * fl; ctx.translate(p[0], p[1] - 26); ctx.rotate(-0.3); ctx.strokeStyle = 'rgba(235,240,255,0.95)'; ctx.setLineDash([3, 4]); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-22, 0); ctx.lineTo(22, 0); ctx.moveTo(-4, 0); ctx.lineTo(-12, -16); ctx.moveTo(-4, 0); ctx.lineTo(-12, 16); ctx.moveTo(-18, 0); ctx.lineTo(-24, -7); ctx.moveTo(-18, 0); ctx.lineTo(-24, 7); ctx.stroke(); ctx.restore();
+      MG.text.draw(ctx, n, p[0] + off[0], p[1] + off[1], { font: MG.F.mono, weight: 700, size: 22, color: `rgba(230,236,250,${0.85 * k})`, tracking: 0.14, align: off[0] < 0 ? 'right' : 'left' }); });
+    ctx.restore();
+    MG.geo.canaryInset(ctx, [140, 830, 250, 150], { fill: '#1C2436', frame: 'rgba(160,180,220,0.4)', labelColor: 'rgba(200,210,235,0.7)' });
+    MG.text.spoken(ctx, MG.phrase('several of these ghost airports', 1114.7).words, 1780, 170, t, { font: MG.F.serif, italic: true, size: 70, color: '#E9E3F4', align: 'right', style: 'blur' });
+  },
+  post: { grade: 'night', vignette: 0.45 },
+});
+
+// ---------- E4 · an estate where nobody has ever lived ----------
+S7.seVende = () => MG.cache('s7sevende', 256, 96, (x) => { x.fillStyle = '#F4EEE0'; x.fillRect(0, 0, 256, 96); x.fillStyle = P.rojo; x.fillRect(0, 0, 256, 14); x.fillRect(0, 82, 256, 14); MG.text.draw(x, 'SE VENDE', 128, 66, { font: MG.F.grotesk, weight: 800, size: 46, color: P.rojo, align: 'center' }); });
+SC.push({
+  id: 's07_e4_ghosttown', start: 1116.7, end: 1120.85,
+  transIn: { type: 'blur', dur: 0.7, amount: 24 },
+  init() { const r = MG.rng(61); this.ban = []; for (let s = 0; s < 2; s++) for (let k = 0; k < 7; k++) for (let f = 0; f < 6; f++) for (let c = 0; c < 4; c++) if (r() < 0.06 && f > 0) this.ban.push([s, k, f, c]); this.sky = MG.cache('s7e4sky', W, H, (x) => { MG.fx.vgrad(x, [[0, '#0C1022'], [0.55, '#1E2442'], [0.7, '#3A3350'], [1, '#3A3350']]); for (let i = 0; i < 90; i++) { x.fillStyle = `rgba(255,255,255,${0.2 + MG.rand(3, i) * 0.6})`; x.fillRect(MG.rand(4, i) * W, MG.rand(5, i) * 500, 1.6, 1.6); } }); },
+  draw(ctx, t) {
+    const zc = lerp(0, 700, MG.ease.inOutSine(lin(t, 1116.7, 1121.6))); const cam = { x: 40 * Math.sin(t * 0.3), y: -170, z: zc, pitch: -0.03, yaw: 0, roll: 0, fov: 54 };
+    ctx.drawImage(this.sky, 0, 0); const hz = S7.pj(0, 0, 1e6, cam)[1]; MG.fx.glow(ctx, 960, hz, 700, '#E9A06A', 0.25);
+    const quad = (pts, fill) => { const q = S7.ppoly(pts, cam); if (!q) return null; ctx.fillStyle = fill; ctx.beginPath(); q.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath(); ctx.fill(); return q; };
+    // ground: road + pavements
+    quad([[-2000, 0, zc + 60], [2000, 0, zc + 60], [2000, 0, 9000], [-2000, 0, 9000]], '#24222A'); quad([[-330, 0, zc + 60], [330, 0, zc + 60], [330, 0, 9000], [-330, 0, 9000]], '#1A1A20');
+    for (let zz = 300; zz < 8000; zz += 500) quad([[-6, -0.1, zz], [6, -0.1, zz], [6, -0.1, zz + 220], [-6, -0.1, zz + 220]], 'rgba(200,190,170,0.35)');
+    // street lamps (pools of light first)
+    for (let k = 0; k < 9; k++) for (const s of [-1, 1]) { const zz = 500 + k * 820 + (s > 0 ? 410 : 0); const g = S7.pj(s * 380, 0, zz, cam); if (g[3] < 30) continue; const fl = (k === 3 && s > 0) ? (Math.sin(t * 30) > 0.2 ? 1 : 0.25) : 1; ctx.save(); ctx.translate(g[0], g[1]); ctx.scale(1, 0.35); MG.fx.glow(ctx, 0, 0, 260 * g[2], '#F5B85A', 0.4 * fl); ctx.restore(); }
+    // façades (far → near)
+    const bl = []; for (let k = 6; k >= 0; k--) for (const s of [-1, 1]) bl.push([s, k]);
+    for (const [s, k] of bl) { const z0 = 400 + k * 1000, z1 = z0 + 860; const x = s * 620; const Hh = 1700; if (z1 < zc + 30) continue; const zz0 = Math.max(z0, zc + 40);
+      const fq = quad([[x, 0, zz0], [x, 0, z1], [x, -Hh, z1], [x, -Hh, zz0]], MG.col.mix('#3A3A4A', '#4E4A58', k / 7)); if (!fq) continue;
+      quad([[x, -Hh, z1], [x + s * 400, -Hh, z1], [x + s * 400, 0, z1], [x, 0, z1]], '#2C2C38');
+      for (let f = 0; f < 6; f++) for (let c = 0; c < 4; c++) { const wz0 = z0 + 60 + c * 200, wz1 = wz0 + 110, wy0 = -150 - f * 260, wy1 = wy0 - 150; if (wz0 < zc + 50) continue; const lit = (s > 0 && k === 1 && f === 3 && c === 2) ? (t > TW('nobody', 1119.1) && t < TW('nobody', 1119.1) + 0.55 ? 1 : 0) : 0;
+        quad([[x - s * 2, wy0, wz0], [x - s * 2, wy0, wz1], [x - s * 2, wy1, wz1], [x - s * 2, wy1, wz0]], lit ? '#F2C77A' : '#161A28');
+        if (f > 0) quad([[x - s * 2, wy0 + 6, wz0 - 10], [x - s * 2, wy0 + 6, wz1 + 10], [x - s * 60, wy0 + 6, wz1 + 10], [x - s * 60, wy0 + 6, wz0 - 10]], '#5A5868'); }
+      for (const [bs, bk, bf, bc] of this.ban) { if (bs !== (s > 0 ? 1 : 0) || bk !== k) continue; const wz0 = z0 + 60 + bc * 200; const pts = S7.ppoly([[x - s * 60, -150 - bf * 260 + 70, wz0 - 10], [x - s * 60, -150 - bf * 260 + 70, wz0 + 140], [x - s * 60, -150 - bf * 260 + 10, wz0 + 140], [x - s * 60, -150 - bf * 260 + 10, wz0 - 10]], cam); if (pts) MG.persp.quad(ctx, S7.seVende(), s > 0 ? [pts[1], pts[0], pts[3], pts[2]] : [pts[0], pts[1], pts[2], pts[3]], 1); } }
+    // lamp posts
+    for (let k = 8; k >= 0; k--) for (const s of [-1, 1]) { const zz = 500 + k * 820 + (s > 0 ? 410 : 0); if (zz < zc + 80) continue; const a = S7.pj(s * 380, 0, zz, cam), b = S7.pj(s * 380, -560, zz, cam); ctx.strokeStyle = '#121218'; ctx.lineWidth = Math.max(1, 14 * a[2]); ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); const fl = (k === 3 && s > 0) ? (Math.sin(t * 30) > 0.2 ? 1 : 0.25) : 1; MG.fx.glow(ctx, b[0], b[1], 90 * b[2] + 6, '#FFD08A', 0.7 * fl); }
+    // a plastic bag drifting across the empty street
+    const bx = lerp(-100, 1300, lin(t, 1117.0, 1120.9)), by = 900 - Math.abs(Math.sin(t * 2.3)) * 60; ctx.save(); ctx.translate(bx, by); ctx.rotate(t * 1.7); ctx.fillStyle = 'rgba(230,230,235,0.75)'; ctx.beginPath(); ctx.ellipse(0, 0, 22, 14 + 6 * Math.sin(t * 5), 0, 0, TAU); ctx.fill(); ctx.restore();
+    MG.text.spoken(ctx, MG.phrase('where nobody has ever lived', 1118.7).words, 960, 160, t, { font: MG.F.serif, italic: true, size: 70, color: '#EDE6F5', align: 'center', style: 'blur' });
+  },
+  post: { grade: 'night', vignette: 0.48, sat: 0.92 },
+});
+
+// =====================================================================================================
 // registration
 // =====================================================================================================
 SC.sort((a, b) => a.start - b.start);

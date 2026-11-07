@@ -1050,8 +1050,8 @@
       const T = THREE; const sc = (this.sc = new T.Scene()); this.cam = new T.PerspectiveCamera(30, 16 / 9, 0.1, 200);
       sc.add(new T.HemisphereLight(0xffe2c4, 0x40324a, 1.0)); const dl = new T.DirectionalLight(0xffb878, 2.8); dl.position.set(-12, 5, 4); sc.add(dl); sc.fog = new T.Fog(0xd8a08a, 10, 26);
       // ground with the street grid (light paving, tree dots)
-      const gc = MG.canvas(1024, 1024); const gx = gc.getContext('2d'); gx.fillStyle = '#a59a94'; gx.fillRect(0, 0, 1024, 1024); gx.fillStyle = '#c4b8ae'; for (let k = 0; k < 1024; k += 128) { gx.fillRect(k, 0, 18, 1024); gx.fillRect(0, k, 1024, 18); } gx.fillStyle = '#6f7a3a'; for (let a = 0; a < 1024; a += 128) for (let b = 0; b < 1024; b += 22) { gx.beginPath(); gx.arc(a + 9, b, 5, 0, MG.TAU); gx.fill(); gx.beginPath(); gx.arc(b, a + 9, 5, 0, MG.TAU); gx.fill(); }
-      const gt = MG.three.canvasTexture(gc); gt.wrapS = gt.wrapT = T.RepeatWrapping; gt.repeat.set(9.8, 9.8); gt.offset.set(0.43, 0.43);
+      const gc = MG.canvas(1024, 1024); const gx = gc.getContext('2d'); gx.fillStyle = '#a59a94'; gx.fillRect(0, 0, 1024, 1024); gx.fillStyle = '#c4b8ae'; for (let k = 0; k < 1024; k += 128) { gx.fillRect(k, 0, 30, 1024); gx.fillRect(0, k, 1024, 30); } gx.fillStyle = '#6f7a3a'; for (let a = 0; a < 1024; a += 128) for (let b = 0; b < 1024; b += 22) { gx.beginPath(); gx.arc(a + 4, b, 4, 0, MG.TAU); gx.fill(); gx.beginPath(); gx.arc(b, a + 4, 4, 0, MG.TAU); gx.fill(); gx.beginPath(); gx.arc(a + 26, b, 4, 0, MG.TAU); gx.fill(); gx.beginPath(); gx.arc(b, a + 26, 4, 0, MG.TAU); gx.fill(); }
+      const gt = MG.three.canvasTexture(gc); gt.wrapS = gt.wrapT = T.RepeatWrapping; gt.repeat.set(80 / 1.3 / 8, 80 / 1.3 / 8); gt.offset.set(((15 / 128) - MG.fract(40 / 1.3)) / 8, ((15 / 128) - MG.fract(40 / 1.3)) / 8);
       const ground = new T.Mesh(new T.PlaneGeometry(80, 80), new T.MeshStandardMaterial({ map: gt, roughness: 0.95 })); ground.rotation.x = -Math.PI / 2; sc.add(ground);
       // chamfered Eixample block with courtyard
       const oct = (s, ch) => { const sh = new T.Shape(); const a = s / 2, b = a - ch; sh.moveTo(-b, -a); sh.lineTo(b, -a); sh.lineTo(a, -b); sh.lineTo(a, b); sh.lineTo(b, a); sh.lineTo(-b, a); sh.lineTo(-a, b); sh.lineTo(-a, -b); sh.closePath(); const h = new T.Path(); const c = s * 0.2; h.moveTo(-c, -c); h.lineTo(-c, c); h.lineTo(c, c); h.lineTo(c, -c); h.closePath(); sh.holes.push(h); return sh; };
@@ -1107,6 +1107,251 @@
       // taxes on every hotel night: moons over the Canaries, each drops a coin
       const nights = 7; for (let k = 0; k < nights; k++) { const t0 = tTax + 0.1 + k * 0.17; const p = PR(t, t0, t0 + 0.3, 'outBack'); if (p <= 0) continue; const mx = cC[0] - 230 + k * 74, my = cC[1] + 150; ctx.save(); ctx.globalAlpha = clamp(p * 1.5); const moon = new Path2D(); moon.arc(mx, my, 20 * p, 0, MG.TAU); const cut = new Path2D(); cut.arc(mx + 9, my - 6, 17 * p, 0, MG.TAU); ctx.save(); ctx.clip(moon); ctx.fillStyle = '#F6D06F'; ctx.fill(moon); ctx.fillStyle = '#A9C6DE'; ctx.fill(cut); ctx.restore(); const cp = PR(t, t0 + 0.15, t0 + 0.5, 'outBounce'); if (cp > 0) K.sun(ctx, mx, lerp(my, my + 62, cp), 15, t, { variant: 'coin', color: '#D9B04A' }); ctx.restore(); }
       MG.text.reveal(ctx, 'TAX PER HOTEL NIGHT?', cC[0] - 230, cC[1] + 110, t, tTax, { font: F.marker, size: 44, color: '#B8231B', style: 'rise', by: 'word' });
+    },
+  };
+
+  // =====================================================================================================
+  // BLOCK D · FALL 2026 — the national crisis
+  // =====================================================================================================
+  /** plane-tree leaf (Platanus) path, centred, size s */
+  S8.leafPath = (s) => { const pts = []; const lobes = [[0, -1], [0.35, -0.55], [0.9, -0.62], [0.62, -0.12], [1, 0.25], [0.45, 0.3], [0.2, 0.75], [0, 0.5], [-0.2, 0.75], [-0.45, 0.3], [-1, 0.25], [-0.62, -0.12], [-0.9, -0.62], [-0.35, -0.55]]; for (const [x, y] of lobes) pts.push([x * s, y * s]); return PL(pts); };
+  S8.leaf = (ctx, x, y, s, rot, col, blur) => { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); if (blur) ctx.filter = `blur(${blur}px)`; const p = S8.leafPath(s); S8.cel(ctx, p, { fill: col, s: s * 0.12, shade: MG.col.shade(col, 0.3), rim: MG.col.light(col, 0.5), rimW: s * 0.03, lw: Math.max(1, s * 0.02) }); S8.stroke(ctx, [[0, s * 1.05], [0, -s * 0.7]], Math.max(1, s * 0.035), MG.col.shade(col, 0.45)); for (const sg of [-1, 1]) S8.stroke(ctx, [[0, s * 0.1], [sg * s * 0.7, -s * 0.45]], Math.max(1, s * 0.025), MG.col.shade(col, 0.4)); ctx.restore(); };
+  S8.leaves = (ctx, t, n, seed, area, o = {}) => { const LC = ['#D9902E', '#C8693F', '#B8862E', '#9a5a2a', '#E0A83E']; for (let i = 0; i < n; i++) { const life = o.life || 5; const tt = t + MG.rand(seed, i) * life; const age = MG.mod(tt, life), u = age / life; const x = area[0] + MG.rand(seed, i + 30) * area[2] + MG.wiggle(tt, 0.4, 80, seed + i) + (o.wind ?? 60) * age; const y = area[1] - 80 + u * (area[3] + 160); const s = (o.size || 30) * (0.6 + MG.rand(seed, i + 60) * 0.8); S8.leaf(ctx, x, y, s, tt * (1 + MG.rand(seed, i)) * 1.6, LC[i % LC.length], o.blur); } };
+  /** newspaper front page (no real masthead) */
+  S8.paper = (ctx, x, y, w, h, o = {}) => { ctx.save(); ctx.translate(x, y); if (o.rot) ctx.rotate(o.rot); MG.fx.shadow(ctx, S8.rr(-w / 2, 0, w, h, 2), { dx: 8, dy: 12, blur: 14, color: 'rgba(30,15,20,0.35)' }); ctx.fillStyle = '#EFE9DC'; ctx.fillRect(-w / 2, 0, w, h); ctx.save(); ctx.beginPath(); ctx.rect(-w / 2, 0, w, h); ctx.clip(); MG.tex.over(ctx, 'fibers', { alpha: 0.5 });
+    const m = w * 0.06; ctx.fillStyle = '#1e1a1d'; ctx.fillRect(-w / 2 + m, h * 0.03, w - 2 * m, h * 0.07); if (o.date) MG.text.draw(ctx, o.date, 0, h * 0.085, { font: F.cond, weight: 900, size: h * 0.06, color: '#EFE9DC', align: 'center', tracking: 0.12 }); S8.stroke(ctx, [[-w / 2 + m, h * 0.115], [w / 2 - m, h * 0.115]], 2, '#1e1a1d');
+    if (o.h1) MG.text.draw(ctx, o.h1, -w / 2 + m, h * 0.2, { font: F.news, size: h * 0.085, color: '#1e1a1d' }); if (o.h2) MG.text.draw(ctx, o.h2, -w / 2 + m, h * 0.29, { font: F.news, size: h * 0.085, color: o.h2c || '#B8231B' });
+    const py = h * 0.33, ph = h * 0.38; if (o.photo) o.photo(ctx, -w / 2 + m, py, w - 2 * m, ph); else { ctx.fillStyle = '#9a948a'; ctx.fillRect(-w / 2 + m, py, w - 2 * m, ph); }
+    for (let c = 0; c < 3; c++) for (let l = 0; l < 9; l++) ctx.fillRect(-w / 2 + m + c * (w - 2 * m) / 3, py + ph + h * 0.03 + l * h * 0.025, (w - 2 * m) / 3 - 14 - (l % 4 === 3 ? 30 : 0), h * 0.009); ctx.restore(); ctx.restore(); };
+  /** halftone "photo" of the tent camp in Puerta del Sol (for the front page) */
+  S8.tentPhoto = () => MG.cache('s08:tentPhoto', 600, 360, (x) => { x.fillStyle = '#C9C2B6'; x.fillRect(0, 0, 600, 360); x.fillStyle = '#8a8278'; x.fillRect(0, 0, 600, 170); x.fillStyle = '#6a625a'; x.fillRect(250, 20, 100, 150); x.fillStyle = '#EFE9DC'; x.beginPath(); x.arc(300, 60, 22, 0, MG.TAU); x.fill(); for (let k = 0; k < 18; k++) { x.fillStyle = ['#3a3a40', '#5a5a60', '#2a2a30'][k % 3]; const tx = 30 + (k % 6) * 95 + (Math.floor(k / 6) % 2) * 40, ty = 220 + Math.floor(k / 6) * 50; x.beginPath(); x.ellipse(tx, ty, 46, 32, 0, Math.PI, 0); x.fill(); } MG.tex.over(x, 'halftone', { alpha: 0.55, spacing: 6, radius: 2, color: '#1e1a1d' }); });
+  DEF.kiosk = {
+    transIn: { dur: 0.6, ease: 'linear', type: S8.objWipe((ctx, p) => { const e = MG.ease.inOutSine(p); S8.leaf(ctx, lerp(2400, -500, e), 560 + Math.sin(p * 5) * 120, 900, p * 2.2, '#C8693F', 8); }, (p) => lerp(2400, -500, MG.ease.inOutSine(p)) + 300, true) },
+    post: { grade: 'warm', vignette: 0.4, temp: 0.03 },
+    draw(ctx, t) {
+      const tH = TW('housing', 1263.11);
+      const c = S8.keys(t, [[1261.03, { x: 960, y: 560, z: 0.92 }], [1262.2, { x: 990, y: 520, z: 1.25 }, 'cam'], [1265.9, { x: 1000, y: 520, z: 1.6 }, 'inOutSine'], [1266.9, { x: 1010, y: 600, z: 2.4 }, 'in']]);
+      c.hh = MG.cam.handheld(t, 2.5, 13);
+      MG.fx.vgrad(ctx, [[0, '#E9C58E'], [1, '#C99A6A']]);
+      ctx.save(); S8.cam(ctx, c);
+      // street behind: blurred Madrid façade + plane trees
+      ctx.drawImage(MG.blurred(S8.eixBase(), 6), -400, -300, 2700, 3000); ctx.fillStyle = 'rgba(200,140,90,0.35)'; ctx.fillRect(-400, -300, 2700, 1800);
+      // kiosk (green metal)
+      const kx = 360, ky = 120, kw = 1240, kh = 860; S8.cel(ctx, PL([[kx - 60, ky], [kx + kw + 60, ky], [kx + kw + 20, ky - 90], [kx - 20, ky - 90]]), { fill: '#2E5A44', s: 10, lw: 4, rim: '#6fa58a' }); S8.cel(ctx, S8.rr(kx, ky, kw, kh, 6), { fill: '#3B6E54', s: 16, lw: 4, rim: '#7fb59a', shade: '#22442f' });
+      MG.text.draw(ctx, 'PRENSA', kx + kw / 2, ky - 26, { font: F.cond, weight: 900, size: 54, color: '#F2E8D5', align: 'center', tracking: 0.4 });
+      // clothes-line of front pages
+      S8.stroke(ctx, [[kx + 20, ky + 60], [kx + kw - 20, ky + 60]], 3, '#2a2628');
+      const pages = [[kx + 190, -0.04, 'FALL 2026', 'RENTS', 'SOAR'], [kx + kw / 2, 0.0, 'FALL 2026', 'HOUSING:', 'A NATIONAL CRISIS'], [kx + kw - 190, 0.05, 'FALL 2026', 'NO ROOM', 'FOR THE YOUNG']];
+      pages.forEach(([px, r, d, h1, h2], i) => { const main = i === 1; const w = main ? 520 : 330, h = main ? 760 : 500; S8.paper(ctx, px, ky + 70, w, h, { rot: r + Math.sin(t * 1.3 + i) * 0.006, date: d, h1: main ? (t > tH - 0.05 ? h1 : '') : h1, h2: main ? (t > TW('national', 1264.31) - 0.05 ? h2 : '') : h2, h2c: main ? '#B8231B' : '#1e1a1d', photo: main ? (x, X, Y, W, H) => x.drawImage(S8.tentPhoto(), X, Y, W, H) : null }); for (const dx of [-0.32, 0.32]) { S8.cel(ctx, S8.rr(px + dx * w - 8, ky + 46, 16, 44, 4), { fill: '#C9A27A', s: 2, lw: 2 }); } });
+      // the headline stamps in on the main page (kinetic, as spoken)
+      ctx.restore();
+      // falling leaves in front (depth): foreground blurred & big, mid sharp
+      S8.leaves(ctx, t, 7, 21, [-200, 0, 2200, 1080], { size: 34, life: 5.5, wind: 40 });
+      S8.leaves(ctx, t, 3, 22, [-200, 0, 2200, 1080], { size: 110, life: 4, blur: 9, wind: 90 });
+    },
+  };
+  // ---------- 14 · PUERTA DEL SOL tent camp ----------
+  S8.solBG = () => MG.cache('s08:solBG', 1920, 1080, (x) => {
+    MG.fx.vgrad(x, [[0, '#3f4a7a'], [0.5, '#c28a86'], [1, '#e7b48a']]);
+    // Real Casa de Correos: brick body + white stone trims, central clock tower
+    const by = 560; x.fillStyle = '#B8573C'; x.fillRect(260, 300, 1400, by - 300 + 40); MG.tex.over(x, 'blotch', { alpha: 0.2, color: '#5a2a1a' }); for (let k = 300; k < by + 40; k += 14) S8.stroke(x, [[260, k], [1660, k]], 1, 'rgba(80,30,20,0.25)');
+    x.fillStyle = '#EDE3CF'; x.fillRect(250, 290, 1420, 22); x.fillRect(250, by + 30, 1420, 18); x.fillRect(250, 420, 1420, 12);
+    for (let k = 0; k < 13; k++) { const wx = 300 + k * 104; if (k === 6) continue; x.fillStyle = '#EDE3CF'; x.fillRect(wx - 8, 330, 66, 82); x.fillRect(wx - 8, 448, 66, 92); x.fillStyle = '#F3C67A'; x.fillRect(wx, 340, 50, 64); x.fillRect(wx, 458, 50, 76); x.fillStyle = 'rgba(40,30,40,0.35)'; x.fillRect(wx + 23, 340, 4, 64); x.fillRect(wx + 23, 458, 4, 76); }
+    // central bay + tower
+    x.fillStyle = '#EDE3CF'; x.fillRect(860, 250, 200, by - 250 + 50); x.fillStyle = '#B8573C'; x.fillRect(880, 300, 160, 240); x.fill(PL([[840, 250], [1080, 250], [960, 200]])); x.fillStyle = '#EDE3CF'; x.fillRect(900, 120, 120, 130); x.fillRect(920, 60, 80, 60); x.fill(PL([[915, 60], [1005, 60], [960, 20]]));
+    S8.stroke(x, [[960, 20], [960, -10]], 4, '#2a2628'); x.fillStyle = '#2a2628'; x.beginPath(); x.arc(960, -12, 8, 0, MG.TAU); x.fill();
+    // plaza floor in perspective
+    x.fillStyle = '#B9AFA2'; x.beginPath(); x.moveTo(0, by + 48); x.lineTo(1920, by + 48); x.lineTo(1920, 1080); x.lineTo(0, 1080); x.fill(); for (let k = -20; k <= 20; k++) S8.stroke(x, [[960 + k * 60, by + 48], [960 + k * 260, 1080]], 1.5, 'rgba(80,70,70,0.25)'); for (let j = 0; j < 8; j++) { const yy = by + 48 + Math.pow(j / 7, 1.8) * 480; S8.stroke(x, [[0, yy], [1920, yy]], 1.5, 'rgba(80,70,70,0.2)'); }
+    const g = x.createLinearGradient(0, by, 0, 1080); g.addColorStop(0, 'rgba(60,40,80,0.35)'); g.addColorStop(1, 'rgba(60,40,80,0.1)'); x.fillStyle = g; x.fillRect(0, by, 1920, 600);
+    // street lamps
+    for (const lx of [200, 640, 1280, 1720]) { S8.stroke(x, [[lx, by + 300], [lx, by - 60]], 7, '#1e1a1d'); x.fillStyle = '#1e1a1d'; x.fill(S8.rr(lx - 16, by - 100, 32, 44, 6)); MG.fx.glow(x, lx, by - 78, 70, '#FFD08A', 0.6); }
+  });
+  S8.tent = (ctx, x, y, w, col, p, t) => { if (p <= 0) return; const [sx, sy] = K.squash(lerp(-0.4, 0, MG.ease.outBack(p)) + MG.jiggle(t, 0, 0, 1, 1)); const h = w * 0.62; ctx.save(); ctx.translate(x, y); ctx.scale(sx * Math.min(1, p * 1.6), sy * MG.ease.outBack(p)); S8.contact(ctx, 10, 2, w * 0.62, w * 0.12, 0.45); const d = new Path2D(); d.moveTo(-w / 2, 0); d.bezierCurveTo(-w / 2, -h * 1.3, w / 2, -h * 1.3, w / 2, 0); d.closePath(); S8.cel(ctx, d, { fill: col, s: w * 0.08, shade: MG.col.shade(col, 0.35), rim: MG.col.light(col, 0.5), rimW: w * 0.02, lw: 2.5 }); ctx.strokeStyle = MG.col.shade(col, 0.5); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, 0); ctx.quadraticCurveTo(-w * 0.05, -h * 0.9, 0, -h * 0.98); ctx.moveTo(-w * 0.3, 0); ctx.quadraticCurveTo(-w * 0.32, -h * 0.7, 0, -h * 0.98); ctx.stroke(); ctx.fillStyle = 'rgba(30,20,30,0.55)'; ctx.beginPath(); ctx.moveTo(w * 0.05, 0); ctx.quadraticCurveTo(w * 0.15, -h * 0.55, w * 0.3, 0); ctx.fill(); ctx.restore(); };
+  DEF.sol = {
+    transIn: { type: S8.zoomThru(1010, 600, 3.5, 0.55, 960, 560), dur: 0.65 },
+    post: { grade: 'warm', vignette: 0.42, temp: -0.02 },
+    draw(ctx, t) {
+      const tT = TW('tent', 1267.87); const c = S8.keys(t, [[1266.63, { x: 960, y: 520, z: 1.12 }], [1270.6, { x: 960, y: 560, z: 1.0 }, 'inOutSine']]); c.hh = MG.cam.handheld(t, 2.5, 47);
+      ctx.save(); S8.cam(ctx, c); ctx.drawImage(S8.solBG(), 0, 0);
+      // clock on the tower (sun disk → clock), time ~ evening
+      K.sun(ctx, 960, 175, 40, t, { variant: 'clock', hour: 20 + (t - 1266) / 60, color: '#F4EEE2', deep: '#C9C2B6', corona: 0 });
+      // tents pop up across the square (back rows first)
+      const TC = ['#F2A33A', '#1F4E8C', '#C8423B', '#2FA7A0', '#6F7A3A', '#F0735A', '#8DB6D9'];
+      const rows = [[640, 70, 13], [700, 96, 11], [790, 130, 9], [910, 175, 7], [1050, 230, 5]];
+      rows.forEach(([yy, w, n], r) => { for (let i = 0; i < n; i++) { const xx = 960 + (i - (n - 1) / 2) * (1920 / n) * 0.95 + MG.range(5, r * 20 + i, -30, 30); const td = tT - 0.2 + r * 0.25 + MG.rand(6, r * 20 + i) * 0.9; S8.tent(ctx, xx, yy, w * 1.25, TC[(r * 3 + i) % TC.length], PR(t, td, td + 0.4, 'linear'), t); } });
+      // people silhouettes milling between the tents
+      for (let i = 0; i < 9; i++) { const xx = 140 + i * 210 + Math.sin(t * 0.6 + i) * 20; S8.person(ctx, { x: xx, y: 700 + (i % 3) * 60, h: 150 + (i % 3) * 30, t: t + i, sil: '#3a2a3e', dir: i % 2 ? 1 : -1, legs: Math.sin((t + i) * 3) * 0.3, hair: { k: ['short', 'long', 'cap'][i % 3], c: '#000' } }); }
+      // a banner on the tower railing
+      const bp = PR(t, 1268.8, 1269.4); if (bp > 0) { ctx.save(); ctx.globalAlpha = bp; const bn = SM([[760, 452], [960, 462 + Math.sin(t * 2) * 4], [1160, 452], [1160, 520], [960, 530], [760, 520]]); S8.cel(ctx, bn, { fill: '#F4EEE2', s: 4, lw: 2.5, after: (x) => MG.text.draw(x, 'VIVIENDA', 960, 506, { font: F.marker, size: 52, color: '#B8231B', align: 'center' }) }); ctx.restore(); }
+      ctx.restore();
+      K.tag(ctx, t, 1267.2, 'Puerta del Sol', { sub: 'MADRID · FALL 2026', x: 130, y: 980 });
+    },
+  };
+  // ---------- 15 · CONGRESS hemicycle ----------
+  S8.seats = () => { if (S8._seats) return S8._seats; const out = []; const rows = 10; let k = 0; for (let r = 0; r < rows; r++) { const R = 260 + r * 52; const n = Math.round(22 + r * 3.1); for (let i = 0; i < n && k < 350; i++, k++) { const a = Math.PI + (Math.PI * (i + 0.5)) / n; out.push({ r, a, R, vote: 0 }); } } while (out.length < 350) out.push({ r: 9, a: Math.PI * 1.5, R: 780 }); // deterministic votes: majority no
+    out.forEach((s, i) => { const h = MG.rand(301, i); s.v = h < 0.52 ? 'no' : h < 0.95 ? 'yes' : 'abs'; s.td = (s.a - Math.PI) / Math.PI * 0.9 + MG.rand(302, i) * 0.4; }); S8._seats = out; return out; };
+  DEF.congress = {
+    transIn: { type: 'whip', dur: 0.42, dir: 'left', smear: 160 },
+    post: { grade: 'neutral', vignette: 0.45, contrast: 1.05 },
+    draw(ctx, t) {
+      const tR = TW('rejects', 1270.95); const S = S8.seats();
+      MG.fx.vgrad(ctx, [[0, '#3a2228'], [1, '#5a2e2e']]); MG.tex.over(ctx, 'blotch', { alpha: 0.25, color: '#000' });
+      const z = lerp(1.0, 1.08, PR(t, 1270.23, 1273.6, 'inOutSine')); ctx.save(); ctx.translate(960, 980); ctx.scale(z, z * 0.52); // hemicycle seen from the presidency, foreshortened
+      // red benches (arcs)
+      for (let r = 9; r >= 0; r--) { const R = 260 + r * 52; ctx.strokeStyle = r % 2 ? '#8a2a26' : '#9a322c'; ctx.lineWidth = 46; ctx.beginPath(); ctx.arc(0, 0, R, Math.PI, MG.TAU); ctx.stroke(); ctx.strokeStyle = 'rgba(20,8,10,0.4)'; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, R + 24, Math.PI, MG.TAU); ctx.stroke(); }
+      // aisles
+      for (const a of [1.2, 1.4, 1.6, 1.8]) { ctx.strokeStyle = '#3a2228'; ctx.lineWidth = 16; ctx.beginPath(); ctx.moveTo(Math.cos(a * Math.PI) * 230, Math.sin(a * Math.PI) * 230); ctx.lineTo(Math.cos(a * Math.PI) * 800, Math.sin(a * Math.PI) * 800); ctx.stroke(); }
+      // MPs as dots that light up with their vote
+      for (const s of S) { const x = Math.cos(s.a) * s.R, y = Math.sin(s.a) * s.R; const p = PR(t, tR - 0.3 + s.td, tR + 0.1 + s.td); const col = p < 0.5 ? '#E9DFCF' : s.v === 'no' ? '#E8352B' : s.v === 'yes' ? '#3FBF6A' : '#F2C230'; ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(x, y, 13, 20, 0, 0, MG.TAU); ctx.fill(); if (p > 0.5) { ctx.globalAlpha = 0.35 * (1 - (p - 0.5) * 2); ctx.beginPath(); ctx.ellipse(x, y, 30, 46, 0, 0, MG.TAU); ctx.fill(); ctx.globalAlpha = 1; } }
+      ctx.restore();
+      // results board (in-world screen on the chamber wall)
+      const bx = 960, by = 230; S8.cel(ctx, S8.rr(bx - 430, by - 120, 860, 220, 10), { fill: '#141216', s: 6, lw: 4, rim: '#5a5060' });
+      MG.text.draw(ctx, 'ROYAL DECREE-LAW · HOUSING', bx, by - 60, { font: F.mono, weight: 700, size: 30, color: '#E9DFCF', align: 'center', tracking: 0.12 });
+      const rp = PR(t, tR + 0.6, tR + 0.9, 'snap'); if (rp > 0) MG.text.draw(ctx, 'REJECTED', bx, by + 62, { font: F.cond, weight: 900, size: 120, color: '#E8352B', align: 'center', tracking: 0.08, scale: lerp(1.4, 1, rp), alpha: rp });
+      else MG.text.draw(ctx, 'VOTING…', bx, by + 50, { font: F.cond, weight: 900, size: 80, color: 'rgba(233,223,207,0.5)', align: 'center', tracking: 0.08 });
+      K.tag(ctx, t, 1270.6, 'Congress of Deputies', { sub: 'MADRID', x: 130, y: 980 });
+    },
+  };
+  // ---------- 16 · PRIME MINISTER ----------
+  S8.pm = (ctx, x, y, s, t, st) => { // bust behind a lectern; respectful caricature: tall, slim, swept dark hair greying at the temples, square jaw
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s); const skin = '#D9A07E', suit = '#1E2A44', hair = '#2E2420';
+    // torso
+    const tor = SM([[-150, -330], [-60, -380], [60, -380], [150, -330], [175, -150], [180, 60], [-180, 60], [-175, -150]]); S8.cel(ctx, tor, { fill: suit, s: 18, lw: 4, rim: '#5a6a90', shade: '#121a2c' });
+    S8.cel(ctx, PL([[-52, -380], [0, -250], [52, -380]]), { fill: '#F4F2EE', s: 6, lw: 3 }); S8.cel(ctx, PL([[-12, -350], [12, -350], [18, -230], [0, -200], [-18, -230]]), { fill: '#8E2A2A', s: 4, lw: 2.5 });
+    S8.cel(ctx, PL([[-60, -380], [-12, -250], [-70, -180], [-120, -330]]), { fill: '#263555', s: 6, lw: 3 }); S8.cel(ctx, PL([[60, -380], [12, -250], [70, -180], [120, -330]]), { fill: '#263555', s: 6, lw: 3 });
+    // raised right hand (announcing)
+    const ra = st.raise || 0; const sh = [140, -320], el = [lerp(200, 240, ra), lerp(-160, -330, ra)], wr = [lerp(170, 250, ra), lerp(-20, -480, ra)];
+    S8.stroke(ctx, [sh, el, wr], 96, INK); S8.stroke(ctx, [sh, el, wr], 88, suit); S8.stroke(ctx, [[sh[0] + 16, sh[1] + 10], [el[0] + 14, el[1] + 8], [wr[0] + 12, wr[1] + 6]], 20, '#121a2c', { alpha: 0.5 });
+    ctx.save(); ctx.translate(wr[0], wr[1]); S8.cel(ctx, S8.rr(-46, -16, 92, 30, 10), { fill: '#F4F2EE', s: 3, lw: 3 }); K.hand(ctx, 0, -10, { pose: ra > 0.5 ? 'open' : 'fist', angle: Math.PI, s: 2.4, skin }); ctx.restore();
+    // head
+    ctx.save(); ctx.translate(0, -470); ctx.rotate(st.tilt || 0); const turn = st.turn ?? 0.15; const fx = turn * 20;
+    S8.cel(ctx, S8.rr(-44, 30, 88, 90, 20), { fill: skin, s: 6, lw: 3.5 });
+    const head = SM([[-82, -40], [-78, -110], [-40, -146], [10, -152], [56, -140], [82, -100], [84, -30], [80, 30], [66, 76], [30, 104], [fx, 112], [-30, 104], [-66, 76], [-80, 30]]); S8.cel(ctx, head, { fill: skin, s: 14, lw: 4, rim: '#FFD9B8', shade: '#b37a5e' });
+    S8.cel(ctx, MG.path.ellipse(-84, -6, 14, 24), { fill: skin, s: 4, lw: 3 }); S8.cel(ctx, MG.path.ellipse(84, -6, 14, 24), { fill: skin, s: 4, lw: 3 });
+    for (const sg of [-1, 1]) S8.eye(ctx, fx + sg * 34, -34, 11, { look: st.look || [0.1, 0], blink: K.blink(t, 71), skin, iris: '#3a2a1c' });
+    S8.brow(ctx, fx - 34, -62, 40, { th: 9, a: -0.08, raise: st.brow || 0, color: hair }); S8.brow(ctx, fx + 34, -62, 40, { th: 9, a: 0.08, flip: true, raise: st.brow || 0, color: hair });
+    const nose = SM([[fx - 4, -32], [fx + 14, 14], [fx + 4, 24], [fx - 14, 18]]); S8.cel(ctx, nose, { fill: '#E0AC8C', s: 5, lw: 3 });
+    S8.stroke(ctx, [[fx - 52, 30], [fx - 44, 64]], 3, 'rgba(120,70,50,0.45)'); S8.stroke(ctx, [[fx + 52, 30], [fx + 44, 64]], 3, 'rgba(120,70,50,0.45)');
+    S8.mouth(ctx, fx + 2, 54, 54, { open: st.talk ? 0.2 + 0.3 * Math.abs(Math.sin(twos(t) * 10)) : 0, curve: 0.3 });
+    const hr = SM([[-86, -40], [-90, -110], [-56, -160], [0, -176], [60, -166], [92, -120], [88, -60], [74, -96], [40, -122], [-10, -124], [-50, -112], [-74, -80]]); S8.cel(ctx, hr, { fill: hair, s: 8, lw: 3.5, rim: '#7a6a62', shade: '#140e0c' });
+    for (const sg of [-1, 1]) { ctx.fillStyle = 'rgba(200,196,190,0.75)'; ctx.beginPath(); ctx.ellipse(sg * 82, -64, 9, 26, 0, 0, MG.TAU); ctx.fill(); }
+    ctx.restore(); ctx.restore(); };
+  S8.urna = (ctx, x, y, s, t, t0) => { ctx.save(); ctx.translate(x, y); ctx.scale(s, s); MG.fx.contact(ctx, 20, 6, 220, 26, 0.45, '#2a1630'); const b = S8.rr(-180, -330, 360, 330, 10); ctx.fillStyle = 'rgba(220,235,245,0.35)'; ctx.fill(b); ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.lineWidth = 6; ctx.stroke(b); ctx.strokeStyle = 'rgba(30,26,29,0.6)'; ctx.lineWidth = 3; ctx.stroke(b);
+    // envelopes inside + dropping in
+    for (let k = 0; k < 7; k++) { ctx.save(); ctx.translate(-120 + k * 38, -40 - (k % 3) * 22); ctx.rotate(MG.range(9, k, -0.4, 0.4)); ctx.fillStyle = '#F2E2B8'; ctx.fillRect(-40, -26, 80, 52); ctx.restore(); }
+    for (let k = 0; k < 3; k++) { const p = PR(t, t0 + k * 0.4, t0 + k * 0.4 + 0.5, 'in'); if (p <= 0 || p >= 1) continue; ctx.save(); ctx.translate(0, lerp(-520, -120, p)); ctx.rotate(0.1 * k); ctx.fillStyle = '#F2E2B8'; ctx.fillRect(-46, -30, 92, 60); ctx.strokeStyle = 'rgba(60,40,20,0.5)'; ctx.lineWidth = 2; ctx.strokeRect(-46, -30, 92, 60); ctx.restore(); }
+    S8.cel(ctx, S8.rr(-195, -360, 390, 40, 8), { fill: '#6E4A2E', s: 5, lw: 3, rim: '#b48a5e' }); ctx.fillStyle = '#1e1a1d'; ctx.fillRect(-60, -346, 120, 12);
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'; ctx.fillRect(-160, -310, 20, 280); MG.text.draw(ctx, 'ELECCIONES', 0, -200, { font: F.grotesk, weight: 800, size: 40, color: 'rgba(30,26,29,0.75)', align: 'center', tracking: 0.1 }); MG.text.draw(ctx, 'GENERALES', 0, -158, { font: F.grotesk, weight: 800, size: 40, color: 'rgba(30,26,29,0.75)', align: 'center', tracking: 0.1 }); ctx.restore(); };
+  DEF.pm = {
+    post: { grade: 'neutral', vignette: 0.4, temp: -0.02 },
+    draw(ctx, t) {
+      const tC = TW('calls', 1274.47), tE = TW('early', 1274.95);
+      const c = S8.keys(t, [[1273.27, { x: 900, y: 560, z: 1.0 }], [1276.9, { x: 960, y: 540, z: 1.1 }, 'inOutSine']]); c.hh = MG.cam.handheld(t, 2, 19);
+      // press-room backdrop: blue panel + flags
+      ctx.save(); S8.cam(ctx, c); MG.fx.vgrad(ctx, [[0, '#2a4f86'], [1, '#183258']]); ctx.fillStyle = 'rgba(255,255,255,0.05)'; for (let k = 0; k < 20; k++) ctx.fillRect(k * 110, 0, 54, 1200);
+      const flag = (fx, cols, eu) => { S8.stroke(ctx, [[fx, 120], [fx, 1000]], 10, '#C9A04A'); const wave = (u) => Math.sin(u * 5 + t * 2) * 14 * u; const p = new Path2D(); p.moveTo(fx, 150); for (let i = 0; i <= 10; i++) p.lineTo(fx + 30 + i * 4 + wave(i / 10), 150 + i * 60); for (let i = 10; i >= 0; i--) p.lineTo(fx - 30 - i * 4 + wave(i / 10), 150 + i * 60); p.closePath(); ctx.save(); ctx.clip(p); if (eu) { ctx.fillStyle = '#24408E'; ctx.fillRect(fx - 80, 140, 160, 640); ctx.fillStyle = '#F6D06F'; for (let k = 0; k < 6; k++) { ctx.fill(MG.path.star(fx + Math.sin(k) * 20, 240 + k * 70, 8, 3.5, 5)); } } else { ctx.fillStyle = '#C8231B'; ctx.fillRect(fx - 80, 140, 160, 640); ctx.fillStyle = '#F2C230'; ctx.fillRect(fx - 80, 300, 160, 300); } const g = ctx.createLinearGradient(fx - 70, 0, fx + 70, 0); g.addColorStop(0, 'rgba(0,0,0,0.3)'); g.addColorStop(0.5, 'rgba(255,255,255,0.15)'); g.addColorStop(1, 'rgba(0,0,0,0.3)'); ctx.fillStyle = g; ctx.fillRect(fx - 80, 140, 160, 640); ctx.restore(); };
+      flag(330, null, false); flag(470, null, true);
+      const raise = PR(t, tC - 0.2, tC + 0.25, 'outBack');
+      S8.pm(ctx, 860, 1010, 1.05, t, { raise, talk: t < 1276.25, turn: 0.12, brow: raise * 0.4 });
+      // lectern
+      S8.cel(ctx, PL([[620, 760], [1100, 760], [1060, 1100], [660, 1100]]), { fill: '#6E4A2E', s: 14, lw: 4, rim: '#b48a5e', shade: '#3e2616' }); S8.cel(ctx, S8.rr(600, 730, 520, 40, 8), { fill: '#7e5a3a', s: 5, lw: 3.5 }); S8.stroke(ctx, [[840, 730], [820, 640]], 6, '#2a2628'); ctx.fillStyle = '#2a2628'; ctx.beginPath(); ctx.ellipse(818, 636, 12, 18, -0.2, 0, MG.TAU); ctx.fill();
+      ctx.save(); ctx.globalAlpha = 0.85; K.sun(ctx, 860, 900, 52, t, { variant: 'flat', color: '#C9A04A', deep: '#9a7020', corona: 0 }); ctx.restore();
+      // ballot box slides in on "early election"
+      const up = PR(t, tE - 0.3, tE + 0.35, 'outBack'); if (up > 0) S8.urna(ctx, lerp(2200, 1500, up), 1020, 1.05, t, tE + 0.3);
+      ctx.restore();
+      MG.text.reveal(ctx, 'EARLY ELECTION', 1500, 280, t, tE - 0.05, { font: F.display, weight: 800, size: 84, color: '#F4EEE2', align: 'center', style: 'rise', by: 'word', shadow: { blur: 20, dy: 6, color: 'rgba(0,0,20,0.5)' } });
+      K.tag(ctx, t, 1273.5, 'Pedro Sánchez', { sub: 'PRIME MINISTER', x: 130, y: 990, subColor: '#E9DFCF' });
+    },
+  };
+  // ---------- 17 · WORKERS (1 in 8) ----------
+  const WK = [ // 8 commuters at the bus stop; index 5 = the waiter (tourism)
+    { skin: '#D9A077', hair: { k: 'short', c: '#2E211B' }, top: { k: 'jacket', c: '#4E5872', long: true }, bot: { k: 'trousers', c: '#2a2a34' }, face: { glasses: '#222' } },
+    { skin: '#C88A62', hair: { k: 'bun', c: '#1e1612' }, top: { k: 'tee', c: '#8DB6D9', long: true }, bot: { k: 'trousers', c: '#8DB6D9' }, face: {} },
+    { skin: '#E3A887', hair: { k: 'cap', c: '#6a4a3a', c2: '#F2A33A' }, top: { k: 'vest', c: '#F2C230', c2: '#F2C230' }, bot: { k: 'trousers', c: '#3a4660' }, face: { beard: '#6a4a3a' }, build: 1.15, belly: 1 },
+    { skin: '#A87050', hair: { k: 'long', c: '#2a1a12' }, top: { k: 'shirt', c: '#F0735A', long: true }, bot: { k: 'skirt', c: '#3B3236' }, face: {} },
+    { skin: '#E8B49A', hair: { k: 'bald', c: '#9b9387' }, top: { k: 'jacket', c: '#6F7A3A', long: true }, bot: { k: 'trousers', c: '#4a3a30' }, face: { glasses: '#444' } },
+    { skin: '#D99A74', hair: { k: 'short', c: '#1e1612' }, top: { k: 'vest', c: '#F7F3EA', c2: '#1e1a1d', long: true, collar: '#F7F3EA' }, bot: { k: 'trousers', c: '#1e1a1d' }, face: { mood: 'smile' }, waiter: true },
+    { skin: '#F0B89A', hair: { k: 'pony', c: '#8C3B2A' }, top: { k: 'tee', c: '#2FA7A0' }, bot: { k: 'trousers', c: '#3a4660' }, face: {} },
+    { skin: '#C88A62', hair: { k: 'curly', c: '#1e1612' }, top: { k: 'jacket', c: '#C8423B', long: true }, bot: { k: 'trousers', c: '#2a2a34' }, face: {} },
+  ];
+  DEF.workers = {
+    transIn: { dur: 0.6, ease: 'linear', type: S8.objWipe((ctx, p) => { const e = MG.ease.inOutSine(p); const x = lerp(2200, -1800, e); ctx.save(); ctx.filter = 'blur(10px)'; S8.cel(ctx, S8.rr(x, 80, 1700, 960, 60), { fill: '#C8231B', s: 30, lw: 0 }); ctx.fillStyle = 'rgba(160,210,240,0.8)'; for (let k = 0; k < 5; k++) ctx.fillRect(x + 120 + k * 320, 200, 260, 300); ctx.fillStyle = '#1e1a1d'; ctx.beginPath(); ctx.arc(x + 300, 1040, 120, 0, MG.TAU); ctx.arc(x + 1400, 1040, 120, 0, MG.TAU); ctx.fill(); ctx.restore(); }, (p) => lerp(2200, -1800, MG.ease.inOutSine(p)) + 1700, true) },
+    post: { grade: 'golden', vignette: 0.42 },
+    draw(ctx, t) {
+      const t1 = TW('one', 1277.91), tT = TW('tourism.', 1279.99);
+      const c = S8.keys(t, [[1276.71, { x: 960, y: 560, z: 1.0 }], [1279.6, { x: 1000, y: 560, z: 1.06 }, 'inOutSine'], [1281.2, { x: 1250, y: 620, z: 1.9 }, 'cam']]); c.hh = MG.cam.handheld(t, 2.2, 29);
+      ctx.save(); S8.cam(ctx, c);
+      MG.fx.vgrad(ctx, [[0, '#F2C28A'], [0.55, '#F6D7AE'], [1, '#D8B48E']]); K.sun(ctx, 230, 330, 90, t, { rays: 0.4, corona: 0.9 });
+      // pavement
+      ctx.fillStyle = '#BFB5A6'; ctx.fillRect(-400, 880, 2800, 400); ctx.fillStyle = '#8a8078'; ctx.fillRect(-400, 860, 2800, 24);
+      // bus shelter: roof + glass + ad panel (in-world typography)
+      S8.cel(ctx, S8.rr(240, 270, 1500, 40, 8), { fill: '#3a3a40', s: 6, lw: 3 }); for (const px of [260, 1700]) S8.cel(ctx, S8.rr(px, 300, 24, 590, 4), { fill: '#4a4a52', s: 3, lw: 2.5 });
+      ctx.fillStyle = 'rgba(200,225,240,0.25)'; ctx.fillRect(284, 310, 1416, 560);
+      S8.cel(ctx, S8.rr(1500, 330, 190, 520, 6), { fill: '#F4EEE2', s: 6, lw: 3, after: (x) => { MG.text.draw(x, '1', 1595, 520, { font: F.cond, weight: 900, size: 200, color: '#B8231B', align: 'center' }); MG.text.draw(x, 'IN', 1595, 580, { font: F.mono, weight: 700, size: 36, color: P.ink, align: 'center', tracking: 0.3 }); MG.text.draw(x, '8', 1595, 760, { font: F.cond, weight: 900, size: 200, color: P.ink, align: 'center' }); MG.text.draw(x, 'WORKERS', 1595, 810, { font: F.mono, weight: 700, size: 24, color: P.ink, align: 'center', tracking: 0.2 }); } });
+      // shelter shadow covers the queue except the waiter's slot (the low sun comes through a gap)
+      WK.forEach((o, i) => { const x = 360 + i * 152, y = 900 + (i % 2) * 8; const h = 300 + MG.range(4, i, -20, 30); const lit = o.waiter; const nod = Math.sin(t * 1.4 + i) * 0.02;
+        S8.contact(ctx, x + 16, y + 2, 60, 10, 0.35);
+        S8.person(ctx, { ...o, x, y, h, t: t + i * 0.3, dir: i < 4 ? 1 : -1, turn: i < 4 ? 0.3 : 0.3, lean: nod, arms: o.waiter ? [[0.2, 0.25], [1.2, 1.35]] : [[0.12, 0.25], [0.12, 0.25]], face: { ...o.face, lid: lit ? 0 : 0.35, mood: lit ? 'smile' : 'flat' }, acc: o.waiter ? (x2, J) => { const w = J.armJ[1].wr; const tp = MG.path.ellipse(w[0] + 3, w[1] - 1, 13, 2.6); S8.cel(x2, tp, { fill: '#C9CDD2', s: 1, lw: 0.6, rim: '#fff' }); S8.cel(x2, S8.rr(w[0] - 1, w[1] - 9, 5, 8, 1.5), { fill: '#F2C230', s: 0.5, lw: 0.4 }); S8.cel(x2, S8.rr(w[0] + 6, w[1] - 7, 4, 6, 1.5), { fill: '#F4EEE2', s: 0.5, lw: 0.4 }); x2.fillStyle = '#1e1a1d'; x2.fill(PL([[-3, J.shY - 2], [0, J.shY + 0.5], [3, J.shY - 2], [3, J.shY + 1], [0, J.shY], [-3, J.shY + 1]])); } : null });
+      });
+      // shade over everyone except the sunlit gap
+      const gp = PR(t, t1 - 0.2, t1 + 0.5, 'inOutSine'); const gapX = 360 + 5 * 152; const sh = new Path2D(); sh.rect(270, 300, 1440, 620); const gap = PL([[gapX - 70 - 260, 300], [gapX + 70 - 260, 300], [gapX + 78, 920], [gapX - 78, 920]]); sh.addPath(gap);
+      ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = `rgba(110,90,140,${0.55 * gp})`; ctx.fill(sh, 'evenodd'); ctx.restore();
+      ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = gp; const g = ctx.createLinearGradient(gapX - 260, 300, gapX, 920); g.addColorStop(0, 'rgba(255,220,150,0.5)'); g.addColorStop(1, 'rgba(255,220,150,0.15)'); ctx.fillStyle = g; ctx.fill(gap); ctx.restore();
+      // tray glint on "tourism"
+      const gl = MG.win(t, tT - 0.1, tT + 0.7, 0.1, 0.4); if (gl > 0) { const wx = gapX + 32, wy = 900 - 300 * 0.62; ctx.save(); ctx.globalCompositeOperation = 'screen'; MG.fx.glow(ctx, wx, wy, 60, '#FFF1C0', 0.9 * gl); ctx.restore(); }
+      ctx.restore();
+      MG.text.reveal(ctx, 'DEPEND ON TOURISM', 960, 1000, t, TW('depends', 1279.47) - 0.05, { font: F.grotesk, weight: 800, size: 54, color: P.ink, tracking: 0.08, align: 'center', style: 'rise', by: 'word' });
+    },
+  };
+  // ---------- 18 · SCALE (Three.js brass balance) ----------
+  DEF.scale = {
+    transIn: { type: S8.zoomThru(1250, 560, 2.4, 0.7, 760, 560), dur: 0.55 },
+    post: { grade: 'warm', vignette: 0.42 },
+    init() {
+      const T = THREE; const sc = (this.sc = new T.Scene()); sc.environment = MG.three.env(); this.cam = new T.PerspectiveCamera(30, 16 / 9, 0.1, 100);
+      sc.add(new T.HemisphereLight(0xfff0dc, 0x4a3a50, 0.6)); const dl = new T.DirectionalLight(0xffe2b8, 2.2); dl.position.set(-4, 6, 5); sc.add(dl);
+      const brass = new T.MeshStandardMaterial({ color: 0xC9A04A, metalness: 0.9, roughness: 0.32 }); const dark = new T.MeshStandardMaterial({ color: 0x3a2a20, metalness: 0.2, roughness: 0.6 });
+      const lathe = (pts, m, seg = 40) => new T.Mesh(new T.LatheGeometry(pts.map((p) => new T.Vector2(p[0], p[1])), seg), m);
+      const base = lathe([[0, 0], [1.1, 0], [1.1, 0.12], [0.8, 0.22], [0.25, 0.4], [0.16, 0.6], [0, 0.6]], brass); sc.add(base);
+      const col = new T.Mesh(new T.CylinderGeometry(0.09, 0.12, 3.2, 24), brass); col.position.y = 2.2; sc.add(col);
+      const top = lathe([[0, 0], [0.2, 0], [0.16, 0.16], [0.05, 0.3], [0, 0.34]], brass); top.position.y = 3.8; sc.add(top);
+      this.beam = new T.Group(); this.beam.position.y = 3.7; sc.add(this.beam); const bm = new T.Mesh(new THREE_ADDONS.RoundedBoxGeometry(4.6, 0.12, 0.14, 2, 0.04), brass); this.beam.add(bm);
+      this.pans = []; for (const sx of [-2.2, 2.2]) { const hang = new T.Group(); hang.position.x = sx; this.beam.add(hang); for (let k = 0; k < 3; k++) { const a = (k / 3) * Math.PI * 2; const ch = new T.Mesh(new T.CylinderGeometry(0.012, 0.012, 2.0, 6), dark); ch.position.set(Math.cos(a) * 0.38, -1.0, Math.sin(a) * 0.38); ch.rotation.z = -Math.cos(a) * 0.19; ch.rotation.x = Math.sin(a) * 0.19; hang.add(ch); } const pan = lathe([[0, 0], [0.75, 0.02], [0.82, 0.12], [0.78, 0.14], [0, 0.06]], brass, 48); pan.position.y = -2.0; hang.add(pan); this.pans.push(hang); }
+      // suitcases (left) and the little house (right)
+      const RB = THREE_ADDONS.RoundedBoxGeometry; this.suits = []; const SC = [0xC8423B, 0x1F4E8C, 0xF2A33A, 0x2FA7A0, 0xF0735A, 0x6F7A3A, 0x8DB6D9, 0x3B3236];
+      for (let k = 0; k < 12; k++) { const g = new T.Group(); const body = new T.Mesh(new RB(0.42, 0.56, 0.22, 2, 0.05), new T.MeshStandardMaterial({ color: SC[k % 8], roughness: 0.45, metalness: 0.05 })); g.add(body); const hd = new T.Mesh(new T.TorusGeometry(0.08, 0.018, 6, 12, Math.PI), dark); hd.position.y = 0.3; g.add(hd); this.pans[0].add(g); this.suits.push(g); }
+      const hs = new T.Group(); const hc = MG.canvas(256, 256); const hx = hc.getContext('2d'); hx.fillStyle = '#F2E2C4'; hx.fillRect(0, 0, 256, 256); hx.fillStyle = '#F3C67A'; for (const [a, b] of [[40, 60], [150, 60], [40, 150], [150, 150]]) { hx.fillRect(a, b, 60, 60); hx.fillStyle = '#3d6b4a'; hx.fillRect(a - 12, b, 12, 60); hx.fillRect(a + 60, b, 12, 60); hx.fillStyle = '#F3C67A'; } const htex = MG.three.canvasTexture(hc);
+      const hb = new T.Mesh(new T.BoxGeometry(0.8, 0.62, 0.62), new T.MeshStandardMaterial({ map: htex, roughness: 0.8 })); hb.position.y = 0.31; hs.add(hb); const rg = new T.CylinderGeometry(0.5, 0.5, 0.72, 3, 1); const roof = new T.Mesh(rg, new T.MeshStandardMaterial({ color: 0xC8693F, roughness: 0.7 })); roof.rotation.z = Math.PI / 2; roof.rotation.y = Math.PI / 2; roof.scale.set(1, 1.18, 0.7); roof.position.y = 0.8; hs.add(roof); hs.position.y = -1.9; this.pans[1].add(hs); this.house = hs;
+      // coins (livelihoods) on the left pan
+      this.coins = []; for (let k = 0; k < 6; k++) { const cn = new T.Mesh(new T.CylinderGeometry(0.11, 0.11, 0.03, 20), brass); this.pans[0].add(cn); this.coins.push(cn); }
+    },
+    draw(ctx, t) {
+      const tCut = TW('cutting', 1281.03), tLet = TW('letting', 1283.59), tPush = TW('pushing', 1285.11);
+      K.paper(ctx, '#EAD8BA', { light: 0.3 }); MG.fx.rgrad(ctx, 960, 420, 900, [[0, 'rgba(255,240,210,0.35)'], [1, 'rgba(60,30,60,0.0)']]);
+      // load: suitcases present / removed / piled on
+      const out = PR(t, tCut + 0.1, tCut + 0.9, 'in'); const pile = (k) => PR(t, tLet + 0.15 + k * 0.17, tLet + 0.45 + k * 0.17, 'outBounce');
+      let wL = 0; this.suits.forEach((g, k) => { const base = k < 3; let y, vis = 1; const col = k % 3, row = Math.floor(k / 3); const px = (col - 1) * 0.44, pz = (row % 2) * 0.1 - 0.05; const py = -1.92 + 0.28 + row * 0.56;
+        if (base) { const o = out * (1 - pile(k)); y = py + o * 4; vis = o < 0.98 ? 1 : 0; wL += 1 - o; if (t > tLet) { const pk = pile(k); y = lerp(py + 4, py, pk); vis = pk > 0 ? 1 : 0; wL += pk; } }
+        else { const pk = pile(k); y = lerp(py + 4, py, pk); vis = pk > 0 ? 1 : 0; wL += pk; }
+        g.position.set(px, y, pz); g.visible = !!vis; g.rotation.y = 0.2 * (col - 1); });
+      const wR = 3 * (1 - PR(t, tPush + 0.3, tPush + 0.9));
+      const target = clamp((wL - 3.2) * 0.075, -0.32, 0.38); const ang = MG.follow('s8beam', (q) => { let w = 0; /* recompute load at q */ const o2 = PR(q, tCut + 0.1, tCut + 0.9, 'in'); w = 3 * (1 - o2); if (q > tLet) for (let k = 0; k < 12; k++) w += PR(q, tLet + 0.15 + k * 0.17, tLet + 0.45 + k * 0.17, 'outBounce') - (k < 3 ? 1 - o2 : 0) * 0; const r = 3 * (1 - PR(q, tPush + 0.3, tPush + 0.9)); return clamp((w - r) * 0.06, -0.3, 0.38); }, t, 1281.03, 40, 7); void target;
+      this.beam.rotation.z = -ang; this.pans.forEach((p) => (p.rotation.z = ang));
+      // coins slide off the left pan when it swings up (livelihoods)
+      this.coins.forEach((cn, k) => { const sp = PR(t, tCut + 0.5 + k * 0.06, tCut + 1.4 + k * 0.06, 'in'); const a = (k / 6) * Math.PI * 2; cn.position.set(Math.cos(a) * 0.45 - sp * 1.2, -1.9 - sp * sp * 3.2, Math.sin(a) * 0.3 + 0.3); cn.rotation.x = sp * 6; cn.visible = t < tLet + 0.2 || sp < 1; });
+      // the house slides off the right pan and falls (residents pushed out)
+      const hsl = PR(t, tPush + 0.25, tPush + 1.35, 'in'); this.house.position.set(hsl * 1.6, -1.9 - hsl * hsl * 6, 0); this.house.rotation.z = -hsl * 1.6;
+      const cy = lerp(2.5, 1.6, PR(t, tPush + 0.6, 1287.4, 'inOutSine')); const cx = lerp(0, 1.2, PR(t, tPush + 0.6, 1287.4, 'inOutSine'));
+      this.cam.position.set(cx + Math.sin(t * 0.15) * 0.5, cy + 0.6, 11.5 - PR(t, 1281.03, 1287.3, 'inOutSine') * 1.2); this.cam.lookAt(cx, cy, 0);
+      // contact shadow under the base (2D)
+      MG.fx.contact(ctx, 1010, 955, 380, 46, 0.45, '#2a1630');
+      const c = MG.three.render(this.sc, this.cam, { slot: 2, exposure: 1.05 }); ctx.drawImage(c, 0, 0);
+      // labels (2D, track pans in screen space)
+      const proj = (o) => { const v = new THREE.Vector3(); o.getWorldPosition(v); v.project(this.cam); return [(v.x * 0.5 + 0.5) * MG.W, (-v.y * 0.5 + 0.5) * MG.H]; };
+      const pl = proj(this.pans[0]), prr = proj(this.pans[1]);
+      MG.text.reveal(ctx, 'LIVELIHOODS', pl[0], pl[1] + 330, t, TW('livelihoods.', 1282.39) - 0.1, { font: F.grotesk, weight: 800, size: 50, color: P.ink, align: 'center', tracking: 0.06, style: 'rise', by: 'word', stroke: 'rgba(250,240,225,0.9)', strokeW: 10 });
+      MG.text.reveal(ctx, 'RESIDENTS', prr[0], prr[1] + 330, t, TW('residents', 1285.51) - 0.1, { font: F.grotesk, weight: 800, size: 50, color: '#B8231B', align: 'center', tracking: 0.06, style: 'rise', by: 'word', stroke: 'rgba(250,240,225,0.9)', strokeW: 10 });
+      MG.text.reveal(ctx, 'TOURISM', pl[0], pl[1] - 420, t, tCut - 0.3, { font: F.mono, weight: 700, size: 30, color: P.ink2, align: 'center', tracking: 0.3, style: 'track', by: 'line' });
     },
   };
 
