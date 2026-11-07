@@ -1385,6 +1385,6 @@
 
   // ------------------------------------------------------------------ registration
   const STUB = Q.get('s10stub') ? [{ id: 's10_stub', start: 1500, end: T0, draw(ctx, t) { MG.kit.paper(ctx, P.paper); MG.kit.sun(ctx, 1400, 360, 120, t, { rays: 0.5 }); MG.text.draw(ctx, 'S09 · Madrid', 200, 600, { font: MG.F.display, weight: 800, size: 140, color: P.ink }); ctx.fillStyle = P.pp; ctx.fillRect(200, 700, 900, 40); ctx.fillStyle = P.psoe; ctx.fillRect(200, 760, 700, 40); } }] : [];
-  const SCENES = [...STUB, STRATA, COIN, LOCATE, MONUMENT, SLAB, DIG, GRAVES, CLOTH, HEMI, ...GEO, FENCE, CANARY, CAYUCO, RECORD, DEADLY, { id: 's10_todo', start: 1593.45, end: T1 + 2, draw(ctx, t) { skyDark(ctx); MG.text.draw(ctx, 'TODO ' + t.toFixed(2), 200, 500, { size: 60, color: '#fff' }); } }];
-  MG.segment('S10', { start: T0, end: T1, scenes: SCENES, audio(A) { } });
+  const SCENES = [...STUB, STRATA, COIN, LOCATE, MONUMENT, SLAB, DIG, GRAVES, CLOTH, HEMI, ...GEO, FENCE, CANARY, CAYUCO, RECORD, DEADLY, DOOR, GIBMAP, ROCK, LATAM1, LATAM2, KM0, CUPS, CLASICO, WORLD1, SECRET, QUESTION];
+  MG.segment('S10', { start: T0, end: T1, scenes: SCENES, audio: S10.audio });
 })();

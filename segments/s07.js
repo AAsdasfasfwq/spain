@@ -1147,6 +1147,177 @@ SC.push({
 });
 
 // =====================================================================================================
+// CHAPTER D — THE BOOM (2000s)
+// =====================================================================================================
+S7.boomSky = () => MG.cache('s7boomsky', W, H, (x) => { MG.fx.vgrad(x, [[0, '#F0A24E'], [0.45, '#F7CF8C'], [0.7, '#FBE6BF'], [1, '#FBE6BF']]); MG.tex.over(x, 'blotch', { alpha: 0.07, color: '#8a4a10', scale: 3 }); });
+S7.coinSprite = (r = 40) => MG.cache('s7coin:' + r, r * 2 + 8, r * 2 + 8, (x) => { MG.kit.sun(x, r + 4, r + 4, r, 0, { variant: 'coin', color: '#D9B451' }); x.fillStyle = 'rgba(190,195,201,0.95)'; x.beginPath(); x.arc(r + 4, r + 4, r * 0.62, 0, TAU); x.fill(); MG.text.draw(x, '€', r + 4, r + 4 + r * 0.34, { font: MG.F.display, weight: 800, size: r * 0.95, color: '#5A4A20', align: 'center' }); });
+S7.letterBlock = (ch, col) => MG.cache('s7blk:' + ch + col, 150, 160, (x) => { const a = 120, d = 26; x.fillStyle = MG.col.shade(col, 0.35); x.beginPath(); x.moveTo(10 + a, 30); x.lineTo(10 + a + d, 30 - d * 0.6 + 26); x.lineTo(10 + a + d, 30 + a - d * 0.6 + 26); x.lineTo(10 + a, 30 + a); x.closePath(); x.fill(); x.fillStyle = MG.col.light(col, 0.2); x.beginPath(); x.moveTo(10, 30); x.lineTo(10 + d, 30 - d * 0.6 + 26 - 26); x.lineTo(10 + a + d, 30 - d * 0.6); x.lineTo(10 + a, 30); x.closePath(); x.fill(); const f = MG.path.rr(10, 30, a, a, 4); MG.fx.volume(x, f, [10, 30, a, a], { color: col, shade: 0.25, hi: 0.3 }); MG.text.draw(x, ch, 10 + a / 2, 30 + a * 0.82, { font: MG.F.cond, weight: 900, size: 118, color: col === P.cal ? P.ink : P.cal, align: 'center' }); });
+
+// ---------- D1 · tilt up from the slab: the coast fills with cranes, B·O·O·M lands ----------
+SC.push({
+  id: 's07_d1_boom', start: 1078.2, end: 1083.05,
+  transIn: { type: 'push', dir: 'down', dur: 0.7, ease: 'inOutCubic' },
+  init() {
+    this.far = MG.cache('s7d1far', W, H, (x) => { x.fillStyle = '#B7A2A8'; x.beginPath(); x.moveTo(0, 640); for (let xx = 0; xx <= W; xx += 12) x.lineTo(xx, 600 + MG.fbm(xx * 0.0025, 8, 3) * 90); x.lineTo(W, H); x.lineTo(0, H); x.closePath(); x.fill(); x.fillStyle = '#7FA7C4'; x.fillRect(1150, 664, W - 1150, 30); x.fillStyle = 'rgba(255,255,255,0.5)'; for (let i = 0; i < 40; i++) x.fillRect(1160 + MG.rand(3, i) * 760, 668 + MG.rand(4, i) * 22, 14, 2); x.fillStyle = '#D9C6A0'; x.fillRect(0, 690, W, H - 690); });
+    this.fg = MG.cache('s7d1fg', W, 420, (x) => { // hoarding + slab edge
+      x.fillStyle = '#9C9890'; x.fillRect(0, 330, W, 90); x.strokeStyle = '#1E1A1F'; x.lineWidth = 6; x.beginPath(); x.moveTo(0, 372); for (let xx = 0; xx < W; xx += 40) x.lineTo(xx, 368 + Math.sin(xx * 0.05) * 6 + (MG.rand(5, xx) - 0.5) * 10); x.stroke();
+      for (let i = 0; i < 6; i++) { const px = i * 205; x.fillStyle = i % 2 ? '#EDE6D6' : '#F4EFE3'; x.fillRect(px, 40, 200, 300); x.fillStyle = 'rgba(40,30,30,0.15)'; x.fillRect(px + 196, 40, 6, 300); }
+      x.fillStyle = P.rojo; x.fillRect(0, 110, 1220, 150); MG.text.draw(x, '2000s', 60, 238, { font: MG.F.cond, weight: 900, size: 170, color: P.cal }); MG.text.draw(x, 'OBRA · CONSTRUCTION', 600, 210, { font: MG.F.mono, weight: 700, size: 30, color: P.cal, tracking: 0.25 });
+      MG.tex.over(x, 'fibers', { alpha: 0.5 });
+    });
+    this.blocks = ['B', 'O', 'O', 'M'].map((c, i) => S7.letterBlock(c, [P.sol, P.cal, P.azulejo, P.rojo][i]));
+    const r = MG.rng(12); this.farC = []; for (let i = 0; i < 11; i++) this.farC.push({ x: 120 + i * 165 + r() * 60, t0: 1078.5 + r() * 2.2, s: 0.32 + r() * 0.12, rot: r() < 0.5 ? 1 : -1, ph: r() * 6 });
+    this.farB = []; for (let i = 0; i < 16; i++) this.farB.push({ x: 60 + i * 120 + r() * 50, t0: 1078.4 + r() * 2.5, f: 5 + Math.floor(r() * 8), w: 70 + r() * 50 });
+  },
+  draw(ctx, t) {
+    const up = MG.ease.cam(lin(t, 1078.2, 1080.4)); const camY = lerp(240, 0, up); const hh = MG.cam.handheld(t, 2, 6);
+    ctx.drawImage(S7.boomSky(), 0, 0); MG.kit.sun(ctx, 330, 220 + camY * 0.15, 92, t, { rays: 0.4, corona: 0.6 });
+    ctx.save(); ctx.translate(hh.dx * 0.3, camY * 0.3); ctx.drawImage(this.far, 0, 0);
+    for (const B of this.farB) { const k = clamp((t - B.t0) / 1.6); if (k <= 0) continue; ctx.save(); ctx.globalAlpha = 0.75; S7.frame(ctx, B.x, 700, B.w * 0.5, B.f, B.f * k, { fh: 16, bays: 3, col: '#E4D8C6' }); ctx.restore(); }
+    for (const Cr of this.farC) { const k = MG.ease.out(clamp((t - Cr.t0) / 0.7)); if (k <= 0) continue; ctx.save(); ctx.globalAlpha = 0.8; S7.crane(ctx, Cr.x, 700, Cr.s, { mast: 520 * k, rot: Math.cos(t * 0.4 + Cr.ph) * Cr.rot, col: '#E8B531' }); ctx.restore(); }
+    ctx.restore();
+    ctx.save(); ctx.translate(hh.dx * 0.6, camY * 0.6);
+    // mid buildings & cranes
+    const mids = [[360, 6, 0.0], [640, 9, 0.3], [1250, 7, 0.6], [1560, 10, 0.2]]; for (const [bx, fl, o] of mids) S7.frame(ctx, bx, 930, 230, fl, fl * MG.ease.inOutSine(lin(t, 1078.5 + o, 1081.8 + o)), { fh: 40, bays: 4, infill: true });
+    const hero = 900; const built = 7 * MG.ease.inOutSine(lin(t, 1078.4, 1081.6)); const roof = S7.frame(ctx, hero, 930, 330, 7, built, { fh: 54, bays: 5, infill: true });
+    for (const [cx, o, s, sg] of [[520, 0.2, 0.95, 1], [1400, 0.7, 1.05, -1]]) { const k = MG.ease.out(lin(t, 1078.8 + o, 1079.9 + o)); S7.crane(ctx, cx, 930, s, { mast: 640 * k, rot: sg * Math.cos(t * 0.35 + o * 4), hook: 0.35 + 0.2 * Math.sin(t + o), trolley: 0.6 }); }
+    // the hero crane lowers B·O·O·M onto the roof
+    const tb = TW('boom', 1082.4); const low = MG.ease.inOutCubic(lin(t, tb - 0.9, tb)); const land = t > tb ? MG.jiggle(t, tb, 0.12, 3, 7) : 0;
+    const jy = 930 - 760 * 1.0 - 22; const cableY0 = jy + 14; const loadY = lerp(cableY0 + 120, roof - 150, low);
+    S7.crane(ctx, 1180, 930, 1.0, { mast: 760, jib: 620, rot: -1, hook: 0 });
+    ctx.strokeStyle = 'rgba(40,30,30,0.8)'; ctx.lineWidth = 2; const hx = 1180 - 620 * 0.47; ctx.beginPath(); ctx.moveTo(hx, cableY0); ctx.lineTo(hx, loadY - 40); ctx.moveTo(hx, loadY - 40); ctx.lineTo(hx - 240, loadY); ctx.moveTo(hx, loadY - 40); ctx.lineTo(hx + 240, loadY); ctx.stroke(); ctx.fillStyle = '#3a3030'; ctx.fillRect(hx - 250, loadY - 6, 500, 10);
+    this.blocks.forEach((b, i) => { const bx = hx - 230 + i * 118; const by = loadY + 8; const sq = i === 0 ? 1 : 1; ctx.save(); ctx.translate(bx + 65, by + 75 + land * 40 * (i % 2 ? 1 : -1)); ctx.scale(1 + land * 0.2, 1 - land * 0.2); ctx.drawImage(b, -75, -80, 150 * 0.9, 160 * 0.9); ctx.restore(); });
+    if (t > tb && t < tb + 1.2) MG.fx.smoke(ctx, hx, roof - 10, t - tb, { n: 8, spread: 480, rise: 20, r: 90, alpha: 0.5 * (1 - (t - tb) / 1.2), color: '#E8D8BE', seed: 9 });
+    ctx.restore();
+    // foreground hoarding (parallax, out of focus a touch)
+    ctx.save(); ctx.translate(0, 660 + camY * 1.25); MG.sprite(ctx, this.fg, 960, 210, { blur: 1.5 }); ctx.restore();
+    MG.text.reveal(ctx, 'an unprecedented construction boom', 960, 130, t, TW('unprecedented', 1080.85) - 0.1, { font: MG.F.serif, italic: true, size: 64, color: P.ink, align: 'center', style: 'blur', by: 'word', stagger: 0.09, out: { at: 1082.85, dur: 0.3 } });
+  },
+  post: { grade: 'golden', vignette: 0.32 },
+});
+
+// ---------- D2 · the fuel: cheap €, tourists, immigrant workers ----------
+S7.suitcase = (ctx, x, y, s, col, rot = 0) => { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); const b = MG.path.rr(-34, -80, 68, 80, 10); MG.fx.volume(ctx, b, [-34, -80, 68, 80], { color: col, shade: 0.35, hi: 0.3, cel: true }); ctx.strokeStyle = 'rgba(0,0,0,0.25)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-14, -80); ctx.lineTo(-14, -74); ctx.moveTo(14, -80); ctx.lineTo(14, -74); ctx.stroke(); ctx.strokeStyle = '#3a3030'; ctx.lineWidth = 5; ctx.beginPath(); ctx.moveTo(-10, -80); ctx.lineTo(-10, -112); ctx.lineTo(10, -112); ctx.lineTo(10, -80); ctx.stroke(); ctx.fillStyle = '#F4EEE0'; ctx.fillRect(-20, -54, 22, 14); ctx.fillStyle = '#2a2224'; ctx.beginPath(); ctx.arc(-22, 2, 6, 0, TAU); ctx.arc(22, 2, 6, 0, TAU); ctx.fill(); ctx.restore(); };
+SC.push({
+  id: 's07_d2_inputs', start: 1083.05, end: 1086.65,
+  transIn: { type: TR.jib, dur: 0.6, angle: -16, width: 320 },
+  draw(ctx, t) {
+    ctx.drawImage(S7.boomSky(), 0, 0); const hh = MG.cam.handheld(t, 2, 9);
+    ctx.save(); ctx.translate(hh.dx, hh.dy);
+    ctx.fillStyle = '#D9C6A0'; ctx.fillRect(0, 900, W, 180); ctx.fillStyle = 'rgba(60,40,40,0.12)'; ctx.fillRect(0, 900, W, 10);
+    const tc = TW('Cheap', 1083.2), te = TW('euros', 1084.0), tt = TW('Tourists', 1084.8), ti = TW('Immigrants', 1085.7);
+    // the sun turns into a euro coin, and coins pour out of it into the building
+    const sx = 250, sy = 210, sR = 96; const flip = MG.ease.inOutCubic(lin(t, tc - 0.05, tc + 0.4));
+    ctx.save(); ctx.translate(sx, sy); ctx.scale(Math.abs(Math.cos(flip * Math.PI)) || 0.02, 1); if (flip < 0.5) MG.kit.sun(ctx, 0, 0, sR, t, { rays: 0.4 }); else MG.sprite(ctx, S7.coinSprite(48), 0, 0, { scale: sR / 48 }); ctx.restore();
+    const roofY = S7.frame(ctx, 1000, 900, 520, 9, lerp(4, 6, MG.ease.inOutSine(lin(t, tc + 0.3, tt))) + MG.ease.inOutSine(lin(t, tt, ti)) + 1.4 * MG.ease.inOutSine(lin(t, ti, 1086.6)), { fh: 58, bays: 6, infill: true });
+    if (t > tc + 0.25) { const coin = S7.coinSprite(22); for (let i = 0; i < 34; i++) { const u = MG.fract((t - tc) * 0.85 + i / 34); if ((t - tc) * 0.85 < i / 34) continue; const px = lerp(sx + 60, 960 + (MG.rand(5, i) - 0.5) * 260, u), py = lerp(sy + 40, roofY + 20, u) - Math.sin(u * Math.PI) * 160; MG.sprite(ctx, coin, px, py, { scale: 0.9, sx: Math.abs(Math.cos(t * 7 + i)) + 0.08, alpha: u < 0.9 ? 1 : (1 - u) * 10 }); } }
+    // tourists: a jet overhead, suitcases rolling in
+    if (t > tt - 0.4) { const u = lin(t, tt - 0.4, tt + 1.6); const px = lerp(W + 200, 1150, MG.ease.out(u)); ctx.save(); ctx.strokeStyle = 'rgba(255,255,255,0.75)'; ctx.lineWidth = 6; ctx.beginPath(); ctx.moveTo(px + 60, 150); ctx.lineTo(W + 300, 140); ctx.stroke(); ctx.fillStyle = '#F4EEE0'; ctx.beginPath(); ctx.moveTo(px - 70, 150); ctx.quadraticCurveTo(px - 60, 138, px, 140); ctx.lineTo(px + 70, 142); ctx.lineTo(px + 86, 124); ctx.lineTo(px + 96, 124); ctx.lineTo(px + 88, 150); ctx.lineTo(px - 60, 158); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#D9D2C2'; ctx.beginPath(); ctx.moveTo(px - 10, 148); ctx.lineTo(px + 30, 148); ctx.lineTo(px - 20, 182); ctx.lineTo(px - 34, 182); ctx.closePath(); ctx.fill(); ctx.restore();
+      const cols = [P.rojo, P.azulejo, P.sol, P.oliva, P.terracota]; cols.forEach((c, i) => { const k = MG.ease.out(lin(t, tt + i * 0.12, tt + 0.9 + i * 0.12)); if (k <= 0) return; const x = lerp(W + 120, 1330 + i * 88, k); S7.suitcase(ctx, x, 905, 0.9 + (i % 2) * 0.15, c, Math.sin((1 - k) * 12) * 0.1); }); }
+    // immigrant workers walk in and climb the scaffold
+    if (t > ti - 0.3) { const outfits = [['#E5762C', '#3F4E6A'], ['#3F6B8C', '#2E3440'], ['#7A5A3A', '#3A3632'], ['#B8322A', '#2E3440']]; outfits.forEach(([top, bot], i) => { const k = MG.ease.out(lin(t, ti - 0.2 + i * 0.15, ti + 0.9 + i * 0.15)); const x = lerp(-120, 430 + i * 105, k); S7.figure(ctx, x, 905, 230, { top, bottom: bot, hat: 'hard', skin: SKINS[(i * 2 + 1) % 5], hair: HAIRS[i], walk: k < 1 ? t * 9 + i : null, seed: i + 3, mood: 'smile', vest: i === 1 ? '#D8E04A' : null, prop: (c2, q) => { c2.fillStyle = '#7A5A3A'; c2.fillRect(q.shW * 0.6, q.shY + 60, 40, 30); } }); }); }
+    ctx.restore();
+    // labels on the spoken word
+    const lab = (s, x, y, t0, col) => MG.text.reveal(ctx, s, x, y, t, t0, { font: MG.F.grotesk, weight: 800, size: 46, color: col || P.ink, style: 'rise', by: 'word', stroke: 'rgba(251,230,191,0.9)', strokeW: 8 });
+    lab('CHEAP LOANS €', 360, 330, tc - 0.06); lab('TOURISTS', 1360, 760, tt - 0.06); lab('IMMIGRANTS', 380, 610, ti - 0.06);
+  },
+  post: { grade: 'golden', vignette: 0.3 },
+});
+
+// ---------- D3 · crane up: Spain sprouts buildings everywhere ----------
+S7.d3 = {
+  pr: () => S7._d3pr || (S7._d3pr = MG.kit.view('iberia')),
+  pts() { if (S7._d3pts) return S7._d3pts; const pr0 = this.pr(); const r = MG.rng(44); const out = []; const d3 = window.d3; const coast = [MG.geo.cities.Malaga, MG.geo.cities.Alicante, MG.geo.cities.Valencia, MG.geo.cities.Barcelona, MG.geo.cities.Murcia, MG.geo.cities.Madrid, MG.geo.cities.Almeria, MG.geo.cities.Cadiz, MG.geo.cities.Tarragona, MG.geo.cities.Benidorm];
+    for (const f of MG.geo.provinces.features) { if (/Canarias|Palmas|Tenerife|Ceuta|Melilla|Gibraltar/.test(f.properties.name)) continue; const dens = MG.geo.density[f.id] || 30; const n = 2 + Math.round(Math.sqrt(dens) * 0.55); const b = d3.geoBounds(f); let k = 0, tries = 0; while (k < n && tries < 300) { tries++; const ll = [lerp(b[0][0], b[1][0], r()), lerp(b[0][1], b[1][1], r())]; if (!d3.geoContains(f, ll)) continue; const p = pr0(ll); let dmin = 1e9; for (const c of coast) { const q = pr0(c); dmin = Math.min(dmin, Math.hypot(q[0] - p[0], q[1] - p[1])); } out.push({ p, d: dmin, h: 12 + r() * 30 + (dmin < 60 ? 20 : 0), w: 8 + r() * 7, v: Math.floor(r() * 4), crane: r() < 0.06 }); k++; } }
+    out.sort((a, b) => a.p[1] - b.p[1]); S7._d3pts = out; return out; },
+};
+SC.push({
+  id: 's07_d3_everywhere', start: 1086.65, end: 1089.25,
+  transIn: { type: TR.zoomOut, dur: 0.7, from: 4, x: 1160, y: 640 },
+  init() { const pr0 = S7.d3.pr(); const q = pr0(MG.geo.cities.Valencia); this.transIn.x = q[0]; this.transIn.y = q[1]; this.base = S7.cacheMap('d3', pr0, { spain: P.sol, relief: 0.35, provinces: true }); S7.d3.pts(); },
+  draw(ctx, t) {
+    const z = lerp(1.0, 1.06, MG.ease.inOutSine(lin(t, 1086.65, 1089.3))); ctx.save(); ctx.translate(960, 540); ctx.scale(z, z); ctx.translate(-960, -540); ctx.drawImage(this.base, 0, 0);
+    const te = TW('everywhere', 1088.2); for (const B of S7.d3.pts()) { const t0 = 1086.75 + Math.min(1.6, B.d / 260) * (te - 1086.75) / 1.0 * 0.9; const k = clamp((t - t0) / 0.35); if (k <= 0) continue; const e = MG.ease.outBack(k); const h = B.h * e, w = B.w; const [x, y] = B.p;
+      ctx.fillStyle = 'rgba(50,30,40,0.25)'; ctx.beginPath(); ctx.moveTo(x - w / 2, y); ctx.lineTo(x + w / 2, y); ctx.lineTo(x + w / 2 + h * 0.6, y + h * 0.2); ctx.lineTo(x - w / 2 + h * 0.6, y + h * 0.2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#F7F1E3'; ctx.fillRect(x - w / 2, y - h, w * 0.6, h); ctx.fillStyle = '#D9CBB8'; ctx.fillRect(x - w / 2 + w * 0.6, y - h, w * 0.4, h); ctx.fillStyle = ['#C8693F', '#B8583A', '#D07A4A', '#A9533A'][B.v]; ctx.fillRect(x - w / 2, y - h - 3, w, 4);
+      if (B.crane && k >= 1) S7.crane(ctx, x + 10, y, 0.09, { mast: 520, rot: Math.cos(t + x), col: '#E8B531' }); }
+    ctx.restore();
+    MG.geo.canaryInset(ctx, [140, 840, 250, 150], { fill: P.sol });
+    MG.text.spoken(ctx, MG.phrase('Everyone is building', 1086.8).words, 140, 170, t, { font: MG.F.serif, italic: true, size: 70, color: P.ink, style: 'blur' });
+    MG.text.reveal(ctx, 'everywhere.', 140, 290, t, te - 0.08, { font: MG.F.display, weight: 900, size: 120, color: P.ink, style: 'rise', by: 'char', stagger: 0.025 });
+  },
+  post: { grade: 'golden', vignette: 0.3 },
+});
+
+// ---------- D4 · one estate: 80 houses = 800,000 homes · 2006 on the site sign ----------
+SC.push({
+  id: 's07_d4_800k', start: 1089.25, end: 1094.15,
+  transIn: { type: 'zoom', dur: 0.6, x: 1180, y: 700, amount: 2.4, from: 0.7 },
+  init() { const pr0 = S7.d3.pr(); const q = pr0(MG.geo.cities.Murcia); this.transIn.x = q[0]; this.transIn.y = q[1];
+    this.ground = MG.cache('s7d4g', W, H, (x) => { MG.fx.vgrad(x, [[0, '#F3C98A'], [0.28, '#FBE6BF'], [0.3, '#D9BE8E'], [1, '#C8A774']]); x.fillStyle = '#B8A18F'; x.beginPath(); x.moveTo(0, 330); for (let xx = 0; xx <= W; xx += 14) x.lineTo(xx, 300 + MG.fbm(xx * 0.003, 2, 3) * 60); x.lineTo(W, 340); x.lineTo(W, H); x.lineTo(0, H); x.closePath(); x.globalAlpha = 0.5; x.fill(); x.globalAlpha = 1; MG.tex.over(x, 'grain', { alpha: 0.08 }); });
+  },
+  iso: (i, j) => [980 + (i - j) * 62, 370 + (i + j) * 34],
+  draw(ctx, t) {
+    const z = lerp(1.06, 1.0, MG.ease.inOutSine(lin(t, 1089.25, 1094.2))); const hh = MG.cam.handheld(t, 2, 11); ctx.save(); ctx.translate(960 + hh.dx, 540 + hh.dy); ctx.scale(z, z); ctx.translate(-960, -540);
+    ctx.drawImage(this.ground, 0, 0);
+    const ts = TW('construction', 1091.0) - 0.15; for (let s2 = 0; s2 < 17; s2++) for (let i = 0; i < 10; i++) { const j = s2 - i; if (j < 0 || j > 7) continue; const [x, y] = this.iso(i, j); const k = clamp((t - ts - (i + j) * 0.075) / 0.4);
+      // plot outline
+      ctx.strokeStyle = 'rgba(120,90,60,0.4)'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(x - 56, y); ctx.lineTo(x, y + 31); ctx.lineTo(x + 56, y); ctx.lineTo(x, y - 31); ctx.closePath(); ctx.stroke();
+      if (k <= 0) continue; const spr = S7.houseSprite((i * 3 + j) % 4, 1.5); const hgt = spr.height * MG.ease.out(k); ctx.save(); ctx.beginPath(); ctx.rect(x - 100, y + 26 - hgt, 200, hgt + 10); ctx.clip(); ctx.drawImage(spr, x - 90, y + 26 - spr.height + 8); ctx.restore(); }
+    // site sign with the year
+    ctx.save(); ctx.translate(330, 640); ctx.rotate(-0.04); ctx.fillStyle = '#5E4E3E'; ctx.fillRect(-150, 0, 16, 330); ctx.fillRect(140, 0, 16, 330); const pan = MG.path.rr(-200, -240, 410, 280, 6); MG.fx.shadow(ctx, pan, { dx: 14, dy: 18, blur: 20, color: 'rgba(50,30,20,0.35)' }); ctx.fillStyle = '#F6F1E6'; ctx.fill(pan); ctx.fillStyle = '#2F7A5A'; ctx.fillRect(-200, -240, 410, 62); MG.text.draw(ctx, 'OBRA NUEVA', 5, -196, { font: MG.F.grotesk, weight: 800, size: 36, color: P.cal, align: 'center', tracking: 0.12 }); MG.text.draw(ctx, '2006', 5, -40, { font: MG.F.cond, weight: 900, size: 150, color: P.ink, align: 'center' }); MG.text.draw(ctx, 'NEW HOMES · HOUSING STARTS', 5, 10, { font: MG.F.mono, weight: 700, size: 17, color: P.ink2, align: 'center', tracking: 0.1 }); ctx.restore();
+    ctx.restore();
+    const t8 = TW('800,000', 1092.0); const cnt = S7.count(t, ts, t8 + 0.5, 0, 800000, { ease: 'inOutSine' }); MG.text.draw(ctx, cnt, 1790, 250, { font: MG.F.cond, weight: 900, size: 190, color: P.ink, align: 'right', shadow: { blur: 12, dx: 5, dy: 7, color: 'rgba(60,30,20,0.25)' } });
+    S7.mono(ctx, 'homes started in one year', 1790, 300, t, TW('homes', 1092.85) - 0.2, { align: 'right', size: 24, color: P.ink });
+    const kl = MG.prog(t, 1092.6, 1093.1); if (kl > 0) { ctx.save(); ctx.globalAlpha = kl; MG.sprite(ctx, S7.houseSprite(0, 1), 1480, 1000, { scale: 0.55 }); MG.text.draw(ctx, '= 10,000 HOMES', 1520, 1012, { font: MG.F.mono, weight: 700, size: 24, color: P.ink, tracking: 0.12 }); ctx.restore(); }
+  },
+  post: { grade: 'golden', vignette: 0.3 },
+});
+
+// ---------- D5 · Spain's pile vs Germany + France + Britain combined ----------
+S7.tower = (ctx, x, base, cols, rows, built, sc = 0.62) => { const spr = S7.houseSprite(1, 1); const dx = 66 * sc, dy = 40 * sc; let n = 0; for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const k = clamp(built - n); n++; if (k <= 0) continue; const e = MG.ease.outBack(k); const px = x + (c - (cols - 1) / 2) * dx, py = base - r * dy * 1.05 - (1 - e) * 40; ctx.save(); ctx.globalAlpha = Math.min(1, k * 2); ctx.drawImage(S7.houseSprite((r + c) % 4, 1), px - 60 * sc, py - 100 * sc, 120 * sc, 110 * sc); ctx.restore(); } return base - rows * dy * 1.05; };
+SC.push({
+  id: 's07_d5_combined', start: 1094.15, end: 1097.6,
+  transIn: { type: 'push', dir: 'left', dur: 0.5, ease: 'inOutCubic' },
+  init() { this.paper = MG.tex.paper('#F6E4C4', { seed: 22, light: 0.25 }); this.sil = {}; for (const n of ['Spain', 'Germany', 'France', 'United Kingdom']) { const f = n === 'Spain' ? S7.spainMain() : MG.geo.country(n, n === 'France' ? '10' : '50'); const ff = n === 'France' ? { ...f, geometry: { type: 'MultiPolygon', coordinates: f.geometry.coordinates.filter((pl) => Math.min(...pl[0].map((q) => q[0])) > -6 && Math.max(...pl[0].map((q) => q[1])) > 41.2) } } : f; const pr0 = MG.geo.proj('mercator', { center: [0, 0], scale: 1 }); pr0.fitExtent([[0, 0], [150, 150]], ff); this.sil[n] = MG.cache('s7sil:' + n, 160, 160, (x) => { x.translate(5, 5); MG.geo.draw(x, pr0, ff, { fill: n === 'Spain' ? P.sol : '#8C8A86', stroke: 'rgba(30,26,29,0.6)', width: 1.5 }); }); } },
+  draw(ctx, t) {
+    ctx.drawImage(this.paper, 0, 0); const hh = MG.cam.handheld(t, 2, 13); ctx.save(); ctx.translate(hh.dx, hh.dy);
+    MG.fx.contact(ctx, 600, 905, 260, 26, 0.3); MG.fx.contact(ctx, 1330, 905, 260, 26, 0.3);
+    const topES = S7.tower(ctx, 600, 900, 4, 20, 80);
+    const tc = TW('combined', 1096.45); const built = 68 * MG.ease.inOutSine(lin(t, tc - 0.1, tc + 0.7)); const topX = S7.tower(ctx, 1330, 900, 4, 17, built);
+    // dashed level of Spain's pile
+    const kd = MG.prog(t, tc + 0.5, tc + 0.9); if (kd > 0) { ctx.save(); ctx.strokeStyle = P.rojo; ctx.lineWidth = 3; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(720, topES); ctx.lineTo(lerp(720, 1500, kd), topES); ctx.stroke(); ctx.restore(); MG.text.reveal(ctx, 'MORE', 1520, topES + 12, t, tc + 0.7, { font: MG.F.grotesk, weight: 800, size: 40, color: P.rojo, style: 'rise' }); }
+    MG.sprite(ctx, this.sil.Spain, 600, 980, { scale: 0.72 }); MG.text.draw(ctx, 'SPAIN', 600, 1062, { font: MG.F.mono, weight: 800, size: 26, color: P.ink, align: 'center', tracking: 0.2 });
+    const cs = [['Germany', 'GERMANY', TW('Germany', 1094.85), 1170], ['France', 'FRANCE', TW('France', 1095.5), 1330], ['United Kingdom', 'BRITAIN', TW('Britain', 1096.1), 1490]];
+    for (const [n, lab, t0, x] of cs) { const k = MG.ease.out(lin(t, t0 - 0.1, t0 + 0.35)); if (k <= 0) continue; MG.sprite(ctx, this.sil[n], x, lerp(780, 980, k), { scale: 0.6, alpha: Math.min(1, k * 2) }); MG.text.draw(ctx, lab, x, 1062, { font: MG.F.mono, weight: 800, size: 24, color: P.ink2, align: 'center', tracking: 0.16, alpha: k }); }
+    const kp = MG.prog(t, 1095.45, 1095.9); if (kp > 0) { MG.text.draw(ctx, '+', 1250, 1000, { font: MG.F.cond, weight: 900, size: 60, color: P.ink2, align: 'center', alpha: kp }); }
+    const kq = MG.prog(t, 1096.05, 1096.5); if (kq > 0) { MG.text.draw(ctx, '+', 1410, 1000, { font: MG.F.cond, weight: 900, size: 60, color: P.ink2, align: 'center', alpha: kq }); }
+    ctx.restore();
+    MG.text.reveal(ctx, 'more than', 960, 150, t, TW('More', 1094.3), { font: MG.F.serif, italic: true, size: 62, color: P.ink, align: 'center', style: 'blur', by: 'word' });
+    MG.text.reveal(ctx, 'all three combined', 960, 240, t, tc - 0.05, { font: MG.F.display, weight: 800, size: 76, color: P.ink, align: 'center', style: 'rise', by: 'word', stagger: 0.08 });
+  },
+  post: { grade: 'warm', vignette: 0.3 },
+});
+
+// ---------- D6 · one in eight jobs: only the builder stands in the sun ----------
+S7.JOBS = [{ top: '#F4EEE0', bottom: '#1E1A1D', apron: '#FAF6EE', hair: C.hair1, hs: 'short' }, { top: '#3F8E8C', bottom: '#3F8E8C', hair: C.hair2, hs: 'bun' }, { top: '#8C8A86', bottom: '#3F5E86', vest: '#E5E04A', hat: 'hard', hair: C.hair4, hs: 'short' }, { top: '#E9EDF2', bottom: '#2E3440', hair: C.hair3, hs: 'short' }, { top: '#B8322A', bottom: '#2E3440', apron: '#B8322A', hair: C.hair1, hs: 'long' }, { top: '#9C6B4A', bottom: '#5A4A3A', hat: 'straw', hair: C.hair2, hs: 'bald' }, { top: '#6F7A3A', bottom: '#4A3A30', hair: '#B9B2A8', hs: 'short' }, { top: '#2E4A7A', bottom: '#2E3440', hat: 'cap', hair: C.hair1, hs: 'short' }];
+SC.push({
+  id: 's07_d6_jobs', start: 1097.6, end: 1100.65,
+  init() { this.wall = MG.cache('s7d6wall', W, H, (x) => { MG.fx.vgrad(x, [[0, '#F3DDB8'], [0.86, '#EBCDA0'], [0.861, '#C9A774'], [1, '#B89565']]); x.globalAlpha = 0.3; x.fillStyle = x.createPattern(MG.tex.blotch(512, 3, 5, '#8a5a30'), 'repeat'); x.fillRect(0, 0, W, H); x.globalAlpha = 1; MG.tex.over(x, 'fibers', { alpha: 0.4 }); }); },
+  draw(ctx, t) {
+    ctx.drawImage(this.wall, 0, 0); const t1 = TW('one', 1098.9); const open = MG.ease.inOutCubic(lin(t, t1 - 0.3, t1 + 0.35));
+    const xs = (i) => 250 + i * 203; const lit = 2;
+    S7.JOBS.forEach((J, i) => { const br = Math.sin(S7.two(t) * 2.2 + i) * 0.012; ctx.save(); ctx.translate(xs(i), 930); ctx.scale(1, 1 + br); S7.figure(ctx, 0, 0, 430, { top: J.top, bottom: J.bottom, apron: J.apron, vest: J.vest, hat: J.hat, hair: J.hair, hairStyle: J.hs, skin: SKINS[(i * 3) % 5], seed: i + 1, mood: i === lit ? 'smile' : 'neutral', look: i < lit ? 0.5 : -0.4, blink: MG.kit.blink(t, i + 2), arms: i === lit ? [0.25, -0.9] : null, prop: i === lit ? (c2, q) => { c2.fillStyle = '#6A5038'; c2.fillRect(q.shW + 40, q.shY - 10, 14, 120); c2.fillStyle = '#8C8A86'; c2.fillRect(q.shW + 20, q.shY - 20, 54, 22); } : null }); ctx.restore(); });
+    // shade over everyone except a shaft of sun on the builder
+    const cx = xs(lit) + 30, half = lerp(0, 150, open); ctx.save(); ctx.globalCompositeOperation = 'multiply'; ctx.fillStyle = 'rgba(86,66,104,0.62)'; const sk = 0.36; ctx.beginPath(); ctx.moveTo(-200, 0); ctx.lineTo(cx - half - H * sk * 0.5, 0); ctx.lineTo(cx - half + H * sk * 0.5, H); ctx.lineTo(-200, H); ctx.closePath(); ctx.moveTo(cx + half - H * sk * 0.5, 0); ctx.lineTo(W + 400, 0); ctx.lineTo(W + 400, H); ctx.lineTo(cx + half + H * sk * 0.5, H); ctx.closePath(); ctx.fill(); ctx.restore();
+    if (open > 0.05) { ctx.save(); ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.18 * open; ctx.fillStyle = '#FFE7B0'; ctx.beginPath(); ctx.moveTo(cx - half - H * sk * 0.5, 0); ctx.lineTo(cx + half - H * sk * 0.5, 0); ctx.lineTo(cx + half + H * sk * 0.5, H); ctx.lineTo(cx - half + H * sk * 0.5, H); ctx.closePath(); ctx.fill(); ctx.restore(); }
+    MG.text.reveal(ctx, '1 IN 8', 1780, 230, t, t1 - 0.06, { font: MG.F.cond, weight: 900, size: 200, color: P.cal, align: 'right', style: 'rise', by: 'word', stagger: 0.1, shadow: { blur: 14, dy: 6, color: 'rgba(30,20,40,0.35)' } });
+    S7.mono(ctx, 'jobs were in construction', 1780, 285, t, TW('jobs', 1099.7) - 0.2, { align: 'right', size: 26, color: P.cal });
+  },
+  post: { grade: 'golden', vignette: 0.36 },
+});
+
+// =====================================================================================================
 // registration
 // =====================================================================================================
 SC.sort((a, b) => a.start - b.start);

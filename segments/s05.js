@@ -1237,13 +1237,131 @@
         ctx.save(); ctx.strokeStyle = P.ink; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(A0[0], A0[1]); ctx.lineTo(Bk[0], Bk[1]); ctx.stroke(); for (let i = 0; i <= 20; i++) { const u = i / 20; if (u > kM) break; const px = lerp(A0[0], B0[0], u), py = lerp(A0[1], B0[1], u); const L = i % 5 ? 8 : 16; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px - nx * L, py - ny * L); ctx.stroke(); } ctx.setLineDash([4, 6]); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(A0[0], A0[1]); ctx.moveTo(b[0], b[1]); ctx.lineTo(B0[0], B0[1]); ctx.stroke(); ctx.restore();
         const mid = [(A0[0] + B0[0]) / 2 + nx * 30, (A0[1] + B0[1]) / 2 + ny * 30]; ctx.save(); ctx.translate(mid[0], mid[1]); ctx.rotate(ang); MG.text.draw(ctx, '≈ 375 MI', 0, 0, { font: F.cond, weight: 900, size: 76, color: P.ink, align: 'center', alpha: kM, stroke: 'rgba(250,244,232,0.85)', strokeW: 10 }); MG.text.draw(ctx, '≈ 600 KM', 0, 36, { font: F.mono, weight: 600, size: 24, color: P.ink2, align: 'center', alpha: kM, tracking: 0.12, stroke: 'rgba(250,244,232,0.85)', strokeW: 6 }); ctx.restore(); }
       // stopwatch (sun-disk clock face) on the Mediterranean
-      const kW = pr(t, tTakes - 0.7, tTakes - 0.2, 'outBack'); if (kW > 0) { const cx = 1610, cy = 650, R = 120 * kW; const hrs = 2.5 * kT; MG.fx.shadow(ctx, MG.path.circle(cx, cy, R), { dx: 10, dy: 16, blur: 22, color: 'rgba(20,30,50,0.35)' }); MG.kit.sun(ctx, cx, cy, R, t, { variant: 'flat', corona: 0, halftone: 0 }); ctx.save(); ctx.fillStyle = A(P.solDeep, 0.85); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R * 0.86, -Math.PI / 2, -Math.PI / 2 + (hrs / 3) * MG.TAU); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.strokeStyle = P.ink; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(cx, cy, R, 0, MG.TAU); ctx.stroke(); ctx.fillStyle = P.ink; ctx.fillRect(cx - 14, cy - R - 26, 28, 18);
+      const kW = pr(t, tTakes - 0.7, tTakes - 0.2, 'outBack'); if (kW > 0.002) { const cx = 1610, cy = 650, R = 120 * kW; const hrs = 2.5 * kT; MG.fx.shadow(ctx, MG.path.circle(cx, cy, R), { dx: 10, dy: 16, blur: 22, color: 'rgba(20,30,50,0.35)' }); MG.kit.sun(ctx, cx, cy, R, t, { variant: 'flat', corona: 0, halftone: 0 }); ctx.save(); ctx.fillStyle = A(P.solDeep, 0.85); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R * 0.86, -Math.PI / 2, -Math.PI / 2 + (hrs / 3) * MG.TAU); ctx.closePath(); ctx.fill(); ctx.restore(); ctx.strokeStyle = P.ink; ctx.lineWidth = 6; ctx.beginPath(); ctx.arc(cx, cy, R, 0, MG.TAU); ctx.stroke(); ctx.fillStyle = P.ink; ctx.fillRect(cx - 14, cy - R - 26, 28, 18);
         const hh2 = Math.floor(hrs), mm = Math.floor((hrs - hh2) * 60); MG.text.draw(ctx, `${hh2} H ${String(mm).padStart(2, '0')}`, cx, cy + 22, { font: F.cond, weight: 900, size: 64, color: P.ink, align: 'center', alpha: kW }); }
       MG.geo.label(ctx, pr2, MG.geo.cities.Madrid, { text: 'MADRID', t, t0: t0 + 0.1, size: 30, weight: 800, color: P.ink, dotColor: P.rojo, halo: 'rgba(250,244,232,0.9)', haloW: 7, dx: -150, dy: 40 });
       MG.geo.label(ctx, pr2, MG.geo.cities.Barcelona, { text: 'BARCELONA', t, t0: tBcn - 0.1, size: 30, weight: 800, color: P.ink, dotColor: P.rojo, halo: 'rgba(250,244,232,0.9)', haloW: 7, dx: 16, dy: 40 });
       MG.geo.label(ctx, pr2, [-0.91, 41.66], { text: 'ZARAGOZA', t, t0: tBcn + 0.3, size: 18, weight: 600, color: P.ink2, dotColor: P.ink, dot: 4, halo: 'rgba(250,244,232,0.85)', haloW: 6, dx: 10, dy: 26 });
     },
     post: { grade: 'warm', vignette: 0.34 },
+  });
+
+  /* ---------- 20 · WHAT PAYS THE BILLS? (3D coin on a bar counter) ----- */
+  add({
+    id: 's05_coin', start: 760.43,
+    transIn: { type: 'blur', dur: 0.8, amount: 22 },
+    init() {
+      const T3 = THREE; const sc = new T3.Scene(); this.sc = sc; this.cam = new T3.PerspectiveCamera(28, 16 / 9, 0.1, 100);
+      sc.add(new T3.HemisphereLight(0xFFF0DC, 0x6a5a50, 0.9)); const key = new T3.DirectionalLight(0xFFE0B0, 2.6); key.position.set(-3, 5, 2); sc.add(key); const rim = new T3.DirectionalLight(0xA8C0FF, 0.8); rim.position.set(3, 2, -3); sc.add(rim);
+      // faces: sun-disk relief + € + ring of 12 stars (no national portrait)
+      const face = (silverCentre) => { const c = MG.canvas(512, 512); const x = c.getContext('2d'); const ring = silverCentre ? '#D6A94A' : '#D8D8DC', mid = silverCentre ? '#D8D8DC' : '#D6A94A'; x.fillStyle = ring; x.fillRect(0, 0, 512, 512); x.fillStyle = mid; x.beginPath(); x.arc(256, 256, 170, 0, MG.TAU); x.fill(); x.strokeStyle = 'rgba(0,0,0,0.35)'; x.lineWidth = 6; x.beginPath(); x.arc(256, 256, 170, 0, MG.TAU); x.stroke();
+        for (let i = 0; i < 12; i++) { const a = (i / 12) * MG.TAU; S5.star(x, 256 + Math.cos(a) * 212, 256 + Math.sin(a) * 212, 17, 'rgba(60,40,10,0.55)'); }
+        x.save(); x.translate(256, 256); for (let i = 0; i < 18; i++) { x.rotate(MG.TAU / 18); x.fillStyle = 'rgba(80,50,10,0.35)'; x.beginPath(); x.moveTo(-8, -96); x.lineTo(0, -150); x.lineTo(8, -96); x.fill(); } x.restore();
+        x.fillStyle = 'rgba(80,50,10,0.3)'; x.beginPath(); x.arc(256, 256, 84, 0, MG.TAU); x.fill(); MG.text.draw(x, '€', 256, 300, { font: F.display, weight: 900, size: 140, color: 'rgba(40,25,5,0.75)', align: 'center' });
+        MG.tex.over(x, 'grain', { alpha: 0.3 }); return MG.three.canvasTexture(c); };
+      const edge = new T3.MeshStandardMaterial({ color: 0xD8B868, metalness: 1, roughness: 0.32, envMap: MG.three.env() });
+      const top = new T3.MeshStandardMaterial({ map: face(false), metalness: 0.85, roughness: 0.35, envMap: MG.three.env() }); const bot = new T3.MeshStandardMaterial({ map: face(true), metalness: 0.85, roughness: 0.35, envMap: MG.three.env() });
+      this.coin = new T3.Mesh(new T3.CylinderGeometry(1, 1, 0.09, 72, 1), [edge, top, bot]); sc.add(this.coin);
+      this.shadow = new T3.Mesh(new T3.CircleGeometry(1.15, 40), new T3.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35 })); this.shadow.rotation.x = -Math.PI / 2; this.shadow.position.y = 0.002; sc.add(this.shadow);
+      // the counter (zinc) + the map lying on it, painted once
+      this.counter = MG.cache('s5zinc', W, H, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, '#3a3236'); g.addColorStop(0.42, '#5a5458'); g.addColorStop(1, '#8E8A88'); x.fillStyle = g; x.fillRect(0, 0, w, h); x.globalAlpha = 0.25; for (let i = 0; i < 300; i++) { x.strokeStyle = i % 2 ? '#c8c4c0' : '#3a3436'; x.lineWidth = 1; const yy = 440 + Math.random.call ? 440 + (i / 300) * 640 : 0; x.beginPath(); x.moveTo(0, yy); x.lineTo(w, yy + MG.rand(5, i) * 6); x.stroke(); } x.globalAlpha = 1; MG.tex.over(x, 'blotch', { alpha: 0.25, color: '#000', scale: 3 });
+        // bar background: bottles & warm lights out of focus
+        for (let i = 0; i < 14; i++) { const bx = 80 + i * 135, bh = 120 + MG.rand(7, i) * 90; x.fillStyle = ['#3a5a3a', '#6a3a2a', '#2a3a5a', '#7a6a3a'][i % 4]; x.fillRect(bx, 400 - bh, 46, bh); x.fillRect(bx + 16, 400 - bh - 40, 14, 40); } x.filter = 'blur(10px)'; x.drawImage(x.canvas, 0, 0); x.filter = 'none'; for (let i = 0; i < 9; i++) MG.fx.glow(x, 120 + i * 220, 120 + MG.rand(8, i) * 120, 90, '#FFC880', 0.5); });
+    },
+    draw(ctx, t, S) {
+      const t0 = S.t0; const tAll = T('All', 760.43), tPays = T('pays', 763.27), tBills = T('bills', 763.75), tToday = T('today', 764.67);
+      ctx.drawImage(this.counter, 0, 0);
+      // the Madrid–Barcelona map lies flat on the counter (out of focus)
+      { const m = MG.cache('s5mapOnBar', 960, 540, (x) => { x.scale(0.5, 0.5); const pr2 = MG.geo.proj('spain', { center: [-1.0, 40.6], scale: 7600, translate: [960, 560] }); MG.kit.iberiaMap(x, { proj: pr2, relief: 0.5, lift: 12 }); S5.HSR.forEach((l) => S5.hsrLine(x, pr2, l.pts, 1, { w: 4, color: A(P.rojo, 0.35), casing: 'rgba(250,244,232,0.4)' })); S5.hsrLine(x, pr2, [[-3.69, 40.41], [-3.10, 40.57], [-1.64, 41.35], [-0.91, 41.66], [0.63, 41.62], [1.20, 41.19], [2.14, 41.38]], 1, { w: 10 }); });
+        const cam2 = { x: 0, y: -2.2, z: -6.2, pitch: -0.62, fov: 40 }; ctx.save(); ctx.filter = 'blur(6px)'; MG.persp.ground(ctx, m, { w: 9.6, h: 5.4, x: -1.2, z: 1.6, y: 0 }, cam2, 10); ctx.restore(); }
+      // coin dynamics: spinning on its edge → wobbling → lands flat on "today"
+      const tLand = tToday + 0.05; const u = clamp((t - t0) / (tLand - t0)); const alpha = t >= tLand ? Math.PI / 2 : lerp(0.08, Math.PI / 2, Math.pow(u, 3.2)); const phi = (t - t0) * lerp(9, 30, u * u) + 1.0;
+      const n = new THREE.Vector3(Math.cos(alpha) * Math.cos(phi), Math.sin(alpha), Math.cos(alpha) * Math.sin(phi)).normalize();
+      this.coin.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), n); const bounce = t > tLand ? Math.abs(Math.sin((t - tLand) * 26)) * Math.exp(-(t - tLand) * 7) * 0.08 : 0;
+      this.coin.position.set(0.9, Math.cos(alpha) * 1 + Math.sin(alpha) * 0.045 + bounce, 0.6); this.shadow.position.set(0.9 - Math.cos(phi) * 0.2 * Math.cos(alpha), 0.003, 0.6 - Math.sin(phi) * 0.2 * Math.cos(alpha)); this.shadow.scale.set(lerp(0.5, 1, Math.sin(alpha)), lerp(0.5, 1, Math.sin(alpha)), 1);
+      const dol = E.inOutSine(li(t, t0, 765.6)); this.cam.position.set(lerp(-0.6, 0.2, dol), lerp(2.6, 3.4, dol), lerp(7.2, 5.6, dol)); this.cam.lookAt(0.6, 0.5, 0.4);
+      const c = MG.three.render(this.sc, this.cam, { slot: 1, w: 1440, h: 810, clearAlpha: 0 }); ctx.drawImage(c, 0, 0, W, H);
+      S5.lead(ctx, 'All right, you might say.', 150, 170, t, tAll - 0.05, { size: 58, color: '#F2E8D5', out: { at: T('But', 762.35) - 0.2, dur: 0.3 } });
+      S5.lead(ctx, 'but what actually', 150, 170, t, T('what', 762.63) - 0.1, { size: 58, color: '#F2E8D5' });
+      S5.key(ctx, 'pays the bills?', 146, 270, t, tPays - 0.1, { size: 104, color: '#FFF3DE' });
+      S5.kick(ctx, 'Spain · today', 152, 330, t, tToday - 0.1, { size: 24, color: '#F2C98A' });
+    },
+    post: { grade: 'warm', vignette: 0.5 },
+  });
+
+  /* ---------- 21 · EUROZONE #4 (3D prism map: height = GDP) ------------ */
+  const GDP = { Germany: 4.66, France: 3.16, Italy: 2.37, Spain: 1.73, Netherlands: 1.23, Belgium: 0.66, Ireland: 0.58, Austria: 0.52, Portugal: 0.31, Finland: 0.30, Greece: 0.25, Slovakia: 0.14, Bulgaria: 0.11, Croatia: 0.09, Luxembourg: 0.09, Lithuania: 0.08, Slovenia: 0.07, Latvia: 0.04, Estonia: 0.04, Cyprus: 0.035, Malta: 0.025 }; // nominal GDP, $ trillion (2024); eurozone = 21 members in 2026
+  add({
+    id: 's05_gdp', start: 765.51,
+    init() {
+      const T3 = THREE; MG.geo.init(); const sc = new T3.Scene(); this.sc = sc; this.cam = new T3.PerspectiveCamera(30, 16 / 9, 5, 6000);
+      sc.add(new T3.HemisphereLight(0xFFF2E0, 0x5a4a5a, 1.0)); const sun = new T3.DirectionalLight(0xFFE2B8, 2.0); sun.position.set(-600, 900, 500); sc.add(sun);
+      const pr2 = MG.geo.proj('conic', { center: [8, 47], scale: 1500, translate: [0, 0] }); this.pr2 = pr2; const d3p = window.d3.geoPath(pr2);
+      const shapesOf = (f) => { const g = f.geometry; const polys = g.type === 'MultiPolygon' ? g.coordinates : [g.coordinates]; const out = []; for (const pl of polys) { const ring = pl[0].map((c) => pr2(c)).filter(Boolean); if (ring.length < 4) continue; let area = 0; for (let i = 0; i < ring.length; i++) { const a = ring[i], b = ring[(i + 1) % ring.length]; area += a[0] * b[1] - b[0] * a[1]; } if (Math.abs(area) < 40) continue; const sh = new T3.Shape(ring.map((q) => new T3.Vector2(q[0], -q[1]))); out.push(sh); } return out; };
+      const land = ['France', 'Spain', 'Portugal', 'Italy', 'Germany', 'Belgium', 'Netherlands', 'Luxembourg', 'Switzerland', 'Austria', 'Denmark', 'United Kingdom', 'Ireland', 'Poland', 'Czechia', 'Slovakia', 'Hungary', 'Slovenia', 'Croatia', 'Bosnia and Herz.', 'Serbia', 'Montenegro', 'Albania', 'Macedonia', 'Kosovo', 'Greece', 'Bulgaria', 'Romania', 'Moldova', 'Ukraine', 'Belarus', 'Lithuania', 'Latvia', 'Estonia', 'Sweden', 'Norway', 'Finland', 'Morocco', 'Algeria', 'Tunisia', 'Turkey', 'Cyprus', 'Malta', 'Libya', 'Russia'];
+      this.prisms = {}; this.tops = {};
+      for (const n of land) { const f = MG.geo.country(n, '50'); if (!f) continue; const shp = shapesOf(f); if (!shp.length) continue; const ez = GDP[n] !== undefined; const hgt = ez ? Math.max(4, GDP[n] * 72) : 2;
+        const col = n === 'Spain' ? 0xF2A33A : ['Germany', 'France', 'Italy'].includes(n) ? 0x3A5FA8 : ez ? 0x9FB3D8 : 0xD9CFBC;
+        const geo = new T3.ExtrudeGeometry(shp, { depth: hgt, bevelEnabled: false, curveSegments: 1 }); geo.rotateX(-Math.PI / 2); const m = new T3.Mesh(geo, new T3.MeshLambertMaterial({ color: col })); m.userData = { n, hgt }; sc.add(m); this.prisms[n] = m;
+        if (ez) { const c = window.d3.geoCentroid(n === 'France' ? { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[ -4.5, 42.5], [8, 42.5], [8, 51], [-4.5, 51], [-4.5, 42.5]]] } } : n === 'Spain' ? S5.spainMain() : f); this.tops[n] = { ll: c, h: hgt }; } }
+      // sea + edge lines
+      const sea = new T3.Mesh(new T3.PlaneGeometry(6000, 6000), new T3.MeshBasicMaterial({ color: 0xA9C6DE })); sea.rotation.x = -Math.PI / 2; sea.position.y = -1; sc.add(sea);
+      this.grow = 0;
+    },
+    draw(ctx, t, S) {
+      const t0 = S.t0; const tFour = T('fourth-largest', 766.67), tDE = T('Germany', 768.67), tFR = T('France', 769.07), tIT = T('Italy', 769.71), tT = T('$1.7', 770.83);
+      // prisms rise (staggered by size) as the camera cranes in
+      const kG = pr(t, t0 - 0.1, t0 + 1.2, 'out');
+      for (const [n, m] of Object.entries(this.prisms)) { const ez = GDP[n] !== undefined; let k = ez ? clamp(kG * 1.3 - (1 - GDP[n] / 4.66) * 0.3) : 1; if (n === 'Spain') k = Math.max(k * 0.98, 0); m.scale.y = Math.max(0.02, E.out(k)); }
+      const cp = MG.keys(t, [[t0, [-760, 1180, 1500]], [tFour, [-640, 980, 1240], 'inOutSine'], [tIT + 0.3, [-420, 860, 1120], 'inOutSine'], [773.3, [-560, 620, 900], 'inOutSine']]);
+      const lk = MG.keys(t, [[t0, [80, 80, -60]], [tIT + 0.3, [60, 120, -40], 'inOutSine'], [773.3, [-300, 80, 260], 'inOutSine']]);
+      const hh = MG.cam.handheld(t, 2, 87); this.cam.position.set(cp[0] + hh.dx * 2, cp[1] + hh.dy * 2, cp[2]); this.cam.lookAt(lk[0], lk[1], lk[2]);
+      MG.kit.seaBg(ctx, '#A9C6DE');
+      const c = MG.three.render(this.sc, this.cam, { slot: 2, w: 1440, h: 810, clearAlpha: 0 }); ctx.drawImage(c, 0, 0, W, H);
+      // labels pinned to prism tops (projected 3D → 2D)
+      const v = new THREE.Vector3(); const pin = (n, num, name, t1, o = {}) => { const tp = this.tops[n]; if (!tp) return; const q = this.pr2(tp.ll); const m = this.prisms[n]; v.set(q[0], tp.h * m.scale.y + 18, q[1]); v.project(this.cam); const sx = (v.x * 0.5 + 0.5) * W, sy = (-v.y * 0.5 + 0.5) * H; const k = pr(t, t1 - 0.1, t1 + 0.35); if (k <= 0) return;
+        ctx.save(); ctx.globalAlpha = k; ctx.strokeStyle = o.c || P.ink; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx, sy - 70 * k); ctx.stroke(); ctx.fillStyle = o.c || P.ink; ctx.beginPath(); ctx.arc(sx, sy, 6, 0, MG.TAU); ctx.fill(); ctx.restore();
+        MG.text.draw(ctx, num, sx - 8, sy - 84, { font: F.cond, weight: 900, size: o.big ? 120 : 96, color: o.c || P.ink, align: 'right', alpha: k, stroke: 'rgba(250,244,232,0.8)', strokeW: 8 }); MG.text.draw(ctx, name, sx + 4, sy - 90, { font: F.grotesk, weight: 800, size: o.big ? 44 : 34, color: P.ink, alpha: k, tracking: 0.06, stroke: 'rgba(250,244,232,0.85)', strokeW: 8 }); if (o.sub) MG.text.draw(ctx, o.sub, sx + 6, sy - 46, { font: F.cond, weight: 900, size: 64, color: P.solDeep, alpha: pr(t, tT - 0.1, tT + 0.3), stroke: 'rgba(250,244,232,0.9)', strokeW: 8 }); };
+      pin('Germany', '1', 'GERMANY', tDE); pin('France', '2', 'FRANCE', tFR); pin('Italy', '3', 'ITALY', tIT); pin('Spain', '4', 'SPAIN', tFour - 0.2, { big: true, c: P.solDeep, sub: '$1.7 TRILLION' });
+      S5.kick(ctx, 'eurozone · GDP (height)', 150, 150, t, t0 + 0.2, { size: 24, color: P.ink2 });
+      S5.lead(ctx, "the eurozone's", 150, 230, t, T('eurozone', 765.83) - 0.1, { size: 56 });
+      S5.key(ctx, 'fourth-largest economy', 146, 320, t, tFour - 0.1, { size: 76 });
+    },
+    post: { grade: 'neutral', vignette: 0.32 },
+  });
+
+  /* ---------- 22 · GROWING WHILE GERMANY STANDS STILL ------------------ */
+  // real GDP index (2022 = 100), approx. from national statistics: Spain +2.7 / +3.2 / +2.9 %; Germany −0.3 / −0.2 / +0.2 %; France ≈ +1.1 / +1.1 / +0.8 %; Italy ≈ +0.7 / +0.7 / +0.5 %
+  const GROW = { Spain: [100, 102.7, 106.0, 109.1], France: [100, 101.1, 102.2, 103.0], Italy: [100, 100.7, 101.4, 101.9], Germany: [100, 99.7, 99.5, 99.7] };
+  S5.growXY = (i, v) => [300 + i * 420, 860 - (v - 98) * 52];
+  add({
+    id: 's05_growth', start: 773.20,
+    transIn: { type: 'push', dir: 'left', dur: 0.6, ease: 'inOutCubic' },
+    draw(ctx, t, S) {
+      const t0 = S.t0; const tYrs = T('years', 774.19), tGrow = T('growing', 775.03), tGer = T('Germany', 778.99), tStill = T('still', 780.27);
+      MG.kit.paper(ctx, '#FAF4E8', { light: 0.25 });
+      const hh = MG.cam.handheld(t, 2, 89); ctx.save(); ctx.translate(hh.dx, hh.dy);
+      // grid + years (2022 → 2025)
+      ctx.strokeStyle = 'rgba(30,26,29,0.12)'; ctx.lineWidth = 1.5; for (let v = 98; v <= 110; v += 2) { const y = S5.growXY(0, v)[1]; ctx.beginPath(); ctx.moveTo(260, y); ctx.lineTo(1620, y); ctx.stroke(); }
+      [2022, 2023, 2024, 2025].forEach((yv, i) => { const [x] = S5.growXY(i, 100); MG.text.draw(ctx, String(yv), x, 950, { font: F.mono, size: 26, weight: 600, color: P.ink2, align: 'center', tracking: 0.06, alpha: pr(t, t0 + i * 0.1, t0 + 0.4 + i * 0.1) }); });
+      const kL = pr(t, tGrow - 0.4, tStill - 0.3, 'inOutSine');
+      const drawLine = (name, col, w, kk, o = {}) => { const pts = []; const vals = GROW[name]; for (let i = 0; i <= 30; i++) { const u = (i / 30) * 3; const a = Math.floor(Math.min(2.999, u)); const f = u - a; const v = lerp(vals[a], vals[a + 1], f); pts.push(S5.growXY(u, v)); }
+        const sub = MG.path.trim(pts, 0, kk); if (sub.length < 2) return null; ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.translate(6, 10); ctx.strokeStyle = 'rgba(60,40,50,0.18)'; ctx.lineWidth = w + 2; ctx.beginPath(); sub.forEach((q, i) => (i ? ctx.lineTo(q[0], q[1]) : ctx.moveTo(q[0], q[1]))); ctx.stroke(); ctx.translate(-6, -10); ctx.strokeStyle = col; ctx.lineWidth = w; ctx.stroke(); ctx.restore(); return sub[sub.length - 1]; };
+      const hF = drawLine('France', '#9FB3D8', 6, kL), hI = drawLine('Italy', '#B7C49A', 6, kL);
+      const hG = drawLine('Germany', '#5A5658', 9, kL); const hS = drawLine('Spain', P.sol, 14, kL);
+      const tag = (h, name, col, dy = 0) => { if (!h) return; MG.text.draw(ctx, name, h[0] + 34, h[1] + 10 + dy, { font: F.grotesk, weight: 800, size: 30, color: col, tracking: 0.06 }); };
+      if (kL > 0.05) { tag(hF, 'FRANCE', '#6E86B8', -8); tag(hI, 'ITALY', '#7E8C5E', 14); tag(hG, 'GERMANY', '#3B3638', 30); }
+      // Spain's line-head is the sun disk (it becomes the beach umbrella in the next shot)
+      if (hS) { MG.kit.sun(ctx, hS[0], hS[1], 30, t, { corona: 0.5, halftone: 0.4 }); MG.text.draw(ctx, 'SPAIN', hS[0] + 48, hS[1] - 10, { font: F.grotesk, weight: 800, size: 40, color: P.solDeep, tracking: 0.06 }); }
+      // Germany standing still: a flat ruler line + label
+      const kGs = pr(t, tGer - 0.2, tStill + 0.2); if (kGs > 0 && hG) { ctx.save(); ctx.globalAlpha = kGs; ctx.setLineDash([8, 8]); ctx.strokeStyle = '#3B3638'; ctx.lineWidth = 2; const y = S5.growXY(0, 100)[1]; ctx.beginPath(); ctx.moveTo(260, y); ctx.lineTo(1620, y); ctx.stroke(); ctx.restore(); S5.lead(ctx, 'standing still', hG[0] + 34, hG[1] + 82, t, tStill - 0.4, { size: 44, color: '#3B3638' }); }
+      ctx.restore();
+      S5.kick(ctx, 'real GDP · 2022 = 100', 150, 130, t, t0 + 0.2, { size: 22, color: P.ink2 });
+      S5.lead(ctx, 'for the past', 150, 210, t, T('past', 773.55) - 0.1, { size: 56 });
+      S5.key(ctx, '3 years', 146, 300, t, T('three', 773.87) - 0.1, { size: 86 });
+      S5.key(ctx, 'faster than any other big EU economy', 150, 380, t, T('faster', 775.43) - 0.1, { size: 40, weight: 700, color: P.ink2 });
+    },
+    post: { grade: 'neutral', vignette: 0.3 },
   });
 
   /*@@SCENES@@*/
@@ -1302,5 +1420,10 @@
     A.sfx.whoosh(752.4, { dur: 0.7, gain: 0.55, dir: 1, pitch: 0.7 }); A.sfx.chime(T('second-largest', 752.59) + 0.1, { note: 'E6', gain: 0.6 });
     A.sfx.whoosh(754.75, { dur: 0.7, gain: 0.5, dir: -1 });
     A.sfx.clock(T('takes', 758.35) - 0.5, { dur: 1.8, bpm: 240, gain: 0.5 }); A.sfx.ding(T('hours', 759.39) + 0.3, { note: 'A6', gain: 0.7 });
+    // the coin: a spinning ring that speeds up, then a clink as it lands
+    { const t0 = 760.43, tl = T('today', 764.67) + 0.05; for (let x = t0 + 0.2; x < tl; x += lerp(0.16, 0.04, (x - t0) / (tl - t0))) A.drum(x, 'tick', { vel: 0.12 + 0.12 * (x - t0) / (tl - t0), bus: 'sfx', rate: 1.6, verb: 0.05 }); A.mallet(tl, 'E7', { kind: 'bell', vel: 0.3, bus: 'sfx' }); A.mallet(tl + 0.09, 'B6', { kind: 'glock', vel: 0.2, bus: 'sfx' }); }
+    A.sfx.thud(765.55, { gain: 0.5 }); A.sfx.swell(766.6, { dur: 1.2, gain: 0.4 });
+    [['Germany', 768.67], ['France', 769.07], ['Italy', 769.71]].forEach(([w, a]) => A.sfx.pop(T(w, a), { freq: 400, gain: 0.6 })); A.sfx.chime(T('$1.7', 770.83), { note: 'C#6', gain: 0.6 });
+    A.sfx.slide(773.2, { dur: 0.5, gain: 0.8 });
   };
 })();
