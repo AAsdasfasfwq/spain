@@ -1119,6 +1119,174 @@
   };
   function pitchOK(cam) { return cam.pitch > 0.35; }
 
+  // =====================================================================================================
+  // GEOGRAPHY · 112.55 → 174.63 · "Let's start with the map" → the square peninsula → the Pyrenees wall →
+  // a world unto itself → "Africa begins at the Pyrenees" → water on three sides → elevation → the Meseta →
+  // nine months of winter, three of hell → hand-off: the standard relief map (S02 continues from it)
+  // =====================================================================================================
+  const GE = {}; S1.GE = GE;
+  const Tg = (w, a) => MG.T(w, a, 2.5);
+  GE.prI = () => GE._pr || (GE._pr = MG.kit.view('iberia'));
+  GE.base = (o = {}) => MG.cache('s01ge:base:' + (o.relief ?? 0.75) + ':' + (o.lift ?? 14), W, H, (x) => { MG.kit.iberiaMap(x, { view: 'iberia', relief: o.relief ?? 0.75, lift: o.lift ?? 14 }); });
+  GE.prS = () => GE._prs || (GE._prs = MG.kit.view('iberia', { scale: 5800 }));
+  GE.baseSmall = () => MG.cache('s01ge:baseS', W, H, (x) => { MG.kit.iberiaMap(x, { proj: GE.prS(), relief: 0.75, lift: 12 }); });
+  GE.camDraw = (ctx, img, cx, cy, z) => { ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-cx, -cy); ctx.drawImage(img, 0, 0); ctx.restore(); };
+  GE.cpt = (p, cx, cy, z) => [W / 2 + (p[0] - cx) * z, H / 2 + (p[1] - cy) * z];
+  /** the Pyrenees as a 2.5D ridge wall built along the range polyline (stacked strokes, lit from the upper-left) */
+  GE.ridge = (ctx, pts, hgt, o = {}) => { if (hgt <= 0.5) return; const n = Math.max(3, Math.ceil(hgt / 2)); ctx.save(); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    ctx.save(); ctx.filter = 'blur(6px)'; ctx.strokeStyle = 'rgba(40,20,30,0.35)'; ctx.lineWidth = (o.w || 26) * 1.4; ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0] + hgt * 0.5, p[1] + hgt * 0.3) : ctx.moveTo(p[0] + hgt * 0.5, p[1] + hgt * 0.3))); ctx.stroke(); ctx.restore();
+    for (let k = 0; k <= n; k++) { const u = k / n; ctx.strokeStyle = MG.col.mix(o.base || '#6E5A48', o.top || '#C9B49A', u); ctx.lineWidth = (o.w || 26) * (1 - u * 0.55); ctx.beginPath(); pts.forEach((p, i) => { const jag = Math.sin(i * 1.7) * hgt * 0.18 * u; i ? ctx.lineTo(p[0], p[1] - u * hgt - jag) : ctx.moveTo(p[0], p[1] - u * hgt - jag); }); ctx.stroke(); }
+    ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.lineWidth = (o.w || 26) * 0.18; ctx.beginPath(); pts.forEach((p, i) => { const jag = Math.sin(i * 1.7) * hgt * 0.18; i ? ctx.lineTo(p[0] - 1, p[1] - hgt - jag - 2) : ctx.moveTo(p[0] - 1, p[1] - hgt - jag - 2); }); ctx.stroke(); ctx.restore(); };
+  GE.ruler = (ctx, a, b, k, label, o = {}) => { if (k <= 0) return; const x = lerp(a[0], b[0], k), y = lerp(a[1], b[1], k); ctx.save(); ctx.strokeStyle = o.color || P.ink; ctx.fillStyle = o.color || P.ink; ctx.lineWidth = o.w || 3; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(x, y); ctx.stroke(); const ang = Math.atan2(b[1] - a[1], b[0] - a[0]); for (const [px, py] of [a, [x, y]]) { ctx.save(); ctx.translate(px, py); ctx.rotate(ang + Math.PI / 2); ctx.fillRect(-1.5, -12, 3, 24); ctx.restore(); } const n = 10; for (let i = 1; i < n; i++) { const u = i / n; if (u > k) break; const px = lerp(a[0], b[0], u), py = lerp(a[1], b[1], u); ctx.save(); ctx.translate(px, py); ctx.rotate(ang + Math.PI / 2); ctx.fillRect(-1, -6, 2, 12); ctx.restore(); }
+    if (k > 0.6 && label) { ctx.globalAlpha = clamp((k - 0.6) / 0.3); const mx = (a[0] + b[0]) / 2 + (o.lx || 0), my = (a[1] + b[1]) / 2 + (o.ly || -28); MG.text.draw(ctx, label, mx, my, { font: F.mono, weight: 700, size: o.size || 30, tracking: 0.08, color: o.color || P.ink, align: 'center', stroke: 'rgba(250,244,232,0.92)', strokeW: 8 }); } ctx.restore(); };
+
+  // ---- G1 · 112.55 · "Let's start with the map." → the peninsula is roughly square, cut off by mountains
+  const g1 = { map: Tg('map.', 112.53), iber: Tg('Iberian', 113.4), sq: Tg('square,', 115.7), cut: Tg('cut', 116.3), mount: Tg('mountains.', 118.3) };
+  const s01_square = { id: 's01_square', start: 112.55, end: 119.16, transIn: { type: 'zoom', dur: 0.6, amount: 2.2, from: 0.6 },
+    init() { GE.base(); this.eu = MG.cache('s01ge:eu', W, H, (x) => { const pr = MG.kit.view('europe'); MG.kit.seaBg(x); for (const f of MG.geo.world50.features) { const c = window.d3.geoCentroid(f); if (c[0] < -30 || c[0] > 50 || c[1] < 25 || c[1] > 72) continue; MG.geo.draw(x, pr, f, { fill: f.properties.name === 'Spain' ? MG.kit.map.spain : f.properties.name === 'Portugal' ? '#E6D7B8' : MG.kit.map.landOther, stroke: MG.kit.map.border, width: 0.8 }); } }); },
+    draw(ctx, t) {
+      // 1 · pull in from Europe to the peninsula (two cached map planes cross-scaled)
+      const kz = MG.prog(t, 112.6, g1.iber + 0.9, 'inOutCubic'); const prE = MG.kit.view('europe'), prI = GE.prI();
+      const pE = prE([-3.6, 40.0]); const zE = lerp(1, 6900 / 1350, kz);
+      if (kz < 1) { ctx.save(); ctx.globalAlpha = 1 - MG.smoothstep(0.6, 1, kz); GE.camDraw(ctx, this.eu, pE[0], pE[1], zE); ctx.restore(); }
+      const zI = lerp(0.42, 1, MG.smoothstep(0.6, 1, kz)) * (1 + 0.025 * MG.lin(t, g1.iber, 119.2)); if (kz > 0.6) { ctx.save(); ctx.globalAlpha = MG.smoothstep(0.6, 1, kz); GE.camDraw(ctx, GE.baseSmall(), 960, 540, zI); ctx.restore(); } const prS = GE.prS(); const SQ = (ll) => { const q = prS(ll); return [W / 2 + (q[0] - 960) * zI, H / 2 + (q[1] - 540) * zI]; };
+      // 2 · the square drawn in marker around the peninsula
+      if (t > g1.sq - 0.5) { const c = [[-9.7, 44.0], [3.5, 44.0], [3.5, 35.9], [-9.7, 35.9]].map(SQ); const pts = []; const seq = [c[0], c[1], c[2], c[3], c[0], [lerp(c[0][0], c[1][0], 0.1), c[0][1]]]; for (let i = 0; i < seq.length - 1; i++) for (let k = 0; k < 20; k++) { const u = k / 20; pts.push([lerp(seq[i][0], seq[i + 1][0], u) + MG.noise2(i * 3 + u * 4, 5) * 4, lerp(seq[i][1], seq[i + 1][1], u) + MG.noise2(i * 3 + u * 4, 9) * 4]); } S1.marker(ctx, pts, MG.prog(t, g1.sq - 0.5, g1.sq + 0.9, 'inOutSine'), { w: 10, color: P.rojo }); }
+      // 3 · mountains rise along the north (Pyrenees + Cantabrian)
+      const km = MG.prog(t, g1.cut, g1.mount + 0.6, 'inOutCubic'); for (const nm of ['Pyrenees', 'Cantabrian']) { const pts = MG.path.spline(MG.geo.ranges[nm].map(SQ), 6); GE.ridge(ctx, pts, (nm === 'Pyrenees' ? 30 : 18) * km, { w: nm === 'Pyrenees' ? 20 : 15 }); }
+      S1.key(ctx, 'Iberia', 140, 180, t, g1.iber - 0.1, { size: 96, font: F.display, weight: 800 }); if (t > g1.sq - 0.2) S1.mono(ctx, 'roughly square', 146, 230, t, g1.sq - 0.2, { color: P.rojoDeep, size: 24 });
+    }, post: { grade: 'warm', vignette: 0.32 } };
+
+  // ---- G2 · 119.16 · the Pyrenees: a barrier ≈270 miles long · for centuries barely any proper roads
+  const g2 = { north: Tg('north,', 119.6), pyr: Tg('Pyrenees', 120.2), stretch: Tg('stretching', 122.2), miles: Tg('miles.', 123.9), cent: Tg('centuries,', 125.1), roads: Tg('roads', 127.3) };
+  const s01_pyrenees = { id: 's01_pyrenees', start: 119.16, end: 128.47, transIn: { type: 'blur', dur: 0.4, amount: 12 },
+    draw(ctx, t) {
+      const prI = GE.prI(); const pyr = MG.path.spline(MG.geo.ranges.Pyrenees.map((ll) => prI(ll)), 8); const mid = MG.path.along(pyr, 0.5);
+      const z = MG.keys(t, [[119.16, 1.0], [g2.pyr + 0.6, 2.25, 'cam'], [g2.cent, 2.35, 'soft'], [128.6, 2.5, 'soft']]); const cx = lerp(960, mid[0], MG.prog(t, 119.2, g2.pyr + 0.6, 'cam')), cy = lerp(540, mid[1] + 30, MG.prog(t, 119.2, g2.pyr + 0.6, 'cam'));
+      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-cx, -cy); ctx.drawImage(GE.base(), 0, 0);
+      const hgt = 34 + 22 * MG.prog(t, g2.pyr - 0.3, g2.pyr + 0.8, 'outBack'); GE.ridge(ctx, pyr, hgt, { w: 26 });
+      // France (north) vs Spain (south) labels on either side of the wall
+      const kL = MG.prog(t, g2.pyr, g2.pyr + 0.5); ctx.globalAlpha = kL; MG.text.draw(ctx, 'FRANCE', mid[0] - 40, mid[1] - hgt - 70, { font: F.grotesk, weight: 700, size: 22, tracking: 0.25, color: P.ink2, align: 'center' }); MG.text.draw(ctx, 'SPAIN', mid[0] + 10, mid[1] + 70, { font: F.grotesk, weight: 700, size: 22, tracking: 0.25, color: P.ink2, align: 'center' }); ctx.globalAlpha = 1;
+      // the length ruler along the chain
+      const a = pyr[0], b = pyr[pyr.length - 1]; GE.ruler(ctx, [a[0], a[1] + 40], [b[0], b[1] + 40], MG.prog(t, g2.stretch - 0.3, g2.miles + 0.2, 'inOutSine'), '≈270 mi · 435 km', { size: 18, ly: 34, w: 2 });
+      // "barely any roads": three mule tracks try to cross and peter out at the wall
+      const kr = MG.prog(t, g2.cent - 0.2, g2.roads + 0.6); for (let i = 0; i < 3; i++) { const u = 0.2 + i * 0.3; const q = MG.path.along(pyr, u); const tr = [[q[0] - 10, q[1] + 90], [q[0] + 6, q[1] + 60], [q[0] - 4, q[1] + 30], [q[0] + 4, q[1] + 6]]; MG.fx.line(ctx, MG.path.spline(tr, 5), { progress: kr, color: P.rojoDeep, width: 2.2, dash: [4, 5] }); if (kr > 0.95) { ctx.strokeStyle = P.rojo; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(q[0] - 6, q[1] - 2); ctx.lineTo(q[0] + 6, q[1] + 10); ctx.moveTo(q[0] + 6, q[1] - 2); ctx.lineTo(q[0] - 6, q[1] + 10); ctx.stroke(); } }
+      ctx.restore();
+      S1.key(ctx, 'the Pyrenees', 140, 180, t, g2.pyr - 0.15, { size: 96, font: F.display, weight: 800 });
+      if (t > g2.cent - 0.3) S1.lead(ctx, 'barely any roads', 146, 260, t, g2.roads - 0.6, { size: 52 });
+    }, post: { grade: 'warm', vignette: 0.34 } };
+
+  // ---- G3 · 128.47 · "a world unto itself" — the peninsula floats off Europe like an island · the French saying
+  const g3 = { world: Tg('world', 131.6), itself: Tg('itself.', 132.6), french: Tg('French', 133.6), saying: Tg('saying:', 134.6), africa: Tg('“Africa', 135.12) || 135.12, begins: Tg('begins', 135.9) };
+  const s01_island = { id: 's01_island', start: 128.47, end: 137.76, transIn: { type: 'blur', dur: 0.5, amount: 14 },
+    init() { const pr = MG.kit.view('iberiaWide'); this.pr = pr; this.sea = MG.cache('s01ge:wsea', W, H, (x) => MG.kit.seaBg(x)); this.rest = MG.cache('s01ge:rest', W, H, (x) => { for (const n of ['France', 'Andorra', 'Italy', 'Switzerland', 'Belgium', 'Germany', 'United Kingdom', 'Morocco', 'Algeria', 'Tunisia', 'W. Sahara', 'Mauritania']) { const f = MG.geo.country(n, '10'); if (f) MG.geo.draw(x, pr, f, { fill: MG.kit.map.landOther, stroke: MG.kit.map.border, width: 1 }); } }); this.pen = MG.cache('s01ge:pen', W, H, (x) => { const pt = MG.geo.country('Portugal', '10'); MG.geo.draw(x, pr, pt, { fill: '#E6D7B8', stroke: MG.kit.map.border, width: 1 }); const es = MG.geo.country('Spain', '10'); MG.geo.draw(x, pr, es, { fill: MG.kit.map.spain, stroke: MG.kit.map.coast, width: 1.3 }); x.save(); MG.geo.clip(x, pr, es); x.globalAlpha = 0.7; x.globalCompositeOperation = 'multiply'; MG.geo.relief(x, pr, {}); x.restore(); }); },
+    draw(ctx, t) {
+      const pr = this.pr; ctx.drawImage(this.sea, 0, 0); const kd = MG.prog(t, 129.2, g3.itself + 0.4, 'inOutCubic') * (1 - MG.prog(t, g3.africa - 0.6, g3.africa + 0.3, 'inOutCubic') * 0.5);
+      // the rest of the continent drifts away and fogs out; the peninsula lifts, casting a shadow on the sea
+      ctx.save(); ctx.globalAlpha = 1 - 0.55 * kd; ctx.translate(kd * 60, -kd * 50); ctx.drawImage(this.rest, 0, 0); ctx.restore();
+      const lift = 26 * kd; ctx.save(); ctx.filter = `blur(${(6 + lift * 0.5).toFixed(1)}px)`; ctx.globalAlpha = 0.35 * kd; ctx.translate(lift * 0.6, lift * 1.2); ctx.globalCompositeOperation = 'multiply'; ctx.drawImage(this.pen, 0, 0); ctx.restore();
+      ctx.save(); ctx.translate(0, -lift); ctx.drawImage(this.pen, 0, 0); const pyr = MG.path.spline(MG.geo.ranges.Pyrenees.map((ll) => pr(ll)), 8); GE.ridge(ctx, pyr, 30, { w: 20 }); ctx.restore();
+      // "Africa begins at the Pyrenees" written along the ridge
+      const kq = MG.prog(t, g3.africa - 0.2, g3.begins + 1.4, 'linear'); if (kq > 0) { MG.fx.glow(ctx, pyr[Math.floor(pyr.length / 2)][0], pyr[Math.floor(pyr.length / 2)][1] - lift - 20, 220, '#FFE2A8', 0.35 * kq); }
+      if (kq > 0) { ctx.save(); ctx.globalAlpha = MG.prog(t, g3.africa - 0.2, g3.africa + 0.4); MG.text.draw(ctx, '“Africa begins', 1180, 760, { font: F.old, italic: true, size: 84, color: P.ink, align: 'center', stroke: 'rgba(250,244,232,0.8)', strokeW: 10 }); MG.text.draw(ctx, 'at the Pyrenees”', 1180, 850, { font: F.old, italic: true, size: 84, color: P.ink, align: 'center', stroke: 'rgba(250,244,232,0.8)', strokeW: 10 }); MG.text.draw(ctx, 'AN OLD FRENCH SAYING', 1180, 900, { font: F.mono, weight: 700, size: 20, tracking: 0.25, color: P.rojoDeep, align: 'center' }); ctx.restore(); }
+      if (t > g3.world - 0.4) S1.lead(ctx, 'a world unto itself', 140, 980, t, g3.world - 0.4, { size: 66, out: { at: g3.french - 0.2, style: 'fade', dur: 0.4 } });
+    }, post: { grade: 'warm', vignette: 0.34 } };
+
+  // ---- G4 · 137.76 · water on three sides: the Atlantic, the Mediterranean, and a strait only 9 miles wide
+  const g4 = { three: Tg('three', 138.4), water: Tg('water:', 139.6), atl: Tg('Atlantic,', 140.6), med: Tg('Mediterranean,', 141.6), strait: Tg('strait', 143.6), nine: Tg('nine', 144.2), afr: Tg('Africa.', 146.3) };
+  const s01_water = { id: 's01_water', start: 137.76, end: 147.16, transIn: { type: 'zoom', dur: 0.5, amount: 1.3, from: 0.88 },
+    draw(ctx, t) {
+      const prI = GE.prI(); const tar = prI([-5.6, 36.01]), cir = prI([-5.48, 35.91]); const mid = [(tar[0] + cir[0]) / 2, (tar[1] + cir[1]) / 2];
+      const kz = MG.prog(t, g4.strait - 0.6, g4.nine + 0.6, 'cam'); const z = lerp(1.0, 3.6, kz); const cx = clamp(lerp(960, mid[0], kz), 960 / z, W - 960 / z), cy = clamp(lerp(540, mid[1], kz), 540 / z, H - 540 / z);
+      ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(z, z); ctx.translate(-cx, -cy); ctx.drawImage(GE.base(), 0, 0);
+      // water glows on three sides (animated shoreline ripple ring)
+      const kw = MG.prog(t, g4.three - 0.2, g4.water + 0.4); if (kw > 0) { ctx.save(); ctx.globalAlpha = kw * (1 - kz); for (let r = 0; r < 3; r++) { const u = MG.fract(t * 0.35 + r / 3); ctx.strokeStyle = `rgba(255,255,255,${0.5 * (1 - u)})`; ctx.lineWidth = 3 / z; const es = MG.geo.country('Spain', '10'); ctx.save(); ctx.translate(960, 540); ctx.scale(1 + u * 0.06, 1 + u * 0.06); ctx.translate(-960, -540); MG.geo.draw(ctx, prI, es, { stroke: `rgba(255,255,255,${0.5 * (1 - u)})`, width: 2.5 }); ctx.restore(); } ctx.restore(); }
+      // sea names written on the water in perspective-ish italic caps
+      ctx.save(); ctx.globalAlpha = (1 - kz); const atl = prI([-11.4, 41.0]), med = prI([2.0, 38.0]);
+      if (t > g4.atl - 0.1) { ctx.save(); ctx.translate(atl[0], atl[1]); ctx.rotate(-1.35); MG.text.reveal(ctx, 'ATLANTIC', 0, 0, t, g4.atl - 0.1, { font: F.display, italic: true, weight: 600, size: 58, tracking: 0.35, color: 'rgba(31,78,140,0.75)', align: 'center', style: 'track', by: 'line' }); ctx.restore(); }
+      if (t > g4.med - 0.1) { ctx.save(); ctx.translate(med[0], med[1]); ctx.rotate(-0.25); MG.text.reveal(ctx, 'MEDITERRANEAN', 0, 0, t, g4.med - 0.1, { font: F.display, italic: true, weight: 600, size: 52, tracking: 0.3, color: 'rgba(31,78,140,0.75)', align: 'center', style: 'track', by: 'line' }); ctx.restore(); }
+      ctx.restore();
+      // the strait ruler (Tarifa ↔ Point Cires)
+      GE.ruler(ctx, tar, cir, MG.prog(t, g4.nine - 0.2, g4.nine + 0.7, 'inOutSine'), null, { w: 0.9, color: P.rojoDeep }); this._lab = [W / 2 + (mid[0] - cx) * z, H / 2 + (mid[1] - cy) * z];
+      if (kz > 0.8) { ctx.globalAlpha = MG.prog(t, g4.nine, g4.nine + 0.6); MG.text.draw(ctx, 'SPAIN', tar[0] - 18, tar[1] - 14, { font: F.grotesk, weight: 800, size: 9, tracking: 0.2, color: P.ink }); MG.text.draw(ctx, 'AFRICA', cir[0] + 4, cir[1] + 18, { font: F.grotesk, weight: 800, size: 9, tracking: 0.2, color: P.ink }); ctx.globalAlpha = 1; }
+      ctx.restore();
+      if (this._lab && t > g4.nine) { const k = MG.prog(t, g4.nine + 0.3, g4.nine + 0.8); MG.text.draw(ctx, '9 mi · 14 km', this._lab[0] - 40, this._lab[1] - 40, { font: F.mono, weight: 700, size: 40, color: P.rojoDeep, align: 'right', alpha: k, stroke: 'rgba(250,244,232,0.92)', strokeW: 10 }); }
+      if (t > g4.three - 0.2) S1.mono(ctx, 'water on three sides', 140, 150, t, g4.three - 0.2, { size: 26, color: P.ink, out: { at: g4.strait - 0.5, style: 'fade', dur: 0.4 } });
+      if (t > g4.strait - 0.2) S1.key(ctx, 'the Strait', 140, 190, t, g4.strait - 0.2, { size: 90, font: F.display, weight: 800 });
+    }, post: { grade: 'warm', vignette: 0.32 } };
+
+  // ---- G5 · 147.16 · elevation: the map becomes stacked paper relief; Spain #2 in Europe after Switzerland; ≈2,200 ft
+  const g5 = { look: Tg('look', 147.5), elev: Tg('elevation', 148.3), second: Tg('second-highest', 150.1), swiss: Tg('Switzerland:', 152.9), feet: Tg('2,200', 154.2), sea: Tg('sea', 155.9) };
+  const s01_elev = { id: 's01_elev', start: 147.16, end: 157.16, transIn: { type: 'blur', dur: 0.45, amount: 12 },
+    init() { MG.geo.reliefBands([0.12, 0.27, 0.42, 0.57, 0.72]); },
+    draw(ctx, t) {
+      const prI = GE.prI(); const es = MG.geo.country('Spain', '10'); const bands = MG.geo.reliefBands([0.12, 0.27, 0.42, 0.57, 0.72]);
+      const kb = MG.prog(t, g5.elev - 0.3, g5.elev + 1.6, 'inOutSine'); const tilt = MG.prog(t, g5.second - 0.4, g5.second + 0.8, 'inOutCubic') * (1 - MG.prog(t, g5.feet - 0.4, g5.feet + 0.4, 'inOutCubic'));
+      MG.kit.seaBg(ctx);
+      ctx.save(); ctx.translate(960, 560); ctx.scale(1 - 0.12 * tilt, 1 - 0.32 * tilt); ctx.translate(-960, -560);
+      for (const n of ['France', 'Portugal', 'Morocco', 'Algeria', 'Andorra']) { const f = MG.geo.country(n, '10'); if (f) MG.geo.draw(ctx, prI, f, { fill: MG.kit.map.landOther, stroke: MG.kit.map.border, width: 1 }); }
+      MG.geo.slab(ctx, prI, es, { depth: 14, top: '#9DAA6A', side: '#5A5A3A', shadow: true, edge: false });
+      ctx.save(); MG.geo.clip(ctx, prI, es); const cols = ['#B9B878', '#D8C88E', '#D6A86A', '#B9784A', '#8E4E34'];
+      bands.forEach((b, i) => { const k = MG.ease.outCubic(clamp(kb * 5 - i * 0.85)); if (k <= 0) return; const dy = -(i + 1) * (5 + 10 * tilt) * k; ctx.save(); ctx.translate(0, dy); ctx.shadowColor = 'rgba(40,24,14,0.4)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 5 + 4 * tilt; MG.geo.draw(ctx, prI, b, { fill: cols[i], alpha: k }); ctx.restore(); });
+      ctx.restore(); ctx.restore();
+      // the European podium of average elevation (only the claim spoken: CH #1, ES #2)
+      const kp = MG.prog(t, g5.second - 0.2, g5.swiss + 0.6, 'inOutCubic') * (1 - MG.prog(t, g5.feet - 0.4, g5.feet + 0.2)); if (kp > 0) { ctx.save(); ctx.globalAlpha = kp; ctx.translate(1440, 860); const bars = [['SWITZERLAND', 1.0, '#C8322B'], ['SPAIN', 0.55, P.sol]]; bars.forEach(([n, v, c], i) => { const hgt = 380 * v * MG.ease.outCubic(clamp(kp * 1.4 - i * 0.2)); const x = i * 220; const peak = new Path2D(); peak.moveTo(x - 90, 0); peak.lineTo(x - 30, -hgt * 0.7); peak.lineTo(x, -hgt); peak.lineTo(x + 40, -hgt * 0.8); peak.lineTo(x + 90, 0); peak.closePath(); MG.fx.volume(ctx, peak, [x - 90, -hgt, 180, hgt], { color: c, shade: 0.5, hi: 0.3, cel: true, outline: P.ink, outlineW: 2.5 }); MG.text.draw(ctx, `#${i + 1}`, x, -hgt - 20, { font: F.cond, weight: 900, size: 64, color: P.ink, align: 'center' }); MG.text.draw(ctx, n, x, 40, { font: F.mono, weight: 700, size: 20, tracking: 0.16, color: P.ink, align: 'center' }); }); ctx.restore(); }
+      // ≈2,200 ft — a sea-level datum and a vertical gauge
+      const kf = MG.prog(t, g5.feet - 0.3, g5.sea + 0.5, 'inOutCubic'); if (kf > 0) { ctx.save(); ctx.globalAlpha = kf; ctx.strokeStyle = P.azulejo; ctx.lineWidth = 3; ctx.setLineDash([10, 8]); ctx.beginPath(); ctx.moveTo(120, 900); ctx.lineTo(1800, 900); ctx.stroke(); ctx.setLineDash([]); MG.text.draw(ctx, 'SEA LEVEL', 130, 935, { font: F.mono, weight: 700, size: 20, tracking: 0.2, color: P.azulejo }); ctx.fillStyle = P.ink; const gh = 300 * kf; ctx.fillRect(1420, 900 - gh, 6, gh); for (let i = 0; i <= 10; i++) ctx.fillRect(1410, 900 - gh * i / 10, 26, 2); MG.text.draw(ctx, '≈2,200 ft', 1460, 900 - gh + 10, { font: F.cond, weight: 900, size: 84, color: P.ink }); MG.text.draw(ctx, '≈670 m · average', 1464, 900 - gh + 52, { font: F.mono, size: 20, tracking: 0.14, color: P.ink2 }); ctx.restore(); }
+      S1.key(ctx, 'elevation', 140, 180, t, g5.elev - 0.2, { size: 96, font: F.display, weight: 800 });
+    }, post: { grade: 'warm', vignette: 0.32 } };
+
+  // ---- G6 · 157.16 · "Why?" — slice the country north→south: the Meseta plateau (2,000–2,600 ft) in cross-section
+  const g6 = { why: Tg('Why?', 157.16), mid: Tg('middle', 158.9), meseta: Tg('Meseta,', 160.5), plateau: Tg('plateau', 161.7), ft: Tg('2,000', 163.3) };
+  const s01_meseta = { id: 's01_meseta', start: 157.16, end: 166.76, transIn: { type: 'zoom', dur: 0.45, amount: 1.3, from: 0.9 },
+    init() { const K = [[0, 0], [0.04, 300], [0.09, 1650], [0.13, 1100], [0.18, 880], [0.26, 850], [0.33, 820], [0.38, 1250], [0.41, 1900], [0.44, 1300], [0.47, 660], [0.53, 640], [0.6, 680], [0.66, 700], [0.7, 780], [0.74, 950], [0.77, 600], [0.8, 160], [0.84, 120], [0.88, 900], [0.92, 1500], [0.95, 900], [0.98, 200], [1, 0]]; this.prof = []; for (let i = 0; i <= 240; i++) { const u = i / 240; let j = 1; while (K[j][0] < u) j++; const a = K[j - 1], b = K[j]; const f = (u - a[0]) / (b[0] - a[0]); const e = lerp(a[1], b[1], MG.ease.inOutSine(f)) + MG.noise2(u * 40, 3) * 25 * (a[1] > 500 ? 1 : 0.2); this.prof.push(Math.max(0, e) / 2200); } },
+    draw(ctx, t) {
+      const prI = GE.prI(); const kc = MG.prog(t, g6.mid - 0.4, g6.mid + 0.8, 'inOutCubic');
+      // map with the slicing line, then it lifts into a cross-section
+      ctx.save(); ctx.globalAlpha = 1 - kc * 0.9; ctx.drawImage(GE.base(), 0, 0); const a = prI([-3.8, 43.45]), b = prI([-4.42, 36.72]); S1.marker(ctx, S1.handLine([a, b], 4, 2), MG.prog(t, 157.3, 158.4, 'inOutSine'), { w: 7, color: P.rojo }); MG.text.draw(ctx, 'SANTANDER', a[0] + 16, a[1] - 6, { font: F.mono, weight: 700, size: 18, tracking: 0.12, color: P.ink }); MG.text.draw(ctx, 'MÁLAGA', b[0] + 16, b[1] + 6, { font: F.mono, weight: 700, size: 18, tracking: 0.12, color: P.ink }); ctx.restore();
+      if (kc > 0) { ctx.save(); ctx.globalAlpha = kc; MG.fx.vgrad(ctx, [[0, '#F4E3C2'], [1, '#E8D2A8']]);
+        const x0 = 160, x1 = 1760, y0 = 860, hs = 520 * kc; const P0 = (i) => [lerp(x0, x1, i / 240), y0 - this.prof[i] * hs];
+        const land = new Path2D(); land.moveTo(x0, y0 + 120); for (let i = 0; i <= 240; i++) { const p = P0(i); land.lineTo(p[0], p[1]); } land.lineTo(x1, y0 + 120); land.closePath();
+        MG.fx.volume(ctx, land, [x0, y0 - hs, x1 - x0, hs + 120], { color: '#C8A46A', shade: 0.35, hi: 0.3, tex: 'blotch', texAlpha: 0.25, texColor: '#5a3a20', light: [-0.4, -0.9] });
+        ctx.save(); ctx.clip(land); for (let k = 0; k < 6; k++) { ctx.strokeStyle = `rgba(90,60,30,${0.12 + k * 0.03})`; ctx.lineWidth = 2; ctx.beginPath(); for (let i = 0; i <= 240; i++) { const p = P0(i); ctx.lineTo(p[0], p[1] + 30 + k * 26); } ctx.stroke(); } ctx.restore();
+        ctx.fillStyle = MG.col.a(P.sea, 0.85); ctx.fillRect(0, y0, x0 + 4, 140); ctx.fillRect(x1 - 4, y0, W - x1 + 4, 140); ctx.strokeStyle = P.azulejo; ctx.lineWidth = 2; ctx.setLineDash([8, 6]); ctx.beginPath(); ctx.moveTo(0, y0); ctx.lineTo(W, y0); ctx.stroke(); ctx.setLineDash([]);
+        // the Meseta band (2,000–2,600 ft) — normalised height ≈ 0.25–0.33 in this raster's scale
+        const kb = MG.prog(t, g6.ft - 0.3, g6.ft + 0.8); if (kb > 0) { const ya = y0 - (610 / 2200) * hs, yb = y0 - (790 / 2200) * hs; ctx.fillStyle = MG.col.a(P.sol, 0.32 * kb); ctx.fillRect(x0 + 260, yb, 1000, ya - yb); ctx.strokeStyle = MG.col.a(P.solDeep, kb); ctx.lineWidth = 2; ctx.strokeRect(x0 + 260, yb, 1000, ya - yb); MG.text.draw(ctx, '2,000–2,600 ft', x0 + 250, yb - 12, { font: F.mono, weight: 700, size: 24, color: P.solDeep, alpha: kb, align: 'right' }); }
+        MG.text.draw(ctx, 'N', x0 - 20, y0 + 50, { font: F.mono, weight: 700, size: 22, color: P.ink2, align: 'center' }); MG.text.draw(ctx, 'S', x1 + 20, y0 + 50, { font: F.mono, weight: 700, size: 22, color: P.ink2, align: 'center' });
+        const lab = (s2, u, el, dy = -24) => MG.text.draw(ctx, s2, lerp(x0, x1, u), y0 - (el / 2200) * hs + dy, { font: F.mono, weight: 700, size: 20, tracking: 0.1, color: P.ink, align: 'center', stroke: 'rgba(244,227,194,0.9)', strokeW: 6 }); lab('CANTABRIAN MTS', 0.09, 1650); lab('SIERRA DE GUADARRAMA', 0.41, 1900); lab('MADRID', 0.5, 650, 40); lab('SIERRA MORENA', 0.74, 950); lab('GUADALQUIVIR', 0.82, 140, -30); lab('BAETIC MTS', 0.92, 1500);
+        ctx.restore(); }
+      if (t > g6.meseta - 0.2) MG.text.reveal(ctx, 'the Meseta', 960, 200, t, g6.meseta - 0.2, { font: F.display, weight: 800, size: 120, color: P.ink, align: 'center', style: 'rise' });
+      if (t > g6.plateau - 0.2) S1.mono(ctx, 'a vast plateau', 960, 256, t, g6.plateau - 0.2, { align: 'center', color: P.rojoDeep, size: 24 });
+      if (t < g6.mid) MG.text.reveal(ctx, 'Why?', 960, 160, t, g6.why - 0.05, { font: F.display, italic: true, weight: 900, size: 120, color: P.ink, align: 'center', style: 'scale' });
+    }, post: { grade: 'warm', vignette: 0.32 } };
+
+  // ---- G7 · 166.76 · dry · hot summers, cold winters · "nine months of winter and three months of hell" (the plain through a year) → hand-off map
+  const g7 = { dry: Tg('Dry,', 166.76), hot: Tg('hot', 167.5), cold: Tg('cold', 168.4), nine: Tg('nine', 171.11), winter: Tg('winter', 172.0), three: Tg('three', 172.6), hell: Tg('hell.', 173.5) };
+  const s01_climate = { id: 's01_climate', start: 166.76, end: 173.95, transIn: { type: 'blur', dur: 0.45 },
+    draw(ctx, t) {
+      // season state: 0 = winter (blue frost), 1 = summer hell (white heat)
+      const sea = MG.keys(t, [[166.76, 0.5], [g7.hot, 1, 'inOutSine'], [g7.cold, 0, 'inOutSine'], [g7.nine, 0], [g7.three + 0.2, 0], [g7.hell + 0.2, 1, 'inOutCubic'], [174, 1]]);
+      MG.fx.vgrad(ctx, [[0, MG.col.mix('#9DB2C8', '#F6E8C4', sea)], [0.62, MG.col.mix('#C9D3DE', '#F8D9A0', sea)], [1, MG.col.mix('#C9D3DE', '#F8D9A0', sea)]]);
+      MG.kit.sun(ctx, 1500, lerp(330, 190, sea), lerp(50, 110, sea), t, { color: MG.col.mix('#E9E2C8', P.sol, sea), deep: MG.col.mix('#B8B0A0', P.solDeep, sea), rays: sea, corona: sea });
+      // the plain (ochre fields, a lone holm oak, a farmhouse) — frost vs scorched
+      ctx.fillStyle = MG.col.mix('#A9A592', '#D9B477', sea); ctx.beginPath(); ctx.moveTo(0, 640); for (let x = 0; x <= W; x += 60) ctx.lineTo(x, 640 + Math.sin(x * 0.004) * 14); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.fill();
+      ctx.strokeStyle = MG.col.a(MG.col.mix('#7A7A70', '#B98A4A', sea), 0.5); ctx.lineWidth = 2; for (let i = 0; i < 14; i++) { const y = 660 + Math.pow(i / 14, 1.7) * 420; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y + 6); ctx.stroke(); }
+      ctx.fillStyle = MG.col.mix('#E6E6E0', '#F4EFE6', sea); ctx.fillRect(330, 560, 160, 100); ctx.fillStyle = '#9C5A3A'; ctx.beginPath(); ctx.moveTo(316, 566); ctx.lineTo(410, 520); ctx.lineTo(504, 566); ctx.fill();
+      ctx.fillStyle = '#4A3A2A'; ctx.fillRect(1196, 520, 18, 150); ctx.fillStyle = MG.col.mix('#5A6450', '#6F7A3A', sea); ctx.beginPath(); ctx.ellipse(1205, 500, 140, 70, 0, 0, TAU); ctx.fill(); MG.fx.contact(ctx, 1220 + sea * 40, 676, 160, 18, 0.35);
+      if (sea < 0.5) { MG.fx.particles(ctx, { n: 90, seed: 7, t, area: [0, -60, W, H], vel: [-20, 70], velJitter: 0.4, life: 8, size: [1.5, 3.4], color: '#FFFFFF', alpha: 0.85 * (1 - sea * 2), drift: 30 }); ctx.save(); ctx.globalAlpha = 0.35 * (1 - sea * 2); ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 640, W, 20); ctx.restore(); }
+      if (sea > 0.5) { const hz = MG.scratch(3); const x = hz.getContext('2d'); x.setTransform(1, 0, 0, 1, 0, 0); x.globalCompositeOperation = 'copy'; x.drawImage(ctx.canvas, 0, 0); x.globalCompositeOperation = 'source-over'; ctx.save(); ctx.globalAlpha = (sea - 0.5) * 1.4; for (let y = 420; y < 720; y += 6) { const dx = Math.sin(y * 0.09 + t * 9) * 5 * (sea - 0.5); ctx.drawImage(hz, 0, y, W, 6, dx, y, W, 6); } ctx.restore(); }
+      // the year strip: 12 months — 9 blue (winter) then 3 red (hell)
+      const kk = MG.prog(t, g7.nine - 0.3, g7.hell + 0.3, 'linear'); if (kk > 0) { for (let m = 0; m < 12; m++) { const on = clamp(kk * 13 - m); if (on <= 0) continue; const x = 360 + m * 100, y = 900; const hell = m >= 9; ctx.save(); ctx.translate(x, y); ctx.scale(on, on); ctx.fillStyle = hell ? P.rojo : '#5A7FA8'; ctx.beginPath(); ctx.roundRect(-40, -40, 80, 80, 10); ctx.fill(); MG.text.draw(ctx, 'JFMAMJJASOND'[(m + 9) % 12], 0, 14, { font: F.mono, weight: 700, size: 30, color: '#F4EFE6', align: 'center' }); ctx.restore(); } }
+      if (t > g7.nine - 0.2 && t < g7.three) S1.key(ctx, '9 months of winter', 140, 200, t, g7.nine - 0.2, { size: 80, font: F.display, weight: 800, color: '#1F3A5A' });
+      if (t > g7.three - 0.2) S1.key(ctx, '3 months of hell', 140, 200, t, g7.three - 0.2, { size: 80, font: F.heat, weight: 400, color: P.rojoDeep });
+      if (t < g7.nine) { S1.mono(ctx, 'dry', 140, 160, t, g7.dry - 0.1, { size: 26 }); S1.mono(ctx, 'hot summers', 140, 200, t, g7.hot - 0.1, { size: 26, color: P.rojoDeep }); S1.mono(ctx, 'cold winters', 140, 240, t, g7.cold - 0.1, { size: 26, color: '#1F3A5A' }); }
+    }, post: (t) => ({ grade: t > g7.three ? 'heat' : 'warm', vignette: 0.32 }) };
+
+  // ---- G8 · 173.95 → 174.63 (+1.2) · hand-off: the standard relief map, Meseta breathing in the light (S02 continues from this exact frame)
+  const s01_handoff = { id: 's01_handoff', start: 173.95, end: 174.63, transIn: { type: 'zoom', dur: 0.6, amount: 0.6, from: 1.25 },
+    draw(ctx, t) { MG.kit.iberiaMap(ctx, { view: 'iberia', relief: 0.75, lift: 14 }); const k = 1 - MG.prog(t, 174.2, 174.6); if (k > 0) { const c = GE.prI()([-3.7, 40.0]); MG.fx.glow(ctx, c[0], c[1], 300, '#FFE9B0', 0.22 * k); } },
+    post: { grade: 'neutral' } };
+
   // ---------------------------------------------------------------- SEGMENT
   const scenes = [
     S1.boardScene,
@@ -1129,8 +1297,7 @@
     S1.birthScene, S1.provScene,
     S1.rentScene, S1.govScene,
     S1.titleScene,
-    { id: 's01_todo5', start: 112.55, end: 113.2, draw: S1.todo('zoom to map') },
-    { id: 's01_todo6', start: 113.2, end: 174.63, draw: S1.todo('the peninsula') },
+    s01_square, s01_pyrenees, s01_island, s01_water, s01_elev, s01_meseta, s01_climate, s01_handoff,
   ];
 
   MG.segment('S01', {
@@ -1144,6 +1311,37 @@
       A.sfx.paper(tQ.rome, { gain: 0.8 }); A.sfx.paper(tQ.venice, { gain: 0.7 }); A.sfx.swish(tQ.not + 0.05, { gain: 0.8 }); A.sfx.swish(tQ.not + 0.3, { gain: 0.6 });
       A.sfx.swish(tQ.wrong, { gain: 0.9 }); A.sfx.swish(tQ.again, { gain: 0.9 }); A.pizz(tQ.again, 'D2', { vel: 0.7 }); A.pizz(tQ.again + 0.13, 'C#2', { vel: 0.6 });
       A.sfx.whoosh(15.5, { dur: 0.8, gain: 0.9 });
+      // ---- 15.5–34 the 49M / 97M reveal → "Spain." hit → the money
+      A.music('mystery', 15.6, 25.6, { key: 'E3', bpm: 100, intensity: [[15.6, 0.5], [22, 0.75], [25.2, 0.9]], fadeIn: 0.5, fadeOut: 0.4 });
+      A.sfx.riser(25.28, { dur: 2.2, gain: 0.6 }); A.sfx.tonal(25.3, ['E2', 'B2', 'E3', 'G#3'], { gain: 0.6 }); A.sfx.boom(25.3, { gain: 0.45 });
+      A.music('flamenco', 25.2, 34.6, { key: 'E3', bpm: 112, intensity: [[25.2, 0.75], [30, 0.6], [34.3, 0.4]], fadeIn: 0.2, fadeOut: 1.2 });
+      for (let i = 0; i < 8; i++) A.sfx.tick(16.6 + i * 0.5, { gain: 0.5 }); A.sfx.register(28.0, { gain: 0.6 }); A.sfx.amb('wind', 30.8, 3.0, { gain: 0.4 });
+      // ---- 34–46 the empire on which the sun never set
+      A.music('epic', 33.8, 46.9, { key: 'D3', bpm: 92, intensity: [[33.8, 0.45], [38, 0.7], [44, 0.8], [46.6, 0.5]], fadeIn: 1.0, fadeOut: 1.0 });
+      A.sfx.whoosh(34.0, { dur: 0.8, gain: 0.7 }); A.sfx.paper(34.1, { dur: 0.6, gain: 0.8 });
+      // ---- 46.5–60.3 language · the man who dresses half the planet
+      A.music('hopeful', 46.2, 60.7, { key: 'G3', bpm: 96, intensity: [[46.2, 0.45], [52, 0.6], [60.3, 0.55]], fadeIn: 0.8, fadeOut: 0.8 });
+      A.sfx.pop(46.6, { gain: 0.6 }); A.sfx.chime(51.6, { note: 'G5', gain: 0.6 }); for (let i = 0; i < 6; i++) A.sfx.swish(54.6 + i * 0.4, { gain: 0.4 });
+      // ---- 60.3–72.2 rail · life expectancy · the trophies
+      A.music('triumph', 60.1, 72.4, { key: 'C3', bpm: 120, intensity: [[60.1, 0.55], [65, 0.65], [68.4, 0.8], [72.1, 0.5]], fadeIn: 0.4, fadeOut: 0.6 });
+      A.sfx.train(60.4, 4.4, { gain: 0.6 }); A.sfx.whoosh(65.05, { dur: 0.5, gain: 0.6 }); A.sfx.cheer(68.4, { dur: 3.6, gain: 0.5 });
+      // ---- 72.2–103 "is everything really that sunny?" — the price
+      A.sfx.downlifter(72.2, { dur: 1.8, gain: 0.7 }); A.sfx.sub(72.4, { gain: 0.5 });
+      A.music('tension', 72.6, 103.6, { key: 'C3', bpm: 100, intensity: [[72.6, 0.3], [78, 0.45], [86, 0.55], [94, 0.65], [98.2, 0.8], [103.4, 0.6]], fadeIn: 1.2, fadeOut: 1.0 });
+      A.sfx.amb('crowd', 72.2, 9.5, { gain: 0.35 }); A.sfx.amb('wind', 84.7, 7.4, { gain: 0.5 }); A.sfx.creak(89.0, { gain: 0.6 }); A.sfx.slide(92.2, { gain: 0.8 }); A.sfx.impact(98.4, { size: 0.5, gain: 0.5 });
+      // ---- 103–112.6 the question & the title
+      A.music('epic', 103.0, 113.2, { key: 'D3', bpm: 84, intensity: [[103, 0.6], [107, 0.8], [110.8, 0.95], [113, 0.5]], fadeIn: 0.6, fadeOut: 1.0 });
+      A.sfx.swell(105.9, { dur: 1.5, gain: 0.6 }); A.sfx.boom(110.85, { gain: 0.55 }); A.sfx.tonal(110.9, ['D2', 'A2', 'D3', 'F3'], { gain: 0.5 });
+      // ---- 112.5–147 the map: the peninsula, the Pyrenees, the water
+      A.sfx.whoosh(112.7, { dur: 0.9, gain: 0.8 });
+      A.music('ambient', 112.8, 147.6, { key: 'D3', bpm: 72, intensity: [[112.8, 0.45], [119, 0.6], [128, 0.55], [135, 0.65], [140, 0.6], [147.2, 0.45]], fadeIn: 1.2, fadeOut: 1.4 });
+      A.sfx.thud(117.0, { gain: 0.4 }); A.sfx.thud(117.6, { gain: 0.35 }); A.sfx.sub(120.6, { gain: 0.4 }); for (let i = 0; i < 10; i++) A.sfx.tick(122.4 + i * 0.16, { gain: 0.4 }); A.sfx.amb('wind', 124.5, 4.0, { gain: 0.6 });
+      A.sfx.swell(131.0, { dur: 1.6, gain: 0.5 }); A.sfx.paper(135.2, { dur: 1.2, gain: 0.6 }); A.sfx.amb('sea', 137.8, 9.4, { gain: 0.9 }); A.sfx.whoosh(144.0, { dur: 0.9, gain: 0.6 }); for (let i = 0; i < 10; i++) A.sfx.tick(144.4 + i * 0.07, { gain: 0.35 });
+      // ---- 147–174.6 elevation · the Meseta · nine months of winter, three of hell
+      A.music('warm', 147.0, 166.9, { key: 'C3', bpm: 84, intensity: [[147, 0.4], [150, 0.55], [157.2, 0.4], [160.5, 0.6], [166.6, 0.5]], fadeIn: 1.0, fadeOut: 1.2 });
+      for (let i = 0; i < 5; i++) A.sfx.thud(148.6 + i * 0.32, { gain: 0.3 }); A.sfx.chime(150.6, { note: 'E5', gain: 0.5 }); A.sfx.tick(154.2, { gain: 0.6 }); A.sfx.pop(157.2, { freq: 640, gain: 0.6 }); A.sfx.slide(158.9, { dur: 0.6, gain: 0.8 });
+      A.sfx.amb('wind', 166.7, 5.2, { gain: 0.8 }); A.music('heat', 166.4, 176.1, { key: 'E2', bpm: 70, intensity: [[166.4, 0.35], [171, 0.4], [172.6, 0.7], [174.6, 0.5]], fadeIn: 0.8, fadeOut: 1.5 });
+      for (let i = 0; i < 9; i++) A.sfx.tock(171.2 + i * 0.13, { gain: 0.45 }); A.sfx.sizzle(172.6, 2.2, { gain: 0.9 }); A.sfx.amb('cicadas', 172.5, 3.4, { gain: 0.6 });
     },
   });
 })();
